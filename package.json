@@ -25,6 +25,8 @@
   "files": [
     "node_modules",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "lib",
+    "bin"
   ]
 }
