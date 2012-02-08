@@ -1,0 +1,2 @@
+npm install -g jake jshint@0.5.2 csslint uglify-js
+npm install
