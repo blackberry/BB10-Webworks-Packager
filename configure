@@ -1,2 +1,4 @@
 npm install -g jake jshint@0.5.2 csslint uglify-js
+git submodule update --init
+npm install Framework/
 npm install
