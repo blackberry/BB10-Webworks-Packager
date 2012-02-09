@@ -3,10 +3,10 @@ var srcPath = __dirname + "/../../../lib/",
     fs = require("fs"),
     wrench = require("wrench"),
     logger = require(srcPath + "logger"),
-    files = require(srcPath + "files"),
-    bar_conf = require(srcPath + "bar_conf");
+    fileMgr = require(srcPath + "file-manager"),
+    barConf = require(srcPath + "bar-conf");
 
-describe("Files", function () {
+describe("File manager", function () {
     beforeEach(function () {
         var wweDir = path.resolve("dependencies/simulator-wwe");
 
@@ -21,16 +21,16 @@ describe("Files", function () {
 
     it("prepare() should copy files and unzip archive", function () {
         var session = {
-            "sourceDir": path.resolve("test/test_src"),
+            "sourceDir": path.resolve("test_src"),
             "archivePath": path.resolve("test/test.zip"),
             "conf": require(srcPath + "conf"),
             targets: ["simulator"]
         };
 
-        files.prepare(session, []);
+        fileMgr.prepare(session, []);
 
         expect(path.existsSync(path.resolve(session.sourceDir + "/wwe"))).toBeTruthy();
-        expect(path.existsSync(path.resolve(session.sourceDir + bar_conf.CHROME))).toBeTruthy();
-        expect(path.existsSync(path.resolve(session.sourceDir + bar_conf.LIB))).toBeTruthy();
+        expect(path.existsSync(path.resolve(session.sourceDir + barConf.CHROME))).toBeTruthy();
+        expect(path.existsSync(path.resolve(session.sourceDir + barConf.LIB))).toBeTruthy();
     });
 });
