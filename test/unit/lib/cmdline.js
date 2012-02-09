@@ -1,4 +1,5 @@
-var cmd = require("../lib/cmdline");
+var srcPath = __dirname + "/../../../lib/";
+    cmd = require(srcPath + "cmdline");
 
 describe("Command line", function () {
     it("accepts -o with argument", function () {
