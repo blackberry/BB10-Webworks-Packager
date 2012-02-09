@@ -1,4 +1,4 @@
-var srcPath = __dirname + "/../../../lib/";
+var srcPath = __dirname + "/../../../lib/",
     cmd = require(srcPath + "cmdline");
 
 describe("Command line", function () {

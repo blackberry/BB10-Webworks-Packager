@@ -1,4 +1,4 @@
-var srcPath = __dirname + "/../../../lib/";
+var srcPath = __dirname + "/../../../lib/",
     path = require("path"),
     fs = require("fs"),
     wrench = require("wrench"),
