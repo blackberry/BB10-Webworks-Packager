@@ -25,6 +25,14 @@ xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assemb
         </fileSet>
 
         <fileSet>            
+            <directory>Framework/dependencies/BBX-Emulator/</directory>                    
+            <outputDirectory>dependencies</outputDirectory>
+            <includes>
+                <include>lib/</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>            
             <directory>lib/</directory>                    
             <outputDirectory>lib</outputDirectory>            
         </fileSet>
