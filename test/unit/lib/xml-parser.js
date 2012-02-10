@@ -1,5 +1,5 @@
 var testData = require("./test-data"),
-    xmlParser = require(testData.libPath + "/xml-pkgr"),
+    xmlParser = require(testData.libPath + "/xml-parser"),
     path = require("path");
 
 describe("xml parser", function () {
