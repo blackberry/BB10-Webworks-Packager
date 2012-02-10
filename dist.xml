@@ -15,7 +15,7 @@ xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assemb
         </fileSet>
 
         <fileSet>            
-            <directory>target/dependency/bin/</directory>                    
+            <directory>target/dependency/</directory>                    
             <outputDirectory>dependencies</outputDirectory>            
         </fileSet>
 
