@@ -4,37 +4,37 @@ xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assemb
     <id>framework</id>
     <formats>
         <format>zip</format>
-    </formats>  
+    </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
-    <baseDirectory>/</baseDirectory>    
+    <baseDirectory>/</baseDirectory>
 
     <fileSets>
-        <fileSet>            
-            <directory>Framework/target/zip/</directory>                    
-            <outputDirectory>Framework</outputDirectory>            
+        <fileSet>
+            <directory>Framework/target/zip/</directory>
+            <outputDirectory>Framework</outputDirectory>
         </fileSet>
 
         <fileSet>            
-            <directory>target/dependency/</directory>                    
-            <outputDirectory>dependencies</outputDirectory>            
+            <directory>target/dependency/</directory>
+            <outputDirectory>dependencies</outputDirectory>
         </fileSet>
 
         <fileSet>            
-            <directory>Framework/dependencies/BBX-Emulator/</directory>                    
+            <directory>Framework/dependencies/BBX-Emulator/</directory>
             <outputDirectory>dependencies/BBX-Emulator</outputDirectory>
             <includes>
                 <include>lib/</include>
             </includes>
         </fileSet>
 
-        <fileSet>            
-            <directory>lib/</directory>                    
-            <outputDirectory>lib</outputDirectory>            
+        <fileSet>
+            <directory>lib/</directory>
+            <outputDirectory>lib</outputDirectory>
         </fileSet>
 
-        <fileSet>            
-            <directory>node_modules/</directory>                    
-            <outputDirectory>node_modules</outputDirectory>            
+        <fileSet>
+            <directory>node_modules/</directory>
+            <outputDirectory>node_modules</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>
