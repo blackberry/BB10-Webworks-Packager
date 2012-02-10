@@ -31,10 +31,10 @@ xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assemb
             <directory>lib/</directory>
             <outputDirectory>lib</outputDirectory>
         </fileSet>
-
-        <fileSet>
-            <directory>node_modules/</directory>
-            <outputDirectory>node_modules</outputDirectory>
+	
+        <fileSet>            
+            <directory>target/zip/bin/</directory>                    
+            <outputDirectory>dependencies</outputDirectory>            
         </fileSet>
     </fileSets>
 </assembly>
