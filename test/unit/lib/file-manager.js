@@ -21,7 +21,7 @@ describe("File manager", function () {
 
     it("prepare() should copy files and unzip archive", function () {
         var session = {
-            "sourceDir": path.resolve("test_src"),
+            "sourceDir": path.resolve("../packager.test"),
             "archivePath": path.resolve("test/test.zip"),
             "conf": require(srcPath + "conf"),
             targets: ["simulator"]

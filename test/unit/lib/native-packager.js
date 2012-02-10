@@ -8,7 +8,7 @@ var path = require("path"),
 describe("Native packager", function () {
     it("exec blackberry-nativepackager", function () {
         if (path.existsSync("dependencies/tools/bin")) {
-            var outputDir = path.resolve("test_bar"),
+            var outputDir = path.resolve("../packager.test"),
                 session = {
                     "barPath": path.resolve(outputDir + "/Demo.bar"),
                     "outputDir": outputDir,
