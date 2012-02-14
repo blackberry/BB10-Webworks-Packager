@@ -96,14 +96,12 @@
  
     <build>
         <plugins>
-
-            <!--  FRAMEWORK-->
-            <!-- jake, and lint -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1.1</version>
                 <executions>
+                    <!--  FRAMEWORK-->
                     <execution>
                         <id>jake-test-framework</id>
                         <phase>package</phase>
@@ -149,15 +147,14 @@
                             <workingDirectory>Framework</workingDirectory>            
                             <arguments>
                                 <argument>build</argument>
-
                             </arguments>
                             <successCodes>
                                 <successCode>0</successCode>
                             </successCodes>
                         </configuration>
                     </execution>
-                    <!-- FRAMEWORK -->
-                    <!-- jake, and lint -->
+
+                    <!-- PACKAGER -->
                     <execution>
                         <id>jake-test-packager</id>
                         <phase>package</phase>
@@ -192,10 +189,26 @@
                             </successCodes>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>jake-build-packager</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>jake</executable>      
+                            <arguments>
+                                <argument>build</argument>
+
+                            </arguments>
+                            <successCodes>
+                                <successCode>0</successCode>
+                            </successCodes>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
-
-
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
