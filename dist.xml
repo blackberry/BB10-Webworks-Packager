@@ -24,18 +24,12 @@ xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assemb
     <baseDirectory>/</baseDirectory>
 
     <fileSets>
-        <fileSet>
-            <directory>Framework/target/zip/</directory>
-            <outputDirectory>Framework</outputDirectory>
-        </fileSet>
-
-        <fileSet>
-            <directory>target/dependency/</directory>
-            <outputDirectory>dependencies</outputDirectory>
-        </fileSet>
-
         <fileSet>            
-            <directory>target/dependency/</directory>
+            <directory>target/zip/</directory>          
+            <outputDirectory></outputDirectory>
+        </fileSet>
+        <fileSet>            
+            <directory>target/dependency/</directory>          
             <outputDirectory>dependencies</outputDirectory>
         </fileSet>
     </fileSets>
