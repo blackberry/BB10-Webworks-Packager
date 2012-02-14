@@ -50,6 +50,7 @@ function _copyFiles() {
 }
 
 function _processFiles() {
+    fs.rmdirSync(_c.NODE_MOD + 'fs-tools/support/'); // Since /fs-tools/support/sandbox-template/link: directory causes a cycle
     return _copyFiles();
 }
 
