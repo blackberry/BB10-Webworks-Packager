@@ -46,11 +46,11 @@ function _copyFiles() {
     return  _copyCmd(_c.FRAMEWORK_DEPLOY, 'Framework/') + cmdSep +
             _copyCmd(_c.FRAMEWORK_EMU_LIB, 'dependencies/BBX-Emulator/') + cmdSep +
             _copyCmd(_c.NODE_MOD, 'node_modules') + cmdSep +
-            _copyCmd(_c.LIB, 'lib');
+            _copyCmd(_c.LIB, 'lib') + cmdSep +
+            'rm -r ' + _c.NODE_MOD + 'fs-tools/support/';
 }
 
 function _processFiles() {
-    fs.rmdirSync(_c.NODE_MOD + 'fs-tools/support/'); // Since /fs-tools/support/sandbox-template/link: directory causes a cycle
     return _copyFiles();
 }
 
