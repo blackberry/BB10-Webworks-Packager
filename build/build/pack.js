@@ -28,7 +28,7 @@ function _copyCmd(source, destination) {
             return 'xcopy /y ' + source + ' ' + path.normalize(_c.DEPLOY + destination);
         } else {
             return 'cmd /c if not exist ' + path.normalize(_c.DEPLOY + destination) +
-                   ' md ' + path.normalize(_c.DEPLOY + desltination) + ' && ' +
+                   ' md ' + path.normalize(_c.DEPLOY + destination) + ' && ' +
                    'xcopy /y/e ' + source + ' ' + path.normalize(_c.DEPLOY + destination);
         }
     } else {
@@ -44,9 +44,9 @@ function _copyCmd(source, destination) {
 function _copyFiles() {
     var cmdSep = " && ";
     return  _copyCmd(_c.FRAMEWORK_DEPLOY, 'Framework/') + cmdSep +
-    		_copyCmd(_c.FRAMEWORK_EMU_LIB, 'dependencies/BBX-Emulator/') + cmdSep +
-    		_copyCmd(_c.NODE_MOD, 'node_modules') + cmdSep +
-    		_copyCmd(_c.LIB, 'lib');
+            _copyCmd(_c.FRAMEWORK_EMU_LIB, 'dependencies/BBX-Emulator/') + cmdSep +
+            _copyCmd(_c.NODE_MOD, 'node_modules') + cmdSep +
+            _copyCmd(_c.LIB, 'lib');
 }
 
 function _processFiles() {
