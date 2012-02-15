@@ -226,7 +226,6 @@
                                     <artifactId>packager-bin</artifactId>
                                     <version>1.0.0.7</version>
                                     <type>zip</type>
-                                    <outputDirectory>/</outputDirectory>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
                             </artifactItems>
