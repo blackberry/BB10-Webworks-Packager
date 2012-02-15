@@ -46,7 +46,7 @@ function _copyFiles() {
     return  _copyCmd(_c.FRAMEWORK_DEPLOY, 'Framework/') + cmdSep +
             _copyCmd(_c.FRAMEWORK_EMU_LIB, 'dependencies/BBX-Emulator/') + cmdSep +
             _copyCmd(_c.LIB, 'lib') + cmdSep +
-            'rm -r ' + _c.NODE_MOD + 'fs-tools/support/' + cmdSep +
+            'rm -r ' + _c.NODE_MOD + '/fs-tools/support/' + cmdSep +
             _copyCmd(_c.NODE_MOD, 'node_modules');
 }
 
