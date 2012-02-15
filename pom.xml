@@ -224,7 +224,7 @@
                                 <artifactItem>
                                     <groupId>net.rim.BBXwebworks</groupId>
                                     <artifactId>packager-bin</artifactId>
-                                    <version>1.0.0.6</version>
+                                    <version>1.0.0.7</version>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
