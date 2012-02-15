@@ -26,7 +26,8 @@ function _getCmd() {
         return "rm -rf " + _c.DEPLOY + " && " + 
                "rm -rf " + _c.TARGET + " && " +
                "mkdir " + _c.TARGET + " && " +
-               "mkdir " + _c.DEPLOY;
+               "mkdir " + _c.DEPLOY + " && " +
+               "rm -rf " + _c.NODE_MOD + '/fs-tools/support/';
     }
 }
 
