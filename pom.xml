@@ -215,7 +215,7 @@
                 <executions>
                     <execution>
                         <id>unpack-framework</id>
-                        <phase>generate-resources</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
@@ -226,6 +226,7 @@
                                     <artifactId>packager-bin</artifactId>
                                     <version>1.0.0.7</version>
                                     <type>zip</type>
+                                    <outputDirectory>/</outputDirectory>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
                             </artifactItems>
