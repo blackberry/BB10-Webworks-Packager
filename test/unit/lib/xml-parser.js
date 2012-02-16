@@ -7,7 +7,7 @@ describe("xml parser", function () {
         xmlParser.parse(testData.configPath, function (configObj) {
             expect(configObj.content).toEqual("local:///startPage.html");
             expect(configObj.version).toEqual("1.0.0");
-            expect(configObj.foregroundSource).toEqual("local:///chrome/startPage.html");
+            expect(configObj.foregroundSource).toEqual("local:///startPage.html");
             expect(configObj.icon).toEqual("test.png");
             expect(configObj.configXML).toEqual("config.xml");
         });
