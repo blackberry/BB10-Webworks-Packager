@@ -21,7 +21,8 @@
     "logule": "0.5.5",
     "zip": "0.0.6",
     "xml2js": "0.1.13",
-    "fsext": "0.0.4"
+    "fsext": "0.0.4",
+    "validator": "0.4.1"
   },
   "files": [
     "node_modules",
