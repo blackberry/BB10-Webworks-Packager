@@ -18,6 +18,13 @@ xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assemb
             <fileMode>0755</fileMode>
         </fileSet>
         <fileSet>            
+            <directory>target/zip/</directory>          
+            <outputDirectory></outputDirectory>
+            <excludes>
+                <exclude>bbwp</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>            
             <directory>target/dependency/</directory>          
             <outputDirectory>dependencies</outputDirectory>
             <excludes>
