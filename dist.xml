@@ -13,16 +13,28 @@ xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assemb
             <directory>target/zip/</directory>          
             <outputDirectory></outputDirectory>
             <includes>
-                <include>bbwp</include>
+                <include>**/*.*</include>
+                <include>**/LICENSE</include>
+                <include>**/README</include>
             </includes>
-            <fileMode>0755</fileMode>
         </fileSet>
         <fileSet>            
             <directory>target/zip/</directory>          
             <outputDirectory></outputDirectory>
             <excludes>
-                <exclude>bbwp</exclude>
+                <exclude>**/*.*</exclude>
+                <exclude>**/LICENSE</exclude>
+                <exclude>**/README</exclude>
             </excludes>
+            <fileMode>0755</fileMode>
+        </fileSet>
+
+        <fileSet>            
+            <directory>target/dependency/</directory>          
+            <outputDirectory>dependencies</outputDirectory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
         </fileSet>
         <fileSet>            
             <directory>target/dependency/</directory>          
@@ -33,4 +45,4 @@ xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assemb
             <fileMode>0755</fileMode>
         </fileSet>
     </fileSets>
-</assembly>
+</assembly>l
