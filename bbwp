@@ -1,0 +1,1 @@
+./dependencies/node/node ./lib/bbwp.js $@
