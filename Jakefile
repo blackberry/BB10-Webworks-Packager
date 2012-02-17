@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-//desc("runs jake build");
-//task('default', [], require('./build/build'));
+desc("runs jake build");
+task('default', [], require('./build/build'));
 
-//desc("package framework - jake build");
-//task('build', [], require('./build/build'));
+desc("package framework - jake build");
+task('build', [], require('./build/build'));
 
 desc("run all tests in node - jake test [path,path2]");
 task('test', [], function () {
