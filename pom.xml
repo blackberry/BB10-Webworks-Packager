@@ -6,6 +6,10 @@
     <name>${project.artifactId}-${project.version}</name>
     <packaging>pom</packaging>
     
+    <modules>
+        <module>Framework</module>
+    </modules>
+    
     <profiles>
         <profile>
             <id>configure-windows</id>
@@ -31,15 +35,28 @@
                                     <executable>configure.bat</executable>
                                 </configuration>
                             </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
                             <execution>
-                                <id>configure-framework</id>
                                 <phase>validate</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
                                 <configuration>
-                                    <executable>Framework/configure.bat</executable>
+                                    <target>
+                                            <replace file="${basedir}/node_modules/wrench/lib/wrench.js" token="if(slashIdx &gt; 0) {">
+            <replacevalue>if(slashIdx &lt; 0) {
+                slashIdx = path.lastIndexOf(&quot;\\&quot;);
+            }
+
+            if(slashIdx &gt; 0) {</replacevalue>            
+        </replace>
+                                    </target>
                                 </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>
@@ -73,20 +90,6 @@
                                     </arguments>
                                 </configuration>
                             </execution>
-                            <execution>
-                                <id>configure-framework</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>sudo</executable>
-                                    <workingDirectory>Framework</workingDirectory>  
-                                    <arguments>
-                                        <argument>./configure</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
@@ -101,59 +104,6 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1.1</version>
                 <executions>
-                    <!--  FRAMEWORK-->
-                    <execution>
-                        <id>jake-test-framework</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>jake</executable>
-                            <workingDirectory>Framework</workingDirectory>            
-                            <arguments>
-                                <argument>test</argument>
-                            </arguments>
-                                <successCodes>
-                                    <successCode>0</successCode>
-                                </successCodes>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>jake-lint-framework</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>jake</executable>
-                            <workingDirectory>Framework</workingDirectory>            
-                            <arguments>
-                                <argument>lint</argument>
-                            </arguments>
-                            <successCodes>
-                                <successCode>0</successCode>
-                            </successCodes>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>jake-build-framework</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>jake</executable>
-                            <workingDirectory>Framework</workingDirectory>            
-                            <arguments>
-                                <argument>build</argument>
-                            </arguments>
-                            <successCodes>
-                                <successCode>0</successCode>
-                            </successCodes>
-                        </configuration>
-                    </execution>
-
                     <!-- PACKAGER -->
                     <execution>
                         <id>jake-test-packager</id>
@@ -162,6 +112,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <skip>true</skip>
                             <executable>jake</executable>
                             <workingDirectory></workingDirectory>            
                             <arguments>
@@ -214,7 +165,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack-framework</id>
+                        <id>unpack-packager-bin</id>
                         <phase>package</phase>
                         <goals>
                             <goal>unpack</goal>
