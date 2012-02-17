@@ -23,9 +23,15 @@ describe("File manager", function () {
         var session = testData.session;
         fileMgr.prepare(session, []);
 
-        expect(path.existsSync(path.resolve(session.sourceDir + "/wwe"))).toBeTruthy();
         expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
         expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
+    });
+
+    it("copyWWE() should copy wwe of the specified target", function () {
+        var session = testData.session;
+        fileMgr.copyWWE(session, "simulator");
+
+        expect(path.existsSync(path.normalize(session.sourceDir + "/wwe"))).toBeTruthy();
     });
 
     it("generateFrameworkModulesJS() should create frameworkModules.js", function () {
@@ -44,6 +50,10 @@ describe("File manager", function () {
         expect(modulesArr.indexOf('lib/config/user.js') >= 0).toBeTruthy();
         expect(modulesArr.indexOf('lib/plugins/bridge.js') >= 0).toBeTruthy();
         expect(modulesArr.indexOf('lib/policy/whitelist.js') >= 0).toBeTruthy();
+
+        modulesArr.forEach(function (module) {
+            expect(module.match(/^lib/)).toBeTruthy();
+        });
     });
 
     it("unzip() should extract 'from' zip file to 'to' directory", function () {

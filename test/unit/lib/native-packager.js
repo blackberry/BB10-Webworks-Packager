@@ -14,7 +14,7 @@ describe("Native packager", function () {
             }
 
             files.prepare(testData.session, []);
-            nativePkgr.exec(testData.session, testData.config, function (code) {
+            nativePkgr.exec(testData.session, "simulator", testData.config, function (code) {
                 expect(code).toEqual(0);
                 expect(path.existsSync(testData.session.barPath)).toBeTruthy();
             });
