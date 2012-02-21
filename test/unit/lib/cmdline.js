@@ -29,6 +29,11 @@ describe("Command line", function () {
         expect(cmd.source).toEqual("mySourceDir");
     });
 
+    it("accepts -d", function () {
+        cmd.parseOptions(["-d"]);
+        expect(cmd.debug).toBeTruthy();
+    });
+
     it("accepts -v", function () {
         cmd.parseOptions(["-v"]);
         expect(cmd.verbose).toBeTruthy();
