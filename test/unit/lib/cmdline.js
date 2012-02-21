@@ -15,6 +15,7 @@ describe("Command line", function () {
         spyOn(process, "exit");
         spyOn(console, "error");
         cmd.parseOptions(["-o"]);
+        expect(console.error).toHaveBeenCalled();
         expect(process.exit).toHaveBeenCalled();
     });
 
