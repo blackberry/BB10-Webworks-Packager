@@ -6,10 +6,6 @@
     <name>${project.artifactId}-${project.version}</name>
     <packaging>pom</packaging>
     
-    <modules>
-        <module>Framework</module>
-    </modules>
-    
     <profiles>
         <profile>
             <id>configure-windows</id>
@@ -99,6 +95,26 @@
  
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-invoker-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>build-framework</id>
+                        <phase>initialize</phase>
+                        <goals>
+                             <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <pom>Framework/pom.xml</pom>
+                            <streamLogs>true</streamLogs>
+                            <noLog>true</noLog>
+                            <projectsDirectory>Framework</projectsDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
