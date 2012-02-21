@@ -33,29 +33,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.6</version>
-                        <executions>
-                            <execution>
-                                <phase>validate</phase>
-                                <configuration>
-                                    <target>
-                                            <replace file="${basedir}/node_modules/wrench/lib/wrench.js" token="if(slashIdx &gt; 0) {">
-            <replacevalue>if(slashIdx &lt; 0) {
-                slashIdx = path.lastIndexOf(&quot;\\&quot;);
-            }
-
-            if(slashIdx &gt; 0) {</replacevalue>            
-        </replace>
-                                    </target>
-                                </configuration>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
                 </plugins>
             </build>    
         </profile>
