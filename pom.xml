@@ -37,29 +37,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.6</version>
-                        <executions>
-                            <execution>
-                                <phase>validate</phase>
-                                <configuration>
-                                    <target>
-                                            <replace file="${basedir}/node_modules/wrench/lib/wrench.js" token="if(slashIdx &gt; 0) {">
-            <replacevalue>if(slashIdx &lt; 0) {
-                slashIdx = path.lastIndexOf(&quot;\\&quot;);
-            }
-
-            if(slashIdx &gt; 0) {</replacevalue>            
-        </replace>
-                                    </target>
-                                </configuration>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
                 </plugins>
             </build>    
         </profile>
@@ -116,6 +93,7 @@
                             <executable>jake</executable>
                             <workingDirectory></workingDirectory>            
                             <arguments>
+                                <argument>--trace</argument>
                                 <argument>test</argument>
                             </arguments>
                                 <successCodes>
@@ -133,6 +111,7 @@
                             <executable>jake</executable>
                             <workingDirectory></workingDirectory>            
                             <arguments>
+                                <argument>--trace</argument>
                                 <argument>lint</argument>
                             </arguments>
                             <successCodes>
@@ -149,8 +128,8 @@
                         <configuration>
                             <executable>jake</executable>      
                             <arguments>
+                                <argument>--trace</argument>
                                 <argument>build</argument>
-
                             </arguments>
                             <successCodes>
                                 <successCode>0</successCode>
