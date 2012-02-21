@@ -13,7 +13,7 @@ describe("Native packager", function () {
                 wrench.rmdirSyncRecursive(testData.session.outputDir);
             }
 
-            files.prepare(testData.session, []);
+            files.prepareOutputFiles(testData.session, []);
             nativePkgr.exec(testData.session, "simulator", testData.config, function (code) {
                 expect(code).toEqual(0);
                 expect(path.existsSync(testData.session.barPath)).toBeTruthy();

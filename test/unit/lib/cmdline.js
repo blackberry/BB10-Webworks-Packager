@@ -1,16 +1,21 @@
 var srcPath = __dirname + "/../../../lib/",
-    cmd = require(srcPath + "cmdline");
+    cmd;
 
 describe("Command line", function () {
+    beforeEach(function () {
+        cmd = require(srcPath + "cmdline");
+    });
+
     it("accepts -o with argument", function () {
         cmd.parseOptions(["-o", "outdir"]);
         expect(cmd.output).toEqual("outdir");
     });
 
-    xit("arg following -o is required", function () {
-        // TODO this causes the process to exit, how do I verify the result?!
+    it("arg following -o is required", function () {
+        spyOn(process, "exit");
+        spyOn(console, "error");
         cmd.parseOptions(["-o"]);
-        console.log("+++ do you see me");
+        expect(process.exit).toHaveBeenCalled();
     });
 
     it("accepts -s without argument", function () {

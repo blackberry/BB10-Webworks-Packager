@@ -19,9 +19,9 @@ describe("File manager", function () {
         }
     });
 
-    it("prepare() should copy files and unzip archive", function () {
+    it("prepareOutputFiles() should copy files and unzip archive", function () {
         var session = testData.session;
-        fileMgr.prepare(session, []);
+        fileMgr.prepareOutputFiles(session, []);
 
         expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
         expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
