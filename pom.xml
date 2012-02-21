@@ -110,7 +110,6 @@
                             <pom>Framework/pom.xml</pom>
                             <streamLogs>true</streamLogs>
                             <noLog>true</noLog>
-                            <projectsDirectory>Framework</projectsDirectory>
                         </configuration>
                     </execution>
                 </executions>
