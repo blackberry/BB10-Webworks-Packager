@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<widget xmlns=" http://www.w3.org/ns/widgets"
+        xmlns:rim="http://www.blackberry.com/ns/widgets"
+        version="1.0.0"
+        id="MyWidgetId">
+    <name>Demo</name>
+    <content src="local:///startPage.html"/>
+    <author>Research In Motion Ltd.</author>
+    <description>This app does everything.</description>
+    <feature id="blackberry.app" required="true" version="1.0.0.0"/>
+    <access uri="*"/>
+    <license href="http://www.apache.org/licenses/LICENSE-2.0">My License</license>
+    <icon rim:hover="false" src="test.png"/>
+    <rim:permissions>
+        <rim:permit>access_shared</rim:permit>
+        <rim:permit>read_geolocation</rim:permit>
+        <rim:permit>use_camera</rim:permit>
+    </rim:permissions>
+    <rim:orientation mode="portrait" />
+</widget>
