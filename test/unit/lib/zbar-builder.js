@@ -6,7 +6,7 @@ var srcPath = __dirname + "/../../../lib/",
 
 describe("BAR builder", function () {
     it("build() create BAR for specified session", function () {
-        barBuilder.build(testData.session, testData.config, function() {
+        barBuilder.build(testData.session, testData.config, function () {
             fileMgr.cleanSource(testData.session);
             expect(path.existsSync(testData.session.barPath)).toBeTruthy();
         });
