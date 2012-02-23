@@ -21,7 +21,7 @@ describe("File manager", function () {
 
     it("prepareOutputFiles() should copy files and unzip archive", function () {
         var session = testData.session;
-        fileMgr.prepareOutputFiles(session, []);
+        fileMgr.prepareOutputFiles(session, ["blackberry.app", "blackberry.system"]);
 
         expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
         expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
@@ -52,7 +52,7 @@ describe("File manager", function () {
         expect(modulesArr.indexOf('lib/policy/whitelist.js') >= 0).toBeTruthy();
 
         modulesArr.forEach(function (module) {
-            expect(module.match(/^lib/)).toBeTruthy();
+            expect(module.match(/^lib\/|^ext\//)).toBeTruthy();
         });
     });
 
