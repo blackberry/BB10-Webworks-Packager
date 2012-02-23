@@ -36,7 +36,7 @@ describe("Native packager", function () {
                     "<env value=\"12\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>" +
                     "<permission system=\"true\">run_native</permission>" +
                     "<description>" + config.description + "</description></qnx>",
-                cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-nativepackager.bat");
+                cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-nativepackager" + (pkgrUtils.isWindows() ? ".bat" : ""));
 
             spyOn(wrench, "readdirSyncRecursive").andReturn(["abc", "xyz"]);
             spyOn(fs, "statSync").andReturn({
