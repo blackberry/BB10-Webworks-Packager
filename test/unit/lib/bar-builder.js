@@ -11,6 +11,7 @@ describe("BAR builder", function () {
     it("build() create BAR for specified session", function () {
         var callback = jasmine.createSpy(),
             session = testData.session,
+            config = testData.config,
             target = session.targets[0];
 
         spyOn(wrench, "mkdirSyncRecursive");
@@ -23,7 +24,7 @@ describe("BAR builder", function () {
 
         expect(wrench.mkdirSyncRecursive).toHaveBeenCalledWith(session.outputDir + "/" + target);
         expect(fileMgr.copyWWE).toHaveBeenCalledWith(session, target);
-        expect(nativePkgr.exec).toHaveBeenCalled();
+        expect(nativePkgr.exec).toHaveBeenCalledWith(session, target, config, jasmine.any(Function));
         expect(callback).toHaveBeenCalledWith(0);
     });
 });
