@@ -21,7 +21,7 @@ describe("File manager", function () {
 
     it("prepareOutputFiles() should copy files and unzip archive", function () {
         var session = testData.session;
-        fileMgr.prepareOutputFiles(session, ["blackberry.app", "blackberry.system"]);
+        fileMgr.prepareOutputFiles(session);
 
         expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
         expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
@@ -32,6 +32,59 @@ describe("File manager", function () {
         fileMgr.copyWWE(session, "simulator");
 
         expect(path.existsSync(path.normalize(session.sourceDir + "/wwe"))).toBeTruthy();
+    });
+
+    it("copyExtensions() should copy files required by features listed in config.xml", function () {
+        var session = testData.session,
+            extPath = session.sourcePaths.EXT,
+            accessList = [{
+                uri: "http://google.com",
+                allowSubDomain: false,
+                features: [{
+                    id: "blackberry.app",
+                    required: true,
+                    version: "1.0.0"
+                }, {
+                    id: "blackberry.system",
+                    required:  true,
+                    version: "1.0.0"
+                }]
+            }, {
+                uri: "WIDGET_LOCAL",
+                allowSubDomain: false,
+                features: [{
+                    id: "blackberry.system",
+                    required: true,
+                    version: "1.0.0"
+                }]
+            }];
+
+        fileMgr.copyExtensions(accessList, session.conf.EXT, extPath);
+
+        expect(path.existsSync(path.normalize(extPath + "/blackberry.app"))).toBeTruthy();
+        expect(path.existsSync(path.normalize(extPath + "/blackberry.app/client.js"))).toBeTruthy();
+        expect(path.existsSync(path.normalize(extPath + "/blackberry.app/index.js"))).toBeTruthy();
+        expect(path.existsSync(path.normalize(extPath + "/blackberry.system"))).toBeTruthy();
+        expect(path.existsSync(path.normalize(extPath + "/blackberry.system/client.js"))).toBeTruthy();
+        expect(path.existsSync(path.normalize(extPath + "/blackberry.system/index.js"))).toBeTruthy();
+        expect(path.existsSync(path.normalize(extPath + "/blackberry.system.event"))).toBeFalsy();
+    });
+
+    it("copyExtension() should throw an error when a specified feature cannot be found in ext folder", function () {
+        var session = testData.session,
+            accessList = [{
+                uri: "http://www.cnn.com",
+                allowSubDomain: false,
+                features: [{
+                    id: "abc.def.ijk",
+                    required: true,
+                    version: "1.0.0"
+                }]
+            }];
+
+        expect(function () {
+            fileMgr.copyExtensions(accessList, session.conf.EXT, session.sourcePaths.EXT);
+        }).toThrow(new Error("Failed to find feature with id: abc.def.ijk"));
     });
 
     it("generateFrameworkModulesJS() should create frameworkModules.js", function () {
