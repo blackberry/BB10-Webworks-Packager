@@ -4,7 +4,8 @@ var srcPath = __dirname + "/../../../lib/",
     wrench = require("wrench"),
     logger = require(srcPath + "logger"),
     fileMgr = require(srcPath + "file-manager"),
-    testData = require("./test-data");
+    testData = require("./test-data"),
+    session = testData.session;
 
 describe("File manager", function () {
     beforeEach(function () {
@@ -20,7 +21,6 @@ describe("File manager", function () {
     });
 
     it("prepareOutputFiles() should copy files and unzip archive", function () {
-        var session = testData.session;
         fileMgr.prepareOutputFiles(session);
 
         expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
@@ -28,7 +28,6 @@ describe("File manager", function () {
     });
 
     it("copyWWE() should copy wwe of the specified target", function () {
-        var session = testData.session;
         fileMgr.copyWWE(session, "simulator");
 
         expect(path.existsSync(path.normalize(session.sourceDir + "/wwe"))).toBeTruthy();
@@ -88,9 +87,7 @@ describe("File manager", function () {
     });
 
     it("generateFrameworkModulesJS() should create frameworkModules.js", function () {
-        var session = testData.session,
-            data,
-            modulesArr;
+        var data, modulesArr;
 
         fileMgr.generateFrameworkModulesJS(session);
 
@@ -110,8 +107,7 @@ describe("File manager", function () {
     });
 
     it("unzip() should extract 'from' zip file to 'to' directory", function () {
-        var session = testData.session,
-            from = session.archivePath,
+        var from = session.archivePath,
             to = session.sourceDir;
 
         fileMgr.unzip(from, to);
@@ -127,8 +123,6 @@ describe("File manager", function () {
     });
 
     it("cleanSource() should delete source folder", function () {
-        var session = testData.session;
-
         expect(path.existsSync(session.sourceDir)).toBeTruthy();
         expect(fs.statSync(session.sourceDir).isDirectory()).toBeTruthy();
         fileMgr.cleanSource(session);
