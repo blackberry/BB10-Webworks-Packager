@@ -4,7 +4,8 @@ var srcPath = __dirname + "/../../../lib/",
     wrench = require("wrench"),
     logger = require(srcPath + "logger"),
     fileMgr = require(srcPath + "file-manager"),
-    testData = require("./test-data");
+    testData = require("./test-data"),
+    session = testData.session;
 
 describe("File manager", function () {
     beforeEach(function () {
@@ -20,24 +21,73 @@ describe("File manager", function () {
     });
 
     it("prepareOutputFiles() should copy files and unzip archive", function () {
-        var session = testData.session;
-        fileMgr.prepareOutputFiles(session, ["blackberry.app", "blackberry.system"]);
+        fileMgr.prepareOutputFiles(session);
 
         expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
         expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
     });
 
     it("copyWWE() should copy wwe of the specified target", function () {
-        var session = testData.session;
         fileMgr.copyWWE(session, "simulator");
 
         expect(path.existsSync(path.normalize(session.sourceDir + "/wwe"))).toBeTruthy();
     });
 
-    it("generateFrameworkModulesJS() should create frameworkModules.js", function () {
+    it("copyExtensions() should copy files required by features listed in config.xml", function () {
         var session = testData.session,
-            data,
-            modulesArr;
+            extPath = session.sourcePaths.EXT,
+            accessList = [{
+                uri: "http://google.com",
+                allowSubDomain: false,
+                features: [{
+                    id: "blackberry.app",
+                    required: true,
+                    version: "1.0.0"
+                }, {
+                    id: "blackberry.system",
+                    required:  true,
+                    version: "1.0.0"
+                }]
+            }, {
+                uri: "WIDGET_LOCAL",
+                allowSubDomain: false,
+                features: [{
+                    id: "blackberry.system",
+                    required: true,
+                    version: "1.0.0"
+                }]
+            }];
+
+        fileMgr.copyExtensions(accessList, session.conf.EXT, extPath);
+
+        expect(path.existsSync(path.normalize(extPath + "/blackberry.app"))).toBeTruthy();
+        expect(path.existsSync(path.normalize(extPath + "/blackberry.app/client.js"))).toBeTruthy();
+        expect(path.existsSync(path.normalize(extPath + "/blackberry.app/index.js"))).toBeTruthy();
+        expect(path.existsSync(path.normalize(extPath + "/blackberry.system"))).toBeTruthy();
+        expect(path.existsSync(path.normalize(extPath + "/blackberry.system/client.js"))).toBeTruthy();
+        expect(path.existsSync(path.normalize(extPath + "/blackberry.system/index.js"))).toBeTruthy();
+        expect(path.existsSync(path.normalize(extPath + "/blackberry.system.event"))).toBeFalsy();
+    });
+
+    it("copyExtension() should throw an error when a specified feature cannot be found in ext folder", function () {
+        var session = testData.session,
+            accessList = [{
+                uri: "http://www.cnn.com",
+                allowSubDomain: false,
+                features: [{
+                    id: "abc.def.ijk",
+                    required: true,
+                    version: "1.0.0"
+                }]
+            }];
+
+        expect(function () {
+            fileMgr.copyExtensions(accessList, session.conf.EXT, session.sourcePaths.EXT);
+        }).toThrow(new Error("Failed to find feature with id: abc.def.ijk"));
+    });
+
+    it("generateFrameworkModulesJS() should create frameworkModules.js", function () {
+        var data, modulesArr;
 
         fileMgr.generateFrameworkModulesJS(session);
 
@@ -57,8 +107,7 @@ describe("File manager", function () {
     });
 
     it("unzip() should extract 'from' zip file to 'to' directory", function () {
-        var session = testData.session,
-            from = session.archivePath,
+        var from = session.archivePath,
             to = session.sourceDir;
 
         fileMgr.unzip(from, to);
@@ -74,8 +123,6 @@ describe("File manager", function () {
     });
 
     it("cleanSource() should delete source folder", function () {
-        var session = testData.session;
-
         expect(path.existsSync(session.sourceDir)).toBeTruthy();
         expect(fs.statSync(session.sourceDir).isDirectory()).toBeTruthy();
         fileMgr.cleanSource(session);

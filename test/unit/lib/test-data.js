@@ -8,7 +8,7 @@ module.exports = {
     libPath: libPath,
     configPath: configPath,
     session: {
-        "barPath": path.resolve(outputDir + "/Demo.bar"),
+        "barPath": outputDir + "/%s/" + "Demo.bar",
         "outputDir": outputDir,
         "sourceDir": path.resolve(outputDir + "/src"),
         "sourcePaths": {
@@ -24,7 +24,7 @@ module.exports = {
     config: {
         "id": 'Demo',
         "name": 'Demo',
-        "versionNumber": '1.0.0',
+        "version": '1.0.0',
         "author": 'Research In Motion Ltd.',
         "description": 'This is a test!',
         "image": 'test.png'
