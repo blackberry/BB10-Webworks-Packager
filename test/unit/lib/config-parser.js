@@ -1,5 +1,5 @@
 var testData = require("./test-data"),
-    xmlParser = require(testData.libPath + "/xml-parser"),
+    configParser = require(testData.libPath + "/config-parser"),
     testUtilities = require("./test-utilities"),
     path = require("path");
 
@@ -10,7 +10,7 @@ describe("xml parser", function () {
             bbAppFeature,
             bbSystemFeature;
 
-        xmlParser.parse(configPath, function (configObj) {
+        configParser.parse(configPath, function (configObj) {
             expect(configObj.content).toEqual("local:///startPage.html");
             expect(configObj.id).toEqual("MyWidgetId");
             expect(configObj.version).toEqual("1.0.0");
@@ -47,7 +47,7 @@ describe("xml parser", function () {
     it("parses a bare minimum config.xml without error", function () {
         var configPath = path.resolve("test/config-bare-minimum.xml");
 
-        xmlParser.parse(configPath, function (configObj) {
+        configParser.parse(configPath, function (configObj) {
             expect(configObj.content).toEqual("local:///startPage.html");
             expect(configObj.version).toEqual("1.0.0");
         });
