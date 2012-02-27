@@ -33,18 +33,9 @@ describe("Native packager", function () {
                 callback(0);
             }
         },
-        bbTabletXML = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-            "<qnx><id>" + config.id + "</id>" +
-            "<name>" + config.name + "</name>" +
-            "<versionNumber>" + config.version + "</versionNumber>" +
-            "<author>" + config.author + "</author>" +
-            "<asset entry=\"true\" type=\"qnx/elf\">wwe</asset>" +
-            "<initialWindow><systemChrome>none</systemChrome><transparent>true</transparent></initialWindow>" +
-            "<env value=\"12\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>" +
-            "<permission system=\"true\">run_native</permission>" +
-            "<description>" + config.description + "</description></qnx>",
-        cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-nativepackager" + (pkgrUtils.isWindows() ? ".bat" : ""));
 
+        // Store original debug token setting and later restore them in afterEach
+        // to be able to test positive and negative cases of each.
         orgDebugEnabled = session.debug;
         orgDebugTokenPath = session.conf.DEBUG_TOKEN;
 
@@ -76,14 +67,36 @@ describe("Native packager", function () {
         expect(logger.warn).toHaveBeenCalledWith(jasmine.any(String));
     });
 
+    it("won't show debug token warning when -d options wasn't provided", function () {
+        spyOn(logger, "warn");
+
+        session.debug = false;
+        //Current time will ensure that the file doesn't exist.
+        session.conf.DEBUG_TOKEN = new Date().getTime() + ".bar";
+
+        nativePkgr.exec(session, target, testData.config, callback);
+
+        expect(logger.warn).not.toHaveBeenCalled();
+    });
+
     it("exec blackberry-nativepackager", function () {
-        if (path.existsSync("dependencies/tools/bin")) {
-            nativePkgr.exec(session, target, testData.config, callback);
+        bbTabletXML = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+            "<qnx><id>" + config.id + "</id>" +
+            "<name>" + config.name + "</name>" +
+            "<versionNumber>" + config.version + "</versionNumber>" +
+            "<author>" + config.author + "</author>" +
+            "<asset entry=\"true\" type=\"qnx/elf\">wwe</asset>" +
+            "<initialWindow><systemChrome>none</systemChrome><transparent>true</transparent></initialWindow>" +
+            "<env value=\"12\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>" +
+            "<permission system=\"true\">run_native</permission>" +
+            "<description>" + config.description + "</description></qnx>",
+        cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-nativepackager" + (pkgrUtils.isWindows() ? ".bat" : ""));
+
+        nativePkgr.exec(session, target, testData.config, callback);
             
-            expect(fs.writeFileSync).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(String));
-            expect(pkgrUtils.writeFile).toHaveBeenCalledWith(session.sourceDir, "blackberry-tablet.xml", bbTabletXML);
-            expect(childProcess.spawn).toHaveBeenCalledWith(cmd, ["@options"], {"cwd": session.sourceDir, "env": process.env});
-            expect(callback).toHaveBeenCalledWith(0);
-        }
+        expect(fs.writeFileSync).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(String));
+        expect(pkgrUtils.writeFile).toHaveBeenCalledWith(session.sourceDir, "blackberry-tablet.xml", bbTabletXML);
+        expect(childProcess.spawn).toHaveBeenCalledWith(cmd, ["@options"], {"cwd": session.sourceDir, "env": process.env});
+        expect(callback).toHaveBeenCalledWith(0);
     });
 });
