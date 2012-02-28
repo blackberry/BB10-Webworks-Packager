@@ -19,10 +19,10 @@ var path = require("path"),
 
 describe("Native packager", function () {
     beforeEach(function () {
-        callback = jasmine.createSpy(),
-        config = testData.config,
-        session = testData.session,
-        target = session.targets[0],
+        callback = jasmine.createSpy();
+        config = testData.config;
+        session = testData.session;
+        target = session.targets[0];
         result = {
             stdout: {
                 on: jasmine.createSpy()
@@ -33,7 +33,7 @@ describe("Native packager", function () {
             on: function (eventName, callback) {
                 callback(0);
             }
-        },
+        };
 
         // Store original debug token setting and later restore them in afterEach
         // to be able to test positive and negative cases of each.
@@ -92,7 +92,7 @@ describe("Native packager", function () {
     });
 
     it("exec blackberry-nativepackager", function () {
-        bbTabletXML = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+        var bbTabletXML = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
             "<qnx><id>" + config.id + "</id>" +
             "<name>" + config.name + "</name>" +
             "<versionNumber>" + config.version + "</versionNumber>" +
@@ -102,7 +102,7 @@ describe("Native packager", function () {
             "<env value=\"12\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>" +
             "<permission system=\"true\">run_native</permission>" +
             "<description>" + config.description + "</description></qnx>",
-        cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-nativepackager" + (pkgrUtils.isWindows() ? ".bat" : ""));
+			cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-nativepackager" + (pkgrUtils.isWindows() ? ".bat" : ""));
 
         nativePkgr.exec(session, target, testData.config, callback);
             
