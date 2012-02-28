@@ -1,15 +1,11 @@
 var testData = require("./test-data"),
     configParser = require(testData.libPath + "/config-parser"),
     testUtilities = require("./test-utilities"),
-    path = require("path");
+    path = require("path"),
+    configPath = path.resolve("test/config.xml");
 
 describe("xml parser", function () {
-    it("parses a config.xml", function () {
-        var configPath = path.resolve("test/config.xml"),
-            localAccessList,
-            customAccessList,
-            accessListFeature;
-
+    it("parses standard elements in a config.xml", function () {
         configParser.parse(configPath, function (configObj) {
             expect(configObj.content).toEqual("local:///startPage.html");
             expect(configObj.id).toEqual("MyWidgetId");
@@ -21,7 +17,14 @@ describe("xml parser", function () {
             expect(configObj.author).toEqual("Research In Motion Ltd.");
             expect(configObj.name).toEqual("Demo");
             expect(configObj.description).toEqual("This app does everything.");
-            
+        });
+    });
+    
+    it("parses Feature elements in a config.xml", function () {
+        var localAccessList,
+            accessListFeature;
+
+        configParser.parse(configPath, function (configObj) {
             //validate WIDGET_LOCAL accessList
             localAccessList = testUtilities.getAccessListForUri(configObj.accessList, "WIDGET_LOCAL");
             expect(localAccessList).toBeDefined();
@@ -32,17 +35,23 @@ describe("xml parser", function () {
             accessListFeature = testUtilities.getFeatureByID(localAccessList.features, "blackberry.app");
             expect(accessListFeature).toBeDefined();
             expect(accessListFeature.id).toEqual("blackberry.app");
-            expect(accessListFeature.required).toEqual(true)
+            expect(accessListFeature.required).toEqual(true);
             expect(accessListFeature.version).toEqual("1.0.0.0");
             
             //validate WIDGET_LOCAL feature [blackberry.system]
             accessListFeature = testUtilities.getFeatureByID(localAccessList.features, "blackberry.system");
             expect(accessListFeature).toBeDefined();
             expect(accessListFeature.id).toEqual("blackberry.system");
-            expect(accessListFeature.required).toEqual(true)
+            expect(accessListFeature.required).toEqual(true);
             expect(accessListFeature.version).toEqual("1.0.0.3");
-            
-            //-----------Access assertions---------------------------------//
+        });
+    });
+    
+    it("parses Access elements a config.xml", function () {
+        var customAccessList,
+            accessListFeature;
+
+        configParser.parse(configPath, function (configObj) {
             //validate http://www.somedomain1.com accessList
             customAccessList = testUtilities.getAccessListForUri(configObj.accessList, "http://www.somedomain1.com");
             expect(customAccessList).toBeDefined();
@@ -53,7 +62,7 @@ describe("xml parser", function () {
             accessListFeature = testUtilities.getFeatureByID(customAccessList.features, "blackberry.app");
             expect(accessListFeature).toBeDefined();
             expect(accessListFeature.id).toEqual("blackberry.app");
-            expect(accessListFeature.required).toEqual(true)
+            expect(accessListFeature.required).toEqual(true);
             expect(accessListFeature.version).toEqual("1.0.0.0");
             
             //validate http://www.somedomain1.com feature [blackberry.app.event]
@@ -66,7 +75,7 @@ describe("xml parser", function () {
     });
 
     it("parses a bare minimum config.xml without error", function () {
-        var configPath = path.resolve("test/config-bare-minimum.xml");
+        configPath = path.resolve("test/config-bare-minimum.xml");
 
         configParser.parse(configPath, function (configObj) {
             expect(configObj.content).toEqual("local:///startPage.html");
