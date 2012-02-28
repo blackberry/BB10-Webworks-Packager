@@ -8,6 +8,7 @@ var path = require("path"),
     pkgrUtils = require(srcPath + "/packager-utils"),
     testData = require("./test-data"),
     logger = require(srcPath + "logger"),
+	localize = require(srcPath + "/localize"),
     callback,
     config,
     session,
@@ -64,7 +65,7 @@ describe("Native packager", function () {
 
         nativePkgr.exec(session, target, testData.config, callback);
 
-        expect(logger.warn).toHaveBeenCalledWith(jasmine.any(String));
+        expect(logger.warn).toHaveBeenCalledWith(localize.translate("EXCEPTION_DEBUG_TOKEN_NOT_FOUND"));
     });
 
     it("won't show debug token warning when -d options wasn't provided", function () {
@@ -77,6 +78,17 @@ describe("Native packager", function () {
         nativePkgr.exec(session, target, testData.config, callback);
 
         expect(logger.warn).not.toHaveBeenCalled();
+    });
+	
+	it("shows debug token warning when debug token not a .bar file", function () {
+        spyOn(logger, "warn");
+
+        session.debug = true;
+        //Current time will ensure that the file doesn't exist.
+        session.conf.DEBUG_TOKEN = new Date().getTime() + ".xyz";
+
+        nativePkgr.exec(session, target, testData.config, callback);
+        expect(logger.warn).toHaveBeenCalledWith(localize.translate("EXCEPTION_DEBUG_TOKEN_WRONG_FILE_EXTENSION"));
     });
 
     it("exec blackberry-nativepackager", function () {
