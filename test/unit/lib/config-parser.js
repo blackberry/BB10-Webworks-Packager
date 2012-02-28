@@ -32,14 +32,14 @@ describe("xml parser", function () {
             accessListFeature = testUtilities.getFeatureByID(localAccessList.features, "blackberry.app");
             expect(accessListFeature).toBeDefined();
             expect(accessListFeature.id).toEqual("blackberry.app");
-            expect(accessListFeature.required).toEqual(true)
+            expect(accessListFeature.required).toEqual(true);
             expect(accessListFeature.version).toEqual("1.0.0.0");
             
             //validate WIDGET_LOCAL feature [blackberry.system]
             accessListFeature = testUtilities.getFeatureByID(localAccessList.features, "blackberry.system");
             expect(accessListFeature).toBeDefined();
             expect(accessListFeature.id).toEqual("blackberry.system");
-            expect(accessListFeature.required).toEqual(true)
+            expect(accessListFeature.required).toEqual(true);
             expect(accessListFeature.version).toEqual("1.0.0.3");
             
             //-----------Access assertions---------------------------------//
@@ -53,7 +53,7 @@ describe("xml parser", function () {
             accessListFeature = testUtilities.getFeatureByID(customAccessList.features, "blackberry.app");
             expect(accessListFeature).toBeDefined();
             expect(accessListFeature.id).toEqual("blackberry.app");
-            expect(accessListFeature.required).toEqual(true)
+            expect(accessListFeature.required).toEqual(true);
             expect(accessListFeature.version).toEqual("1.0.0.0");
             
             //validate http://www.somedomain1.com feature [blackberry.app.event]
