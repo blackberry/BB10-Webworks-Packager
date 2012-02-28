@@ -8,7 +8,7 @@ var path = require("path"),
     pkgrUtils = require(srcPath + "/packager-utils"),
     testData = require("./test-data"),
     logger = require(srcPath + "logger"),
-	localize = require(srcPath + "/localize"),
+    localize = require(srcPath + "/localize"),
     callback,
     config,
     session,
@@ -79,8 +79,8 @@ describe("Native packager", function () {
 
         expect(logger.warn).not.toHaveBeenCalled();
     });
-	
-	it("shows debug token warning when debug token not a .bar file", function () {
+    
+    it("shows debug token warning when debug token not a .bar file", function () {
         spyOn(logger, "warn");
 
         session.debug = true;
@@ -102,7 +102,7 @@ describe("Native packager", function () {
             "<env value=\"12\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>" +
             "<permission system=\"true\">run_native</permission>" +
             "<description>" + config.description + "</description></qnx>",
-			cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-nativepackager" + (pkgrUtils.isWindows() ? ".bat" : ""));
+            cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-nativepackager" + (pkgrUtils.isWindows() ? ".bat" : ""));
 
         nativePkgr.exec(session, target, testData.config, callback);
             
