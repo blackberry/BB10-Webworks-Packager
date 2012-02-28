@@ -7,8 +7,8 @@ describe("xml parser", function () {
     it("parses a config.xml", function () {
         var configPath = path.resolve("test/config.xml"),
             localAccessList,
-            bbAppFeature,
-            bbSystemFeature;
+            customAccessList,
+            accessListFeature;
 
         configParser.parse(configPath, function (configObj) {
             expect(configObj.content).toEqual("local:///startPage.html");
@@ -29,18 +29,39 @@ describe("xml parser", function () {
             expect(localAccessList.allowSubDomain).toEqual(true);
             
             //validate WIDGET_LOCAL feature [blackberry.app]
-            bbAppFeature = testUtilities.getFeatureByID(localAccessList.features, "blackberry.app");
-            expect(bbAppFeature).toBeDefined();
-            expect(bbAppFeature.id).toEqual("blackberry.app");
-            expect(bbAppFeature.required).toBeTruthy();
-            expect(bbAppFeature.version).toEqual("1.0.0.0");
+            accessListFeature = testUtilities.getFeatureByID(localAccessList.features, "blackberry.app");
+            expect(accessListFeature).toBeDefined();
+            expect(accessListFeature.id).toEqual("blackberry.app");
+            expect(accessListFeature.required).toEqual(true)
+            expect(accessListFeature.version).toEqual("1.0.0.0");
             
             //validate WIDGET_LOCAL feature [blackberry.system]
-            bbSystemFeature = testUtilities.getFeatureByID(localAccessList.features, "blackberry.system");
-            expect(bbSystemFeature).toBeDefined();
-            expect(bbSystemFeature.id).toEqual("blackberry.system");
-            expect(bbSystemFeature.required).toBeTruthy();
-            expect(bbSystemFeature.version).toEqual("1.0.0.3");
+            accessListFeature = testUtilities.getFeatureByID(localAccessList.features, "blackberry.system");
+            expect(accessListFeature).toBeDefined();
+            expect(accessListFeature.id).toEqual("blackberry.system");
+            expect(accessListFeature.required).toEqual(true)
+            expect(accessListFeature.version).toEqual("1.0.0.3");
+            
+            //-----------Access assertions---------------------------------//
+            //validate http://www.somedomain1.com accessList
+            customAccessList = testUtilities.getAccessListForUri(configObj.accessList, "http://www.somedomain1.com");
+            expect(customAccessList).toBeDefined();
+            expect(customAccessList.uri).toEqual("http://www.somedomain1.com");
+            expect(customAccessList.allowSubDomain).toEqual(true);
+            
+            //validate http://www.somedomain1.com feature [blackberry.app]
+            accessListFeature = testUtilities.getFeatureByID(customAccessList.features, "blackberry.app");
+            expect(accessListFeature).toBeDefined();
+            expect(accessListFeature.id).toEqual("blackberry.app");
+            expect(accessListFeature.required).toEqual(true)
+            expect(accessListFeature.version).toEqual("1.0.0.0");
+            
+            //validate http://www.somedomain1.com feature [blackberry.app.event]
+            accessListFeature = testUtilities.getFeatureByID(customAccessList.features, "blackberry.app.event");
+            expect(accessListFeature).toBeDefined();
+            expect(accessListFeature.id).toEqual("blackberry.app.event");
+            expect(accessListFeature.required).toEqual(false);
+            expect(accessListFeature.version).toEqual("2.0.0.0");
         });
     });
 

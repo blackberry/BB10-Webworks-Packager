@@ -18,7 +18,7 @@
     <feature id="blackberry.app" required="true" version="1.0.0.0"/>
     <feature id="blackberry.system" required="true" version="1.0.0.3"/>
     <access uri="http://www.somedomain1.com" subdomains="true">
-        <feature id="blackberry.app"/>
-        <feature id="blackberry.app.event"/>
+        <feature id="blackberry.app" required="true" version="1.0.0.0"/>
+        <feature id="blackberry.app.event" required="false" version="2.0.0.0"/>
     </access>
 </widget>
