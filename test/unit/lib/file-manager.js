@@ -1,6 +1,7 @@
 var srcPath = __dirname + "/../../../lib/",
+    fs = require("fsext"),
     path = require("path"),
-    fs = require("fs"),
+    util = require("util"),
     wrench = require("wrench"),
     logger = require(srcPath + "logger"),
     fileMgr = require(srcPath + "file-manager"),
@@ -8,49 +9,108 @@ var srcPath = __dirname + "/../../../lib/",
     session = testData.session;
 
 describe("File manager", function () {
-    beforeEach(function () {
-        var wweDir = path.resolve("dependencies/simulator-wwe");
-
-        if (!path.existsSync(wweDir)) {
-            wrench.mkdirSyncRecursive(wweDir, "0755");
-        }
-
-        if (!path.existsSync(path.normalize(wweDir + "/wwe"))) {
-            fs.writeFileSync(path.normalize(wweDir + "/wwe"), "");
-        }
-    });
-
     it("prepareOutputFiles() should copy files and unzip archive", function () {
-        fileMgr.prepareOutputFiles(session, []);
+        fileMgr.prepareOutputFiles(session);
 
         expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
         expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
     });
 
     it("copyWWE() should copy wwe of the specified target", function () {
+        spyOn(fs, "copySync");
+
         fileMgr.copyWWE(session, "simulator");
 
-        expect(path.existsSync(path.normalize(session.sourceDir + "/wwe"))).toBeTruthy();
+        expect(fs.copySync).toHaveBeenCalledWith(path.normalize(util.format(session.conf.DEPENDENCIES_WWE, "simulator") + "/wwe"), path.normalize(session.sourceDir + "/wwe"));
+    });
+
+    it("copyExtensions() should copy files required by features listed in config.xml", function () {
+        var session = testData.session,
+            feature = "blackberry.app",
+            extPath = session.sourcePaths.EXT,
+            toDir = extPath + "/" + feature,
+            apiDir = path.resolve(session.conf.EXT, feature),
+            accessList = [{
+                uri: "http://google.com",
+                allowSubDomain: false,
+                features: [{
+                    id: "blackberry.app",
+                    required: true,
+                    version: "1.0.0"
+                }, {
+                    id: "blackberry.system",
+                    required:  true,
+                    version: "1.0.0"
+                }]
+            }, {
+                uri: "WIDGET_LOCAL",
+                allowSubDomain: false,
+                features: [{
+                    id: "blackberry.system",
+                    required: true,
+                    version: "1.0.0"
+                }]
+            }];
+
+        spyOn(path, "existsSync").andReturn(true);
+        spyOn(wrench, "mkdirSyncRecursive");
+        spyOn(wrench, "copyDirSyncRecursive");
+
+        fileMgr.copyExtensions(accessList, session.conf.EXT, extPath);
+
+        expect(path.existsSync).toHaveBeenCalledWith(apiDir);
+        expect(wrench.mkdirSyncRecursive).toHaveBeenCalledWith(toDir, "0755");
+        expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(apiDir, toDir);
+    });
+
+    it("copyExtension() should throw an error when a specified feature cannot be found in ext folder", function () {
+        var session = testData.session,
+            accessList = [{
+                uri: "http://www.cnn.com",
+                allowSubDomain: false,
+                features: [{
+                    id: "abc.def.ijk",
+                    required: true,
+                    version: "1.0.0"
+                }]
+            }];
+
+        expect(function () {
+            fileMgr.copyExtensions(accessList, session.conf.EXT, session.sourcePaths.EXT);
+        }).toThrow(new Error("Failed to find feature with id: abc.def.ijk"));
     });
 
     it("generateFrameworkModulesJS() should create frameworkModules.js", function () {
-        var data, modulesArr;
+        var files = [],
+            modulesArr;
+
+        files.push(path.normalize(session.sourcePaths.CHROME + "/lib/framework.js"));
+        files.push(path.normalize(session.sourcePaths.CHROME + "/lib/config/user.js"));
+        files.push(path.normalize(session.sourcePaths.CHROME + "/lib/plugins/bridge.js"));
+        files.push(path.normalize(session.sourcePaths.CHROME + "/lib/policy/whitelist.js"));
+        files.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.app/client.js"));
+
+        spyOn(wrench, "readdirSyncRecursive").andReturn(files);
+        spyOn(fs, "statSync").andReturn({
+            isDirectory: function () {
+                return false;
+            }
+        });
+        spyOn(path, "existsSync").andReturn(true);
+        spyOn(JSON, "stringify");
+        spyOn(fs, "writeFileSync");
 
         fileMgr.generateFrameworkModulesJS(session);
 
-        expect(path.existsSync(session.sourcePaths.CHROME + "/frameworkModules.js")).toBeTruthy();
-
-        data = fs.readFileSync(session.sourcePaths.CHROME + "/frameworkModules.js");
-        modulesArr = JSON.parse(data.toString().replace("var frameworkModules =", "").replace(";", ""));
-
-        expect(modulesArr.indexOf('lib/framework.js') >= 0).toBeTruthy();
-        expect(modulesArr.indexOf('lib/config/user.js') >= 0).toBeTruthy();
-        expect(modulesArr.indexOf('lib/plugins/bridge.js') >= 0).toBeTruthy();
-        expect(modulesArr.indexOf('lib/policy/whitelist.js') >= 0).toBeTruthy();
-
+        modulesArr = JSON.stringify.mostRecentCall.args[0];
         modulesArr.forEach(function (module) {
-            expect(module.match(/^lib/)).toBeTruthy();
+            expect(module.match(/^lib\/|^ext\//)).toBeTruthy();
         });
+        expect(modulesArr).toContain("lib/framework.js");
+        expect(modulesArr).toContain("lib/config/user.js");
+        expect(modulesArr).toContain("lib/plugins/bridge.js");
+        expect(modulesArr).toContain("lib/policy/whitelist.js");
+        expect(modulesArr).toContain("ext/blackberry.app/client.js");
     });
 
     it("unzip() should extract 'from' zip file to 'to' directory", function () {
