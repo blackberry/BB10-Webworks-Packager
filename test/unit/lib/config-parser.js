@@ -1,6 +1,8 @@
 var testData = require("./test-data"),
     configParser = require(testData.libPath + "/config-parser"),
     testUtilities = require("./test-utilities"),
+    xml2js = require('xml2js'),
+    localize = require(testData.libPath + "/localize"),
     path = require("path"),
     configPath = path.resolve("test/config.xml");
 
@@ -81,5 +83,24 @@ describe("xml parser", function () {
             expect(configObj.content).toEqual("local:///startPage.html");
             expect(configObj.version).toEqual("1.0.0");
         });
+    });
+    
+    it("fails when id is undefined", function () {
+        var data = testData.xml2jsConfig;
+        data["@"].id = undefined;
+        
+        spyOn(xml2js, "Parser").andReturn({
+            parseString: function (fileData, callback) {
+                //call callback with no error and altered xml2jsConfig data
+                callback(undefined, data);
+            }
+        });
+        
+        //Should throw an EXCEPTION_INVALID_ID error
+        expect(function () {
+            configParser.parse(configPath, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ID"));
+        
+        
     });
 });
