@@ -2,6 +2,7 @@ var srcPath = __dirname + "/../../../lib/",
     fs = require("fsext"),
     path = require("path"),
     util = require("util"),
+    localize = require(srcPath + "localize"),
     wrench = require("wrench"),
     logger = require(srcPath + "logger"),
     fileMgr = require(srcPath + "file-manager"),
@@ -30,27 +31,7 @@ describe("File manager", function () {
             extPath = session.sourcePaths.EXT,
             toDir = extPath + "/" + feature,
             apiDir = path.resolve(session.conf.EXT, feature),
-            accessList = [{
-                uri: "http://google.com",
-                allowSubDomain: false,
-                features: [{
-                    id: "blackberry.app",
-                    required: true,
-                    version: "1.0.0"
-                }, {
-                    id: "blackberry.system",
-                    required:  true,
-                    version: "1.0.0"
-                }]
-            }, {
-                uri: "WIDGET_LOCAL",
-                allowSubDomain: false,
-                features: [{
-                    id: "blackberry.system",
-                    required: true,
-                    version: "1.0.0"
-                }]
-            }];
+            accessList = testData.accessList;
 
         spyOn(path, "existsSync").andReturn(true);
         spyOn(wrench, "mkdirSyncRecursive");
@@ -78,6 +59,55 @@ describe("File manager", function () {
         expect(function () {
             fileMgr.copyExtensions(accessList, session.conf.EXT, session.sourcePaths.EXT);
         }).toThrow(new Error("Failed to find feature with id: abc.def.ijk"));
+    });
+    
+    it("throws an error when the client.js file does not exist in ext folder", function () {
+        var session = testData.session,
+            accessList = testData.accessList;
+
+        //When checking if client.js exists, return false
+        spyOn(path, "existsSync").andCallFake(function (mPath) {
+            return mPath.indexOf("client.js") === -1;
+        });
+
+        //Return a dummy path 
+        spyOn(path, "resolve").andReturn("/I/DO/NOT/EXIST");
+            
+        expect(function () {
+            fileMgr.copyExtensions(accessList, session.conf.EXT, session.sourcePaths.EXT);
+        }).toThrow(new Error(localize.translate("EXCEPTION_MISSING_FILE_IN_API_DIR", "client.js", "/I/DO/NOT/EXIST")));
+    });
+    
+    it("throws an error when the index.js file does not exist in ext folder", function () {
+        var session = testData.session,
+            accessList = testData.accessList;
+
+        //When checking if client.js exists, return false
+        spyOn(path, "existsSync").andCallFake(function (mPath) {
+            return mPath.indexOf("index.js") === -1;
+        });
+
+        //Return a dummy path 
+        spyOn(path, "resolve").andReturn("/I/DO/NOT/EXIST");
+            
+        expect(function () {
+            fileMgr.copyExtensions(accessList, session.conf.EXT, session.sourcePaths.EXT);
+        }).toThrow(new Error(localize.translate("EXCEPTION_MISSING_FILE_IN_API_DIR", "index.js", "/I/DO/NOT/EXIST")));
+    });
+    
+    it("throws an error when there are non-js files in ext folder", function () {
+        var session = testData.session,
+            accessList = testData.accessList,
+            clientJsPath = session.conf.EXT + "\\blackberry.app\\client.js";
+
+        //When checking if client.js is a .js file, return a .nonJsExtension
+        spyOn(path, "extname").andCallFake(function (mPath) {
+            return (mPath.indexOf("client.js") !== -1) ? ".nonJsExtension" : ".js";
+        });
+            
+        expect(function () {
+            fileMgr.copyExtensions(accessList, session.conf.EXT, session.sourcePaths.EXT);
+        }).toThrow(new Error(localize.translate("EXCEPTION_NON_JS_FILE_IN_API_DIR", clientJsPath)));
     });
 
     it("generateFrameworkModulesJS() should create frameworkModules.js", function () {
