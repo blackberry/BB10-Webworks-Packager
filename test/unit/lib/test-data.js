@@ -28,5 +28,26 @@ module.exports = {
         "author": 'Research In Motion Ltd.',
         "description": 'This is a test!',
         "image": 'test.png'
-    }
+    },
+    accessList: [{
+        uri: "http://google.com",
+        allowSubDomain: false,
+        features: [{
+            id: "blackberry.app",
+            required: true,
+            version: "1.0.0"
+        }, {
+            id: "blackberry.system",
+            required:  true,
+            version: "1.0.0"
+        }]
+    }, {
+        uri: "WIDGET_LOCAL",
+        allowSubDomain: false,
+        features: [{
+            id: "blackberry.system",
+            required: true,
+            version: "1.0.0"
+        }]
+    }]
 };
