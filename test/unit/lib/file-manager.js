@@ -98,7 +98,7 @@ describe("File manager", function () {
     it("throws an error when there are non-js files in ext folder", function () {
         var session = testData.session,
             accessList = testData.accessList,
-            clientJsPath = session.conf.EXT + "\\blackberry.app\\client.js";
+            clientJsPath = path.join(session.conf.EXT, "/blackberry.app/client.js");
 
         //When checking if client.js is a .js file, return a .nonJsExtension
         spyOn(path, "extname").andCallFake(function (mPath) {
