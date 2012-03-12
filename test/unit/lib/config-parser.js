@@ -15,6 +15,9 @@ describe("xml parser", function () {
             expect(configObj.icon).toEqual("test.png");
             expect(configObj.configXML).toEqual("config.xml");
             expect(configObj.author).toEqual("Research In Motion Ltd.");
+            expect(configObj.authorURL).toEqual("http://www.rim.com/");
+            expect(configObj.copyRight).toEqual("No Copyright");
+            expect(configObj.authorEmail).toEqual("author@rim.com");
             expect(configObj.name).toEqual("Demo");
             expect(configObj.description).toEqual("This app does everything.");
         });

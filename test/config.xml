@@ -5,7 +5,9 @@
         id="MyWidgetId">
     <name>Demo</name>
     <content src="local:///startPage.html"/>
-    <author>Research In Motion Ltd.</author>
+    <author rim:copyright="No Copyright"
+            href="http://www.rim.com/"
+            email = "author@rim.com">Research In Motion Ltd.</author>
     <description>This app does everything.</description>
     <license href="http://www.apache.org/licenses/LICENSE-2.0">My License</license>
     <icon rim:hover="false" src="test.png"/>
