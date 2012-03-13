@@ -8,38 +8,6 @@
     
     <profiles>
         <profile>
-            <id>configure-scm</id>
-            <activation>
-                <property>
-                    <name>scm</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.1.1</version>
-                        <executions>
-                            <execution>
-                                <id>configure-packager</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>configure.bat</executable>
-                                    <arguments>
-                                        <argument>-p</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>    
-        </profile>
-        <profile>
             <id>configure-windows</id>
             <activation>
                 <os>
@@ -61,6 +29,9 @@
                                 </goals>
                                 <configuration>
                                     <executable>configure.bat</executable>
+                                    <arguments>
+                                        <argument>${scm}</argument>
+                                    </arguments>
                                 </configuration>
                             </execution>
                         </executions>
@@ -119,6 +90,9 @@
                             <pom>Framework/pom.xml</pom>
                             <streamLogs>true</streamLogs>
                             <noLog>true</noLog>
+                            <properties>
+                                <scm>${scm}</scm>
+                            </properties>
                         </configuration>
                     </execution>
                 </executions>
