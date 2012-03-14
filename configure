@@ -1,3 +1,5 @@
 npm install -g jake jshint@0.5.2 csslint uglify-js
-git submodule update --init
 npm install
+if [ "$1" != "-p" ]; then
+    git submodule update --init
+fi
