@@ -31,3 +31,28 @@ module.exports = {
         return newObj;
     }
 };
+
+describe("test-utilities", function () {
+    var testUtilities = require("./test-utilities");
+    
+    it("can clone objects using cloneObj", function () {
+        var obj = {
+                A: "A",
+                B: "B",
+                C: { 
+                    CA: "CA",
+                    CB: "CB",
+                    CC: {
+                        CCA: "CCA"
+                    }
+                }
+            },
+            clonedObj = testUtilities.cloneObj(obj);
+        
+        //not the same object
+        expect(clonedObj).not.toBe(obj);
+        
+        //has the same data
+        expect(clonedObj).toEqual(obj);
+    });
+});
