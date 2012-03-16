@@ -2,6 +2,7 @@ var testData = require("./test-data"),
     configParser = require(testData.libPath + "/config-parser"),
     fileManager = require(testData.libPath + "/file-manager"),
     logger = require(testData.libPath + "./logger"),
+    pkgrUtils = require(testData.libPath + "./packager-utils"),
     testUtilities = require("./test-utilities"),
     xml2js = require('xml2js'),
     localize = require(testData.libPath + "/localize"),
@@ -34,6 +35,9 @@ describe("xml parser", function () {
             expect(configObj.authorEmail).toEqual("author@rim.com");
             expect(configObj.name).toEqual("Demo");
             expect(configObj.description).toEqual("This app does everything.");
+            expect(pkgrUtils.contains(configObj.permissions, 'access_shared')).toBeTruthy();
+            expect(pkgrUtils.contains(configObj.permissions, 'read_geolocation')).toBeTruthy();
+            expect(pkgrUtils.contains(configObj.permissions, 'use_camera')).toBeTruthy();
         });
     });
     
@@ -134,5 +138,17 @@ describe("xml parser", function () {
         configParser.parse(configPath, session, function () {});
         
         expect(fileManager.cleanSource).toHaveBeenCalled();
+    });
+    
+    it("adds the access_internet permission if unprovided", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['rim:permit'] = [];
+        
+        mockParsing(data);
+        
+        configParser.parse(configPath, session, function (configObj) {
+            //access_internet permission was set
+            expect(pkgrUtils.contains(configObj.permissions, 'access_internet')).toBeTruthy();
+        });
     });
 });
