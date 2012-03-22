@@ -1,12 +1,26 @@
 var testData = require("./test-data"),
     configParser = require(testData.libPath + "/config-parser"),
+    fileManager = require(testData.libPath + "/file-manager"),
+    logger = require(testData.libPath + "./logger"),
     testUtilities = require("./test-utilities"),
+    xml2js = require('xml2js'),
+    localize = require(testData.libPath + "/localize"),
     path = require("path"),
+    session = testData.session,
     configPath = path.resolve("test/config.xml");
+    
+function mockParsing(data, error) {
+    spyOn(xml2js, "Parser").andReturn({
+        parseString: function (fileData, callback) {
+            //call callback with no error and altered xml2jsConfig data
+            callback(error, data);
+        }
+    });
+}
 
 describe("xml parser", function () {
     it("parses standard elements in a config.xml", function () {
-        configParser.parse(configPath, function (configObj) {
+        configParser.parse(configPath, session, function (configObj) {
             expect(configObj.content).toEqual("local:///startPage.html");
             expect(configObj.id).toEqual("MyWidgetId");
             expect(configObj.version).toEqual("1.0.0");
@@ -27,7 +41,7 @@ describe("xml parser", function () {
         var localAccessList,
             accessListFeature;
 
-        configParser.parse(configPath, function (configObj) {
+        configParser.parse(configPath, session, function (configObj) {
             //validate WIDGET_LOCAL accessList
             localAccessList = testUtilities.getAccessListForUri(configObj.accessList, "WIDGET_LOCAL");
             expect(localAccessList).toBeDefined();
@@ -54,7 +68,7 @@ describe("xml parser", function () {
         var customAccessList,
             accessListFeature;
 
-        configParser.parse(configPath, function (configObj) {
+        configParser.parse(configPath, session, function (configObj) {
             //validate http://www.somedomain1.com accessList
             customAccessList = testUtilities.getAccessListForUri(configObj.accessList, "http://www.somedomain1.com");
             expect(customAccessList).toBeDefined();
@@ -80,9 +94,45 @@ describe("xml parser", function () {
     it("parses a bare minimum config.xml without error", function () {
         configPath = path.resolve("test/config-bare-minimum.xml");
 
-        configParser.parse(configPath, function (configObj) {
+        configParser.parse(configPath, session, function (configObj) {
             expect(configObj.content).toEqual("local:///startPage.html");
             expect(configObj.version).toEqual("1.0.0");
         });
+    });
+    
+    it("fails when id is undefined", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["@"].id = undefined;
+        
+        mockParsing(data);
+        
+        //Should throw an EXCEPTION_INVALID_ID error
+        expect(function () {
+            configParser.parse(configPath, session, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ID"));
+        
+        
+    });
+    
+    it("adds local:/// protocol to urls", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.content["@"].src = "localFile.html";
+        
+        mockParsing(data);
+        
+        configParser.parse(configPath, session, function (configObj) {
+            expect(configObj.content).toEqual("local:///localFile.html");
+        });
+    });
+    
+    it("cleans source folder on error", function () {
+        mockParsing({}, "ERROR");
+        
+        spyOn(logger, "error");
+        spyOn(fileManager, "cleanSource");
+        
+        configParser.parse(configPath, session, function () {});
+        
+        expect(fileManager.cleanSource).toHaveBeenCalled();
     });
 });
