@@ -91,7 +91,7 @@
                             <streamLogs>true</streamLogs>
                             <noLog>true</noLog>
                             <properties>
-                                <scm>${scm}</scm>
+                                <scm>-notscm</scm>
                             </properties>
                         </configuration>
                     </execution>
