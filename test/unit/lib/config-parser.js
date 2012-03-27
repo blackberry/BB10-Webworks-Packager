@@ -34,6 +34,9 @@ describe("xml parser", function () {
             expect(configObj.authorEmail).toEqual("author@rim.com");
             expect(configObj.name).toEqual("Demo");
             expect(configObj.description).toEqual("This app does everything.");
+            expect(configObj.permissions).toContain('access_shared');
+            expect(configObj.permissions).toContain('read_geolocation');
+            expect(configObj.permissions).toContain('use_camera');
         });
     });
     
@@ -134,5 +137,17 @@ describe("xml parser", function () {
         configParser.parse(configPath, session, function () {});
         
         expect(fileManager.cleanSource).toHaveBeenCalled();
+    });
+    
+    it("adds the access_internet permission if unprovided", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['rim:permit'] = [];
+        
+        mockParsing(data);
+        
+        configParser.parse(configPath, session, function (configObj) {
+            //access_internet permission was set
+            expect(configObj.permissions).toContain('access_internet');
+        });
     });
 });
