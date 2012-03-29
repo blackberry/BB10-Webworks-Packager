@@ -5,7 +5,10 @@
     <version>1.0.0.0</version>
     <name>${project.artifactId}-${project.version}</name>
     <packaging>pom</packaging>
-    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <scm>notscm</scm>
+    </properties>
     <profiles>
         <profile>
             <id>configure-windows</id>
@@ -63,6 +66,7 @@
                                     <executable>sudo</executable>
                                     <arguments>
                                         <argument>./configure</argument>
+                                        <argument>${scm}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -89,10 +93,7 @@
                         <configuration>
                             <pom>Framework/pom.xml</pom>
                             <streamLogs>true</streamLogs>
-                            <noLog>true</noLog>
-                            <properties>
-                                <scm>${scm}</scm>
-                            </properties>
+                            <noLog>true</noLog>                            
                         </configuration>
                     </execution>
                 </executions>
@@ -206,7 +207,4 @@
             </plugin>
         </plugins>
     </build>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 </project>
