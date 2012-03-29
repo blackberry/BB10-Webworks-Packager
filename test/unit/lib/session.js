@@ -1,5 +1,7 @@
 var session = require(__dirname + "/../../../lib/session"),
-    wrench = require("wrench");
+    path = require("path"),
+    wrench = require("wrench"),
+    zipLocation = __dirname + "/../../config.xml";
 
 describe("Session", function () {
     beforeEach(function () {
@@ -15,7 +17,7 @@ describe("Session", function () {
         },
         result = session.initialize(data);
         
-        expect(result.sourceDir).toEqual("C:\\sampleApp\\mySource\\src");
+        expect(result.sourceDir).toEqual(path.normalize("C:\\sampleApp\\mySource\\src"));
     });
     
     it("sets the source directory correctly when unspecified [-s] and output path set [-o]", function () {
@@ -27,17 +29,17 @@ describe("Session", function () {
         result = session.initialize(data);
         
         //src folder should be created in output directory
-        expect(result.sourceDir).toEqual("C:\\sampleApp\\bin\\src");
+        expect(result.sourceDir).toEqual(path.normalize("C:\\sampleApp\\bin\\src"));
     });
     
     it("sets the source directory correctly when unspecified [-s] and no output path is set", function () {
         var data = {
-            args: [ 'C:\\sampleApp\\sample.zip' ],
+            args: [ zipLocation ],
             source: true//equivalent to [-s]
         },
         result = session.initialize(data);
         
         //src folder should be created in output directory
-        expect(result.sourceDir).toEqual("C:\\sampleApp\\src");
+        expect(result.sourceDir).toEqual(path.join(path.dirname(zipLocation), "\\src"));
     });
 });
