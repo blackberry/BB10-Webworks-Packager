@@ -150,4 +150,77 @@ describe("xml parser", function () {
             expect(configObj.permissions).toContain('access_internet');
         });
     });
+
+    it("multi access should be false if no access", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, function (configObj) {
+            //hasMultiAccess was set to false
+            expect(configObj.hasMultiAccess).toEqual(false);
+            expect(configObj.accessList).toEqual([ {
+                features : [],
+                uri : 'WIDGET_LOCAL',
+                allowSubDomain : true
+            } ]);
+        });
+    });
+
+    it("multi access should be false if no uri is equal to *", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['access'] = {"@" : {"uri" : "http://www.somedomain1.com"}};
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, function (configObj) {
+            //hasMultiAccess was set to false
+            expect(configObj.hasMultiAccess).toEqual(false);
+            expect(configObj.accessList).toEqual([ {
+                features : [],
+                uri : 'WIDGET_LOCAL',
+                allowSubDomain : true
+            }, {
+                "features" : [],
+                "uri" : "http://www.somedomain1.com"
+            } ]);
+        });
+    });
+
+    it("multi access should be true with the uri being equal to *", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['access'] = {"@" : {"uri" : "*"}};
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, function (configObj) {
+            //hasMultiAccess was set to true
+            expect(configObj.hasMultiAccess).toEqual(true);
+            expect(configObj.accessList).toEqual([ {
+                features : [],
+                uri : 'WIDGET_LOCAL',
+                allowSubDomain : true
+            } ]);
+        });
+    });
+
+    it("multi access should be true with one uri being equal to *", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['access'] = [{"@" : {"uri" : "*"}}, {"@" : {"uri" : "http://www.somedomain1.com"}}];
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, function (configObj) {
+            //hasMultiAccess was set to true
+            expect(configObj.hasMultiAccess).toEqual(true);
+            expect(configObj.accessList).toEqual([ {
+                features : [],
+                uri : 'WIDGET_LOCAL',
+                allowSubDomain : true
+            }, {
+                "features" : [],
+                "uri" : "http://www.somedomain1.com"
+            } ]);
+        });
+    });
 });
