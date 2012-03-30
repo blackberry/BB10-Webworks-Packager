@@ -159,7 +159,11 @@ describe("xml parser", function () {
         configParser.parse(configPath, session, function (configObj) {
             //hasMultiAccess was set to false
             expect(configObj.hasMultiAccess).toEqual(false);
-            expect(configObj.accessList).toEqual([]);
+            expect(configObj.accessList).toEqual([ {
+                features : [],
+                uri : 'WIDGET_LOCAL',
+                allowSubDomain : true
+            } ]);
         });
     });
 
@@ -173,6 +177,10 @@ describe("xml parser", function () {
             //hasMultiAccess was set to false
             expect(configObj.hasMultiAccess).toEqual(false);
             expect(configObj.accessList).toEqual([ {
+                features : [],
+                uri : 'WIDGET_LOCAL',
+                allowSubDomain : true
+            }, {
                 "features" : [],
                 "uri" : "http://www.somedomain1.com"
             } ]);
@@ -188,7 +196,11 @@ describe("xml parser", function () {
         configParser.parse(configPath, session, function (configObj) {
             //hasMultiAccess was set to true
             expect(configObj.hasMultiAccess).toEqual(true);
-            expect(configObj.accessList).toEqual([]);
+            expect(configObj.accessList).toEqual([ {
+                features : [],
+                uri : 'WIDGET_LOCAL',
+                allowSubDomain : true
+            } ]);
         });
     });
 
@@ -202,6 +214,10 @@ describe("xml parser", function () {
             //hasMultiAccess was set to true
             expect(configObj.hasMultiAccess).toEqual(true);
             expect(configObj.accessList).toEqual([ {
+                features : [],
+                uri : 'WIDGET_LOCAL',
+                allowSubDomain : true
+            }, {
                 "features" : [],
                 "uri" : "http://www.somedomain1.com"
             } ]);
