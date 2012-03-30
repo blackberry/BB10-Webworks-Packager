@@ -223,4 +223,25 @@ describe("xml parser", function () {
             } ]);
         });
     });
+    
+    it("does not fail when there is a single feature element in the access list", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        
+        //Add an access element with one feature
+        data['access'] = {
+            '@': {
+                uri: 'http://rim.net',
+                subdomains: 'true'
+            },
+            feature: {
+                '@': { id: 'blackberry.system' }
+            }
+        };
+        
+        mockParsing(data);
+        
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).not.toThrow();
+    });
 });
