@@ -42,4 +42,28 @@ describe("Session", function () {
         //src folder should be created in output directory
         expect(result.sourceDir).toEqual(path.join(path.dirname(zipLocation), "src"));
     });
+    
+    it("sets the password when specified using -g", function () {
+        var data = {
+            args: [ 'C:/sampleApp/sample.zip' ],
+            output: 'C:/sampleApp/bin',
+            source: 'C:/sampleApp/mySource',//equivalent to [-s C:/sampleApp/mySource]
+            password: 'myPassword'
+        },
+        result = session.initialize(data);
+        
+        expect(result.storepass).toEqual('myPassword');
+    });
+    
+    it("sets the buildId when specified [-buildId]", function () {
+        var data = {
+            args: [ 'C:/sampleApp/sample.zip' ],
+            output: 'C:/sampleApp/bin',
+            source: 'C:/sampleApp/mySource',//equivalent to [-s C:/sampleApp/mySource]
+            buildId: '100'
+        },
+        result = session.initialize(data);
+        
+        expect(result.buildId).toEqual('100');
+    });
 });
