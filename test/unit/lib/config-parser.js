@@ -30,7 +30,7 @@ describe("xml parser", function () {
             expect(configObj.configXML).toEqual("config.xml");
             expect(configObj.author).toEqual("Research In Motion Ltd.");
             expect(configObj.authorURL).toEqual("http://www.rim.com/");
-            expect(configObj.copyRight).toEqual("No Copyright");
+            expect(configObj.copyright).toEqual("No Copyright");
             expect(configObj.authorEmail).toEqual("author@rim.com");
             expect(configObj.name).toEqual("Demo");
             expect(configObj.description).toEqual("This app does everything.");
@@ -100,6 +100,15 @@ describe("xml parser", function () {
         configParser.parse(configPath, session, function (configObj) {
             expect(configObj.content).toEqual("local:///startPage.html");
             expect(configObj.version).toEqual("1.0.0");
+        });
+    });
+
+    it("license url is set even if license body is empty", function () {
+        configPath = path.resolve("test/config-license.xml");
+
+        configParser.parse(configPath, session, function (configObj) {
+            expect(configObj.license).toEqual("");
+            expect(configObj.licenseURL).toEqual("http://www.apache.org/licenses/LICENSE-2.0");
         });
     });
     
