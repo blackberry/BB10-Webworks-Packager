@@ -232,6 +232,30 @@ describe("xml parser", function () {
             } ]);
         });
     });
+
+    it("should fail when feature is defined with the uri being equal to *", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['access'] = {"@" : {"uri" : "*"}, "feature" : {"@": {"id": "blackberry.app"}}};
+
+        //console.log(data);
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).toThrow("Invalid config.xml - no tags are allowed for this element");
+    });
+
+    it("should fail when multi features are defined with the uri being equal to *", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['access'] = {"@" : {"uri" : "*"}, "feature" : {"@": {"id": "blackberry.app"}}, "feature" : {"@": {"id": "blackberry.system"}}, "feature" : {"@": {"id": "blackberry.invoke"}}};
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).toThrow("Invalid config.xml - no tags are allowed for this element");
+    });
     
     it("does not fail when there is a single feature element in the access list", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
