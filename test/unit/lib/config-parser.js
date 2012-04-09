@@ -241,7 +241,7 @@ describe("xml parser", function () {
 
         expect(function () {
             configParser.parse(configPath, session, function (configObj) {});
-        }).toThrow("Invalid config.xml - no tags are allowed for this element");
+        }).toThrow(localize.translate("EXCEPTION_FEATURE_DEFINED_WITH_WILDCARD_ACCESS_URI"));
     });
 
     it("should fail when multi features are defined with the uri being equal to *", function () {
@@ -252,7 +252,7 @@ describe("xml parser", function () {
 
         expect(function () {
             configParser.parse(configPath, session, function (configObj) {});
-        }).toThrow("Invalid config.xml - no tags are allowed for this element");
+        }).toThrow(localize.translate("EXCEPTION_FEATURE_DEFINED_WITH_WILDCARD_ACCESS_URI"));
     });
     
     it("does not fail when there is a single feature element in the access list", function () {
