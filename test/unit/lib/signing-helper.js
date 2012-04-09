@@ -38,21 +38,19 @@ describe("signing-helper", function () {
         expect(result).toContain("~/Library/Research In Motion/");
     });
     
-    it("throws an exception on windows when keys cannot be found", function () {
+    it("returns undefined on windows when keys cannot be found", function () {
         spyOn(os, "type").andReturn("windows");
         spyOn(path, "existsSync").andReturn(false);
         
-        expect(function () {
-            signingHelper.getKeyStorePath();
-        }).toThrow(localize.translate("EXCEPTION_MISSING_SIGNING_KEYS"));
+        var result = signingHelper.getKeyStorePath();
+        expect(result).toBeUndefined();
     });
     
-    it("throws an exception on mac when keys cannot be found", function () {
+    it("returns undefined on mac when keys cannot be found", function () {
         spyOn(os, "type").andReturn("darwin");
         spyOn(path, "existsSync").andReturn(false);
         
-        expect(function () {
-            signingHelper.getKeyStorePath();
-        }).toThrow(localize.translate("EXCEPTION_MISSING_SIGNING_KEYS"));
+        var result = signingHelper.getKeyStorePath();
+        expect(result).toBeUndefined();
     });
 });
