@@ -237,8 +237,6 @@ describe("xml parser", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data['access'] = {"@" : {"uri" : "*"}, "feature" : {"@": {"id": "blackberry.app"}}};
 
-        //console.log(data);
-
         mockParsing(data);
 
         expect(function () {
@@ -248,7 +246,7 @@ describe("xml parser", function () {
 
     it("should fail when multi features are defined with the uri being equal to *", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
-        data['access'] = {"@" : {"uri" : "*"}, "feature" : {"@": {"id": "blackberry.app"}}, "feature" : {"@": {"id": "blackberry.system"}}, "feature" : {"@": {"id": "blackberry.invoke"}}};
+        data['access'] = {"@" : {"uri" : "*"}, "feature" : [{"@": {"id": "blackberry.app"}}, {"@": {"id": "blackberry.system"}}, {"@": {"id": "blackberry.invoke"}}]};
 
         mockParsing(data);
 
