@@ -182,6 +182,24 @@
                             </artifactItems>
                         </configuration>
                   </execution>
+                  <execution>
+                        <id>unpack-bar-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>        
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>net.rim.BBXwebworks</groupId>
+                                    <artifactId>bar-dependencies</artifactId>
+                                    <version>1.0.0.0</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                  </execution>
                 </executions>
             </plugin>
 
