@@ -15,7 +15,8 @@ module.exports = {
             "ROOT": path.resolve(outputDir + "/src"),
             "CHROME": path.normalize(path.resolve(outputDir + "/src") + barConf.CHROME),
             "LIB": path.normalize(path.resolve(outputDir + "/src") + barConf.LIB),
-            "EXT": path.normalize(path.resolve(outputDir + "/src") + barConf.EXT)
+            "EXT": path.normalize(path.resolve(outputDir + "/src") + barConf.EXT),
+            "PLUGINS": path.normalize(path.resolve(outputDir + "/src") + barConf.PLUGINS)
         },
         "archivePath": path.resolve("test/test.zip"),
         "conf": require(path.resolve(libPath + "/conf")),
