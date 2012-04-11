@@ -31,11 +31,11 @@ describe("signing-helper", function () {
         spyOn(os, "type").andReturn("darwin");
         
         spyOn(path, "existsSync").andCallFake(function (path) {
-            return path.indexOf("~/Library/Research In Motion/") !== -1;
+            return path.indexOf("/Library/Research In Motion/") !== -1;
         });
         
         var result = signingHelper.getKeyStorePath();
-        expect(result).toContain("~/Library/Research In Motion/");
+        expect(result).toContain("/Library/Research In Motion/");
     });
     
     it("returns undefined on windows when keys cannot be found", function () {
