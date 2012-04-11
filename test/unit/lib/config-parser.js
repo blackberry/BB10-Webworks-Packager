@@ -122,8 +122,30 @@ describe("xml parser", function () {
         expect(function () {
             configParser.parse(configPath, session, {});
         }).toThrow(localize.translate("EXCEPTION_INVALID_ID"));
+    });
+    
+    it("fails when id begins with a number", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["@"].id = "1abcdefghijk";
         
+        mockParsing(data);
         
+        //Should throw an EXCEPTION_INVALID_ID error
+        expect(function () {
+            configParser.parse(configPath, session, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ID"));
+    });
+    
+    it("fails when id contains a non [a-zA-Z0-9] character", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["@"].id = "abcde#fghijk";
+        
+        mockParsing(data);
+        
+        //Should throw an EXCEPTION_INVALID_ID error
+        expect(function () {
+            configParser.parse(configPath, session, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ID"));
     });
     
     it("adds local:/// protocol to urls", function () {
