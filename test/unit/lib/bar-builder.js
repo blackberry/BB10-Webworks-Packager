@@ -16,7 +16,6 @@ describe("BAR builder", function () {
 
         spyOn(wrench, "mkdirSyncRecursive");
         spyOn(fileMgr, "copyWWE");
-        spyOn(fileMgr, "copyBarDependencies");
         spyOn(nativePkgr, "exec").andCallFake(function (session, target, config, callback) {
             callback(0);
         });
@@ -25,7 +24,6 @@ describe("BAR builder", function () {
 
         expect(wrench.mkdirSyncRecursive).toHaveBeenCalledWith(session.outputDir + "/" + target);
         expect(fileMgr.copyWWE).toHaveBeenCalledWith(session, target);
-        expect(fileMgr.copyBarDependencies).toHaveBeenCalledWith(session);
         expect(nativePkgr.exec).toHaveBeenCalledWith(session, target, config, jasmine.any(Function));
         expect(callback).toHaveBeenCalledWith(0);
     });

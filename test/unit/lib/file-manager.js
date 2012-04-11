@@ -25,14 +25,6 @@ describe("File manager", function () {
         expect(fs.copySync).toHaveBeenCalledWith(path.normalize(util.format(session.conf.DEPENDENCIES_WWE, "simulator") + "/wwe"), path.normalize(session.sourceDir + "/wwe"));
     });
 
-    it("copyBarDependencies() should copy bar-dependencies dir contents to the specified target", function () {
-        spyOn(wrench, "copyDirSyncRecursive");
-
-        fileMgr.copyBarDependencies(session);
-
-        expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(path.normalize(session.conf.DEPENDENCIES_BAR), path.normalize(session.sourceDir));
-    });
-
     it("copyExtensions() should copy files required by features listed in config.xml", function () {
         var session = testData.session,
             feature = "blackberry.app",
