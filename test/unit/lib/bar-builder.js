@@ -25,7 +25,7 @@ describe("BAR builder", function () {
 
         expect(wrench.mkdirSyncRecursive).toHaveBeenCalledWith(session.outputDir + "/" + target);
         expect(fileMgr.copyWWE).toHaveBeenCalledWith(session, target);
-        expect(fileMgr.copyBarDependencies).toHaveBeenCalledWith(session, target);
+        expect(fileMgr.copyBarDependencies).toHaveBeenCalledWith(session);
         expect(nativePkgr.exec).toHaveBeenCalledWith(session, target, config, jasmine.any(Function));
         expect(callback).toHaveBeenCalledWith(0);
     });
