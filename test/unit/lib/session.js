@@ -40,6 +40,6 @@ describe("Session", function () {
         result = session.initialize(data);
         
         //src folder should be created in output directory
-        expect(result.sourceDir).toEqual(path.join(path.dirname(zipLocation), "src"));
+        expect(result.sourceDir).toEqual(path.join(process.cwd(), "src"));
     });
 });
