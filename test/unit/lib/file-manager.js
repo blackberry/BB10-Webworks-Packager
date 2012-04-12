@@ -11,6 +11,8 @@ var srcPath = __dirname + "/../../../lib/",
 
 describe("File manager", function () {
     it("prepareOutputFiles() should copy files and unzip archive", function () {
+        spyOn(fileMgr, "copyBarDependencies");
+
         fileMgr.prepareOutputFiles(session);
 
         expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
