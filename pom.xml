@@ -7,7 +7,7 @@
     <packaging>pom</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scm>notscm</scm>
+        <scm>ci</scm>
     </properties>
     <profiles>
         <profile>
@@ -92,6 +92,9 @@
                         </goals>
                         <configuration>
                             <pom>Framework/pom.xml</pom>
+                            <properties>
+                                <scm>${scm}</scm>
+                            </properties>
                             <streamLogs>true</streamLogs>
                             <noLog>true</noLog>                            
                         </configuration>
