@@ -175,7 +175,7 @@
                                 <artifactItem>
                                     <groupId>net.rim.BBXwebworks</groupId>
                                     <artifactId>packager-bin</artifactId>
-                                    <version>1.0.0.9</version>
+                                    <version>1.0.0.11</version>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
@@ -193,7 +193,7 @@
                                 <artifactItem>
                                     <groupId>net.rim.BBXwebworks</groupId>
                                     <artifactId>bar-dependencies</artifactId>
-                                    <version>1.0.0.1</version>
+                                    <version>1.0.0.2</version>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
