@@ -1,3 +1,3 @@
 #!/bin/sh
 BBWP_DIR=`dirname $0`
-$BBWP_DIR/dependencies/node/node $BBWP_DIR/lib/bbwp.js $@
+$BBWP_DIR/dependencies/node/node $BBWP_DIR/lib/bbwp.js "$@"
