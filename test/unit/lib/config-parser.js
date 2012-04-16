@@ -297,4 +297,44 @@ describe("xml parser", function () {
             configParser.parse(configPath, session, function (configObj) {});
         }).not.toThrow();
     });
+    
+    it("supports 4 digit version [build id]", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["@"].version = "1.0.0.50";
+        
+        mockParsing(data);
+        
+        configParser.parse(configPath, session, function (configObj) {
+            expect(configObj.version).toEqual("1.0.0");
+            expect(configObj.buildId).toEqual("50");
+        });
+    });
+    
+    it("uses --buildId when set", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        
+        //--buildId 100
+        session.buildId = "100";
+        
+        mockParsing(data);
+        
+        configParser.parse(configPath, session, function (configObj) {
+            expect(configObj.buildId).toEqual("100");
+        });
+    });
+    
+    it("overides the build id specified in version with --buildId flag", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["@"].version = "1.0.0.50";
+        
+        //--buildId 100
+        session.buildId = "100";
+        
+        mockParsing(data);
+        
+        configParser.parse(configPath, session, function (configObj) {
+            expect(configObj.version).toEqual("1.0.0");
+            expect(configObj.buildId).toEqual("100");
+        });
+    });
 });
