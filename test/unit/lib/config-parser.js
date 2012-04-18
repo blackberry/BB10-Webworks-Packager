@@ -181,6 +181,24 @@ describe("xml parser", function () {
             expect(configObj.permissions).toContain('access_internet');
         });
     });
+    
+    it("does not add unwanted local features to custom access rules", function () {
+        var customAccessList,
+            data = testUtilities.cloneObj(testData.xml2jsConfig);
+        
+        //Add a local feature element and a custom access list
+        data['feature'] = {'@': {id: 'blackberry.app', required: 'true', version: '1.0.0.0'}};//local feature
+        data['access'] = {'@': {uri: 'http://ci0000000094448.rim.net', subdomains: 'true'}};//custom access rule
+        
+        mockParsing(data);
+
+        configParser.parse(configPath, session, function (configObj) {
+            customAccessList = testUtilities.getAccessListForUri(configObj.accessList, 'http://ci0000000094448.rim.net');
+            
+            //The custom access list features should remain empty
+            expect(customAccessList.features).toEqual([]);
+        });
+    });
 
     it("multi access should be false if no access", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
