@@ -48,4 +48,9 @@ describe("Command line", function () {
         cmd.parseOptions(["--buildId", "100"]);
         expect(cmd.buildId).toEqual("100");
     });
+    
+    it("accepts -buildId with argument", function () {
+        cmd.parseOptions(["-buildId", "100"]);
+        expect(cmd.buildId).toEqual("100");
+    });
 });
