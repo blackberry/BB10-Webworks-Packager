@@ -24,6 +24,5 @@ module.exports = {
     DEPENDENCIES: path.normalize(__dirname + "/../../dependencies"),
     NODE_MOD: path.normalize(__dirname + "/../../node_modules"),
     FRAMEWORK: path.normalize(__dirname + "/../../Framework"),
-    FRAMEWORK_DEPLOY: path.normalize(__dirname + "/../../Framework/target/zip/*"),
-    FRAMEWORK_EMU_LIB: path.normalize(__dirname + "/../../Framework/dependencies/BBX-Emulator/lib/*")
+    FRAMEWORK_DEPLOY: path.normalize(__dirname + "/../../Framework/target/zip/*")
 };
