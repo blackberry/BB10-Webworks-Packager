@@ -199,6 +199,17 @@ describe("xml parser", function () {
             expect(customAccessList.features).toEqual([]);
         });
     });
+        
+    it("does not throw an exception with empty permit tags", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['rim:permit'] = ['read_geolocation', {}, 'access_internet' ];
+        
+        mockParsing(data);
+        
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).not.toThrow();
+    });
 
     it("multi access should be false if no access", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
