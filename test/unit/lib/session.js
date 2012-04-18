@@ -65,8 +65,19 @@ describe("Session", function () {
             password: 'myPassword'
         },
         result = session.initialize(data);
-        
         expect(result.storepass).toEqual('myPassword');
+    });
+    
+    it("does not set the password when not a string", function () {
+        //Commander somtimes improperly sets password to a function, when no value provided
+        var data = {
+            args: [ 'C:/sampleApp/sample.zip' ],
+            output: 'C:/sampleApp/bin',
+            source: 'C:/sampleApp/mySource',//equivalent to [-s C:/sampleApp/mySource]
+            password: function () {}
+        },
+        result = session.initialize(data);
+        expect(result.storepass).toBeUndefined();
     });
     
     it("sets the buildId when specified [-buildId]", function () {
@@ -77,7 +88,6 @@ describe("Session", function () {
             buildId: '100'
         },
         result = session.initialize(data);
-        
         expect(result.buildId).toEqual('100');
     });
     
