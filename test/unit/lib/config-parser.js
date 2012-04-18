@@ -366,4 +366,16 @@ describe("xml parser", function () {
             expect(configObj.buildId).toEqual("100");
         });
     });
+    
+    it("throws a proper error when author tag is empty", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.author = {};
+        
+        mockParsing(data);
+        
+        //Should throw an EXCEPTION_INVALID_AUTHOR error
+        expect(function () {
+            configParser.parse(configPath, session, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_AUTHOR"));
+    });
 });
