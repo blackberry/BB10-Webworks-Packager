@@ -196,7 +196,7 @@
                                 <artifactItem>
                                     <groupId>net.rim.BBXwebworks</groupId>
                                     <artifactId>bar-dependencies</artifactId>
-                                    <version>1.0.0.2</version>
+                                    <version>1.0.0.3</version>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
