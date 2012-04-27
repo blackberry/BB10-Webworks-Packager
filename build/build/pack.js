@@ -44,11 +44,11 @@ function _copyCmd(source, destination) {
 function _copyFiles() {
     var cmdSep = " && ";
     return  _copyCmd(_c.FRAMEWORK_DEPLOY, 'Framework/') + cmdSep +
-            _copyCmd(_c.FRAMEWORK_EMU_LIB, 'dependencies/BBX-Emulator/') + cmdSep +
             _copyCmd(_c.LIB, 'lib') + cmdSep +
             _copyCmd(_c.NODE_MOD, 'node_modules') + cmdSep +
             _copyCmd(_c.ROOT + 'bbwp', '') + cmdSep +
-            _copyCmd(_c.ROOT + 'bbwp.bat', '');
+            _copyCmd(_c.ROOT + 'bbwp.bat', '') + cmdSep +
+            _copyCmd(_c.ROOT + 'licenses.txt', '');
 }
 
 function _processFiles() {

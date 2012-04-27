@@ -98,6 +98,8 @@ describe("Native packager", function () {
             "<versionNumber>" + config.version + "</versionNumber>" +
             "<author>" + config.author + "</author>" +
             "<asset entry=\"true\" type=\"qnx/elf\">wwe</asset>" +
+            "<asset>abc</asset>" +
+            "<asset>xyz</asset>" +            
             "<initialWindow><systemChrome>none</systemChrome><transparent>true</transparent></initialWindow>" +
             "<env value=\"12\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>" +
             "<permission system=\"true\">run_native</permission>" +

@@ -122,8 +122,30 @@ describe("xml parser", function () {
         expect(function () {
             configParser.parse(configPath, session, {});
         }).toThrow(localize.translate("EXCEPTION_INVALID_ID"));
+    });
+    
+    it("fails when id begins with a number", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["@"].id = "1abcdefghijk";
         
+        mockParsing(data);
         
+        //Should throw an EXCEPTION_INVALID_ID error
+        expect(function () {
+            configParser.parse(configPath, session, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ID"));
+    });
+    
+    it("fails when id contains a non [a-zA-Z0-9] character", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["@"].id = "abcde#fghijk";
+        
+        mockParsing(data);
+        
+        //Should throw an EXCEPTION_INVALID_ID error
+        expect(function () {
+            configParser.parse(configPath, session, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ID"));
     });
     
     it("adds local:/// protocol to urls", function () {
@@ -158,6 +180,35 @@ describe("xml parser", function () {
             //access_internet permission was set
             expect(configObj.permissions).toContain('access_internet');
         });
+    });
+    
+    it("does not add unwanted local features to custom access rules", function () {
+        var customAccessList,
+            data = testUtilities.cloneObj(testData.xml2jsConfig);
+        
+        //Add a local feature element and a custom access list
+        data['feature'] = {'@': {id: 'blackberry.app', required: 'true', version: '1.0.0.0'}};//local feature
+        data['access'] = {'@': {uri: 'http://ci0000000094448.rim.net', subdomains: 'true'}};//custom access rule
+        
+        mockParsing(data);
+
+        configParser.parse(configPath, session, function (configObj) {
+            customAccessList = testUtilities.getAccessListForUri(configObj.accessList, 'http://ci0000000094448.rim.net');
+            
+            //The custom access list features should remain empty
+            expect(customAccessList.features).toEqual([]);
+        });
+    });
+        
+    it("does not throw an exception with empty permit tags", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['rim:permit'] = ['read_geolocation', {}, 'access_internet' ];
+        
+        mockParsing(data);
+        
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).not.toThrow();
     });
 
     it("multi access should be false if no access", function () {
@@ -232,6 +283,28 @@ describe("xml parser", function () {
             } ]);
         });
     });
+
+    it("should fail when feature is defined with the uri being equal to *", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['access'] = {"@" : {"uri" : "*"}, "feature" : {"@": {"id": "blackberry.app"}}};
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).toThrow(localize.translate("EXCEPTION_FEATURE_DEFINED_WITH_WILDCARD_ACCESS_URI"));
+    });
+
+    it("should fail when multi features are defined with the uri being equal to *", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['access'] = {"@" : {"uri" : "*"}, "feature" : [{"@": {"id": "blackberry.app"}}, {"@": {"id": "blackberry.system"}}, {"@": {"id": "blackberry.invoke"}}]};
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).toThrow(localize.translate("EXCEPTION_FEATURE_DEFINED_WITH_WILDCARD_ACCESS_URI"));
+    });
     
     it("does not fail when there is a single feature element in the access list", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
@@ -252,5 +325,57 @@ describe("xml parser", function () {
         expect(function () {
             configParser.parse(configPath, session, function (configObj) {});
         }).not.toThrow();
+    });
+    
+    it("supports 4 digit version [build id]", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["@"].version = "1.0.0.50";
+        
+        mockParsing(data);
+        
+        configParser.parse(configPath, session, function (configObj) {
+            expect(configObj.version).toEqual("1.0.0");
+            expect(configObj.buildId).toEqual("50");
+        });
+    });
+    
+    it("uses --buildId when set", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        
+        //--buildId 100
+        session.buildId = "100";
+        
+        mockParsing(data);
+        
+        configParser.parse(configPath, session, function (configObj) {
+            expect(configObj.buildId).toEqual("100");
+        });
+    });
+    
+    it("overides the build id specified in version with --buildId flag", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["@"].version = "1.0.0.50";
+        
+        //--buildId 100
+        session.buildId = "100";
+        
+        mockParsing(data);
+        
+        configParser.parse(configPath, session, function (configObj) {
+            expect(configObj.version).toEqual("1.0.0");
+            expect(configObj.buildId).toEqual("100");
+        });
+    });
+    
+    it("throws a proper error when author tag is empty", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.author = {};
+        
+        mockParsing(data);
+        
+        //Should throw an EXCEPTION_INVALID_AUTHOR error
+        expect(function () {
+            configParser.parse(configPath, session, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_AUTHOR"));
     });
 });
