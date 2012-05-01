@@ -17,7 +17,7 @@ module.exports = {
             "LIB": path.normalize(path.resolve(outputDir + "/src") + barConf.LIB),
             "EXT": path.normalize(path.resolve(outputDir + "/src") + barConf.EXT),
             "PLUGINS": path.normalize(path.resolve(outputDir + "/src") + barConf.PLUGINS),
-            "PPS": path.normalize(path.resolve(outputDir + "/src") + barConf.PPS)
+            "JNEXT_PLUGINS": path.normalize(path.resolve(outputDir + "/src") + barConf.JNEXT_PLUGINS)
         },
         "archivePath": path.resolve("test/test.zip"),
         "conf": require(path.resolve(libPath + "/conf")),

@@ -26,21 +26,72 @@ describe("File manager", function () {
         expect(fs.copySync).toHaveBeenCalledWith(path.normalize(util.format(session.conf.DEPENDENCIES_WWE, "simulator") + "/wwe"), path.normalize(session.sourceDir + "/wwe"));
     });
 
-    it("copyExtensions() should copy files required by features listed in config.xml", function () {
+    it("copyExtensions() should copy all .js files required by features listed in config.xml", function () {
         var session = testData.session,
             feature = "blackberry.app",
-            extPath = session.sourcePaths.EXT,
-            toDir = extPath + "/" + feature,
-            target = session.targets[0],
-            accessList = testData.accessList;
+            toDir = path.join(session.sourcePaths.EXT, feature),
+            apiDir = path.resolve(session.conf.EXT, feature),
+            
+            //extension javascript files
+            indexJS = path.join(apiDir, "index.js"),
+            clientJS = path.join(apiDir, "client.js"),
+            subfolderJS = path.join(apiDir, "/subfolder/myjs.js");//Sub folder js file
+            
 
         spyOn(wrench, "mkdirSyncRecursive");
         spyOn(packager_utils, "copyFile");
+        
+        //Mock the extension directory
+        spyOn(wrench, "readdirSyncRecursive").andCallFake(function (directory) {
+            return [
+                indexJS,
+                clientJS,
+                subfolderJS,
+            ];
+        });
 
-        fileMgr.copyExtensions(accessList, session, target);
+        fileMgr.copyExtensions(testData.accessList, session, session.targets[0]);
 
+        //Extension directory is created
         expect(wrench.mkdirSyncRecursive).toHaveBeenCalledWith(toDir, "0755");
-        expect(packager_utils.copyFile).toHaveBeenCalled();
+        
+        //Javascript files are copied
+        expect(packager_utils.copyFile).toHaveBeenCalledWith(indexJS, toDir, apiDir);
+        expect(packager_utils.copyFile).toHaveBeenCalledWith(clientJS, toDir, apiDir);
+        expect(packager_utils.copyFile).toHaveBeenCalledWith(subfolderJS, toDir, apiDir);
+    });
+    
+    it("copyExtensions() should copy .so files required by features listed in config.xml", function () {
+        var session = testData.session,
+            feature = "blackberry.app",
+            apiDir = path.resolve(session.conf.EXT, feature),
+            soDest = session.sourcePaths.JNEXT_PLUGINS,
+            
+            //extension .so files
+            simulatorSO = path.join(apiDir, "/simulator/myso.so"),//simulator so file
+            deviceSO = path.join(apiDir, "/device/myso.so");//device so file
+            
+
+        spyOn(path, "existsSync").andReturn(true);
+        spyOn(wrench, "mkdirSyncRecursive");
+        spyOn(packager_utils, "copyFile");
+        
+        //Mock the extension directory
+        spyOn(wrench, "readdirSyncRecursive").andCallFake(function (directory) {
+            return [
+                simulatorSO,
+                deviceSO
+            ];
+        });
+
+        fileMgr.copyExtensions(testData.accessList, session, session.targets[0]);
+
+        //plugins/jnext output directory is created
+        expect(wrench.mkdirSyncRecursive).toHaveBeenCalledWith(session.sourcePaths.JNEXT_PLUGINS, "0755");
+        
+        //The .so files are copied
+        expect(packager_utils.copyFile).toHaveBeenCalledWith(simulatorSO, soDest);
+        expect(packager_utils.copyFile).toHaveBeenCalledWith(deviceSO, soDest);
     });
 
     it("copyExtension() should throw an error when a specified feature cannot be found in ext folder", function () {
