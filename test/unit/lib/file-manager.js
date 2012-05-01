@@ -2,6 +2,7 @@ var srcPath = __dirname + "/../../../lib/",
     fs = require("fsext"),
     path = require("path"),
     util = require("util"),
+    packager_utils = require(srcPath + "packager-utils"),
     localize = require(srcPath + "localize"),
     wrench = require("wrench"),
     logger = require(srcPath + "logger"),
@@ -30,18 +31,16 @@ describe("File manager", function () {
             feature = "blackberry.app",
             extPath = session.sourcePaths.EXT,
             toDir = extPath + "/" + feature,
-            apiDir = path.resolve(session.conf.EXT, feature),
+            target = session.targets[0],
             accessList = testData.accessList;
 
-        spyOn(path, "existsSync").andReturn(true);
         spyOn(wrench, "mkdirSyncRecursive");
-        spyOn(wrench, "copyDirSyncRecursive");
+        spyOn(packager_utils, "copyFile");
 
-        fileMgr.copyExtensions(accessList, session.conf.EXT, extPath);
+        fileMgr.copyExtensions(accessList, session, target);
 
-        expect(path.existsSync).toHaveBeenCalledWith(apiDir);
         expect(wrench.mkdirSyncRecursive).toHaveBeenCalledWith(toDir, "0755");
-        expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(apiDir, toDir);
+        expect(packager_utils.copyFile).toHaveBeenCalled();
     });
 
     it("copyExtension() should throw an error when a specified feature cannot be found in ext folder", function () {
@@ -57,7 +56,7 @@ describe("File manager", function () {
             }];
 
         expect(function () {
-            fileMgr.copyExtensions(accessList, session.conf.EXT, session.sourcePaths.EXT);
+            fileMgr.copyExtensions(accessList, session);
         }).toThrow(new Error("Failed to find feature with id: abc.def.ijk"));
     });
     
@@ -74,8 +73,8 @@ describe("File manager", function () {
         spyOn(path, "resolve").andReturn("/I/DO/NOT/EXIST");
             
         expect(function () {
-            fileMgr.copyExtensions(accessList, session.conf.EXT, session.sourcePaths.EXT);
-        }).toThrow(new Error(localize.translate("EXCEPTION_MISSING_FILE_IN_API_DIR", "client.js", "/I/DO/NOT/EXIST")));
+            fileMgr.copyExtensions(accessList, session);
+        }).toThrow(new Error(path.normalize(localize.translate("EXCEPTION_MISSING_FILE_IN_API_DIR", "client.js", "/I/DO/NOT/EXIST"))));
     });
     
     it("throws an error when the index.js file does not exist in ext folder", function () {
@@ -91,23 +90,8 @@ describe("File manager", function () {
         spyOn(path, "resolve").andReturn("/I/DO/NOT/EXIST");
             
         expect(function () {
-            fileMgr.copyExtensions(accessList, session.conf.EXT, session.sourcePaths.EXT);
-        }).toThrow(new Error(localize.translate("EXCEPTION_MISSING_FILE_IN_API_DIR", "index.js", "/I/DO/NOT/EXIST")));
-    });
-    
-    it("throws an error when there are non-js files in ext folder", function () {
-        var session = testData.session,
-            accessList = testData.accessList,
-            clientJsPath = path.join(session.conf.EXT, "/blackberry.app/client.js");
-
-        //When checking if client.js is a .js file, return a .nonJsExtension
-        spyOn(path, "extname").andCallFake(function (mPath) {
-            return (mPath.indexOf("client.js") !== -1) ? ".nonJsExtension" : ".js";
-        });
-            
-        expect(function () {
-            fileMgr.copyExtensions(accessList, session.conf.EXT, session.sourcePaths.EXT);
-        }).toThrow(new Error(localize.translate("EXCEPTION_NON_JS_FILE_IN_API_DIR", clientJsPath)));
+            fileMgr.copyExtensions(accessList, session);
+        }).toThrow(new Error(path.normalize(localize.translate("EXCEPTION_MISSING_FILE_IN_API_DIR", "index.js", "/I/DO/NOT/EXIST"))));
     });
 
     it("generateFrameworkModulesJS() should create frameworkModules.js", function () {
