@@ -18,6 +18,7 @@ describe("BAR builder", function () {
         spyOn(fileMgr, "copyWWE");
         spyOn(fileMgr, "copyBarDependencies");
         spyOn(fileMgr, "copyExtensions");
+        spyOn(fileMgr, "generateFrameworkModulesJS");
         spyOn(nativePkgr, "exec").andCallFake(function (session, target, config, callback) {
             callback(0);
         });
@@ -28,6 +29,7 @@ describe("BAR builder", function () {
         expect(fileMgr.copyWWE).toHaveBeenCalledWith(session, target);
         expect(fileMgr.copyBarDependencies).toHaveBeenCalledWith(session, target);
         expect(fileMgr.copyExtensions).toHaveBeenCalledWith(config.accessList, session, target);
+        expect(fileMgr.generateFrameworkModulesJS).toHaveBeenCalledWith(session);
         expect(nativePkgr.exec).toHaveBeenCalledWith(session, target, config, jasmine.any(Function));
         expect(callback).toHaveBeenCalledWith(0);
     });
