@@ -8,6 +8,11 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <scm>ci</scm>
+        <major>1</major>
+        <minor>0</minor>
+        <revision>0</revision>
+        <subrevision>7</subrevision>
+        <update.version>false<update.version>
     </properties>
     <profiles>
         <profile>
@@ -94,6 +99,11 @@
                             <pom>Framework/pom.xml</pom>
                             <properties>
                                 <scm>${scm}</scm>
+                                <major>${major}</major>
+                                <minor>${minor}</minor>
+                                <revision>${revision}</revision>
+                                <subrevision>${subrevision}</subrevision>
+                                <update.version>${update.version}</update.version>
                             </properties>
                             <streamLogs>true</streamLogs>
                             <noLog>true</noLog>                            
