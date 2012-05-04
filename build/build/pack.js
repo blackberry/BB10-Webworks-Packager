@@ -13,58 +13,41 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-var childProcess = require("child_process"),
-    utils = require("./utils"),
-    util = require("util"),
+var wrench = require("../../node_modules/wrench"),
+    packager_utils = require("../../lib/packager-utils"),
     _c = require("./conf"),
-    fs = require("fs"),
     path = require("path");
 
-function _copyCmd(source, destination) {
-    var unix_path = (_c.DEPLOY + destination).replace(/([^\/]*)$/, '');
-
-    if (utils.isWindows()) {
-        if (destination === '') {
-            return 'xcopy /y ' + source + ' ' + path.normalize(_c.DEPLOY + destination);
-        } else {
-            return 'cmd /c if not exist ' + path.normalize(_c.DEPLOY + destination) +
-                   ' md ' + path.normalize(_c.DEPLOY + destination) + ' && ' +
-                   'xcopy /y/e ' + source + ' ' + path.normalize(_c.DEPLOY + destination);
-        }
-    } else {
-        if (_c.DEPLOY === unix_path) {
-            return 'cp -r ' + source + ' ' + unix_path;
-        } else {
-            return 'mkdir -p ' + unix_path + ' && ' +
-                   'cp -r ' + source + ' ' + unix_path;
-        }
+function copyFolder(source, destination) {
+    //create the destination folder if it does not exist
+    if (!path.existsSync(destination)) {
+        wrench.mkdirSyncRecursive(destination, "0755");
     }
-}
 
-function _copyFiles() {
-    var cmdSep = " && ";
-    return  _copyCmd(_c.FRAMEWORK_DEPLOY, 'Framework/') + cmdSep +
-            _copyCmd(_c.LIB, 'lib') + cmdSep +
-            _copyCmd(_c.NODE_MOD, 'node_modules') + cmdSep +
-            _copyCmd(_c.ROOT + 'bbwp', '') + cmdSep +
-            _copyCmd(_c.ROOT + 'bbwp.bat', '') + cmdSep +
-            _copyCmd(_c.ROOT + 'licenses.txt', '');
-}
-
-function _processFiles() {
-    return _copyFiles();
+    wrench.copyDirSyncRecursive(source, destination);
 }
 
 module.exports = function (src, baton) {
+    var frameworkDest = path.join(_c.DEPLOY, 'Framework/'),
+        libDest = path.join(_c.DEPLOY, 'lib'),
+        nodeModulesDest = path.join(_c.DEPLOY, 'node_modules'),
+        
+        //files
+        bbwpFile = path.join(_c.ROOT, 'bbwp'),
+        bbwpBatFile = path.join(_c.ROOT, 'bbwp.bat'),
+        licenseFile = path.join(_c.ROOT, 'licenses.txt');
+    
     baton.take();
 
-    childProcess.exec(_processFiles(), function (error, stdout, stderr) {
-        if (error) {
-            console.log(stdout);
-            console.log(stderr);
-            baton.pass(error.code);
-        } else {
-            baton.pass(src);
-        }
-    });
+    //Copy folders to target directory
+    copyFolder(_c.FRAMEWORK_DEPLOY, frameworkDest);
+    copyFolder(_c.LIB, libDest);
+    copyFolder(_c.NODE_MOD, nodeModulesDest);
+    
+    //Copy files to target directory
+    packager_utils.copyFile(bbwpFile, _c.DEPLOY);
+    packager_utils.copyFile(bbwpBatFile, _c.DEPLOY);
+    packager_utils.copyFile(licenseFile, _c.DEPLOY);
+    
+    baton.pass(src);
 };
