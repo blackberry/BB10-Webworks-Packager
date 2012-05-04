@@ -12,7 +12,7 @@
         <minor>0</minor>
         <revision>0</revision>
         <subrevision>7</subrevision>
-        <update.version>false<update.version>
+        <update.version>false</update.version>
     </properties>
     <profiles>
         <profile>
