@@ -16,7 +16,8 @@ module.exports = {
             "CHROME": path.normalize(path.resolve(outputDir + "/src") + barConf.CHROME),
             "LIB": path.normalize(path.resolve(outputDir + "/src") + barConf.LIB),
             "EXT": path.normalize(path.resolve(outputDir + "/src") + barConf.EXT),
-            "PLUGINS": path.normalize(path.resolve(outputDir + "/src") + barConf.PLUGINS)
+            "PLUGINS": path.normalize(path.resolve(outputDir + "/src") + barConf.PLUGINS),
+            "JNEXT_PLUGINS": path.normalize(path.resolve(outputDir + "/src") + barConf.JNEXT_PLUGINS)
         },
         "archivePath": path.resolve("test/test.zip"),
         "conf": require(path.resolve(libPath + "/conf")),
