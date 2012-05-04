@@ -31,7 +31,7 @@ describe("signing-helper", function () {
         process.env.HOMEPATH = "Users\\user";
         process.env.HOMEDRIVE = "C:";
         
-        this.after = function() {
+        this.after = function () {
             delete process.env.HOMEPATH;
             delete process.env.HOMEDRIVE;
         };
@@ -49,7 +49,7 @@ describe("signing-helper", function () {
         process.env.HOMEPATH = "Users\\User";
         process.env.HOMEDRIVE = "D:";
 
-        this.after = function() {
+        this.after = function () {
             delete process.env.HOMEPATH;
             delete process.env.HOMEDRIVE;
         };
