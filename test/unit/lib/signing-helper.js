@@ -27,6 +27,42 @@ describe("signing-helper", function () {
         expect(result).toContain("\\AppData");
     });
     
+    it("returns a path on windows that specifies the drive", function () {
+        process.env.HOMEPATH = "Users\\user";
+        process.env.HOMEDRIVE = "C:";
+        
+        this.after = function() {
+            delete process.env.HOMEPATH;
+            delete process.env.HOMEDRIVE;
+        };
+
+        spyOn(os, "type").andReturn("windows");
+        spyOn(path, "existsSync").andCallFake(function (p) {
+            return p.indexOf("C:") !== -1;
+        });
+
+        var result = signingHelper.getKeyStorePath();
+        expect(result).toContain("C:");
+    });
+
+    it("can find keys in windows on a different path", function () {
+        process.env.HOMEPATH = "Users\\User";
+        process.env.HOMEDRIVE = "D:";
+
+        this.after = function() {
+            delete process.env.HOMEPATH;
+            delete process.env.HOMEDRIVE;
+        };
+
+        spyOn(os, "type").andReturn("windows");
+        spyOn(path, "existsSync").andCallFake(function (path) {
+            return path.indexOf("D:") !== -1;
+        });
+
+        var result = signingHelper.getKeyStorePath();
+        expect(result).toContain("D:");
+    });
+    
     it("can find keys in the Mac Library folder", function () {
         spyOn(os, "type").andReturn("darwin");
         
