@@ -18,11 +18,7 @@ var wrench = require("../../node_modules/wrench"),
     _c = require("./conf");
 
 module.exports = function (prev, baton) {
-    baton.take();
-
     //Remove existing target directory
     wrench.rmdirSyncRecursive(_c.TARGET, true);
-    wrench.rmdirSyncRecursive(path.join(_c.NODE_MOD, '/fs-tools/support'), true);    
-    
-    baton.pass(prev);
+    wrench.rmdirSyncRecursive(path.join(_c.NODE_MOD, '/fs-tools/support'), true);
 };

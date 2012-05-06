@@ -36,8 +36,6 @@ module.exports = function (src, baton) {
         bbwpFile = path.join(_c.ROOT, 'bbwp'),
         bbwpBatFile = path.join(_c.ROOT, 'bbwp.bat'),
         licenseFile = path.join(_c.ROOT, 'licenses.txt');
-    
-    baton.take();
 
     //Copy folders to target directory
     copyFolder(_c.FRAMEWORK_DEPLOY, frameworkDest);
@@ -48,6 +46,4 @@ module.exports = function (src, baton) {
     packager_utils.copyFile(bbwpFile, _c.DEPLOY);
     packager_utils.copyFile(bbwpBatFile, _c.DEPLOY);
     packager_utils.copyFile(licenseFile, _c.DEPLOY);
-    
-    baton.pass(src);
 };
