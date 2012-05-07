@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 var wrench = require("../../node_modules/wrench"),
-    packager_utils = require("../../lib/packager-utils"),
+    utils = require("./utils"),
     _c = require("./conf"),
     path = require("path");
 
@@ -43,7 +43,7 @@ module.exports = function (src, baton) {
     copyFolder(_c.NODE_MOD, nodeModulesDest);
     
     //Copy files to target directory
-    packager_utils.copyFile(bbwpFile, _c.DEPLOY);
-    packager_utils.copyFile(bbwpBatFile, _c.DEPLOY);
-    packager_utils.copyFile(licenseFile, _c.DEPLOY);
+    utils.copyFile(bbwpFile, _c.DEPLOY);
+    utils.copyFile(bbwpBatFile, _c.DEPLOY);
+    utils.copyFile(licenseFile, _c.DEPLOY);
 };
