@@ -10,7 +10,7 @@ var testData = require('./test-data'),
 
 describe("signing-helper", function () {
 
-    describe("windows path to signing keys", function () {
+    describe("on windows", function () {
         
         beforeEach(function () {
             
@@ -25,6 +25,8 @@ describe("signing-helper", function () {
             } else {
                 properties.homedrive = process.env.HOMEDRIVE;
             }
+            
+            spyOn(os, "type").andReturn("windows");
         });
         
         afterEach(function () {
@@ -46,8 +48,7 @@ describe("signing-helper", function () {
             }
         });
 
-        it("contains Local Settings", function () {
-            spyOn(os, "type").andReturn("windows");
+        it("can find keys in Local Settings", function () {
             
             spyOn(path, "existsSync").andCallFake(function (path) {
                 return path.indexOf("\\Local Settings") !== -1;
@@ -57,8 +58,7 @@ describe("signing-helper", function () {
             expect(result).toContain("\\Local Settings");
         });
         
-        it("contains AppData", function () {
-            spyOn(os, "type").andReturn("windows");
+        it("can find keys in AppData", function () {
             
             spyOn(path, "existsSync").andCallFake(function (path) {
                 return path.indexOf("\\AppData") !== -1;
@@ -68,11 +68,10 @@ describe("signing-helper", function () {
             expect(result).toContain("\\AppData");
         });
     
-        it("contains the home path", function () {
+        it("can find keys in home path", function () {
             process.env.HOMEPATH = "Users\\user";
             process.env.HOMEDRIVE = "C:";
 
-            spyOn(os, "type").andReturn("windows");
             spyOn(path, "existsSync").andCallFake(function (p) {
                 return p.indexOf("C:") !== -1;
             });
@@ -81,12 +80,11 @@ describe("signing-helper", function () {
             expect(result).toContain("C:");
         });
 
-        it("specifies the drive", function () {
+        it("can find keys on C drive", function () {
 
             process.env.HOMEPATH = "Users\\user";
             process.env.HOMEDRIVE = "C:";
             
-            spyOn(os, "type").andReturn("windows");
             spyOn(path, "existsSync").andCallFake(function (p) {
                 return p.indexOf("C:") !== -1;
             });
@@ -95,11 +93,10 @@ describe("signing-helper", function () {
             expect(result).toContain("C:");
         });
 
-        it("specifies a drive other than C", function () {
+        it("can find keys on a drive other than C", function () {
             process.env.HOMEPATH = "Users\\User";
             process.env.HOMEDRIVE = "D:";
 
-            spyOn(os, "type").andReturn("windows");
             spyOn(path, "existsSync").andCallFake(function (path) {
                 return path.indexOf("D:") !== -1;
             });
@@ -108,8 +105,7 @@ describe("signing-helper", function () {
             expect(result).toContain("D:");
         });
 
-        it("is undefined when keys cannot be found", function () {
-            spyOn(os, "type").andReturn("windows");
+        it("returns undefined when keys cannot be found", function () {
             spyOn(path, "existsSync").andReturn(false);
             
             var result = signingHelper.getKeyStorePath();
@@ -117,10 +113,13 @@ describe("signing-helper", function () {
         });
     });
 
-    describe("mac path to signing keys", function () {
-
-        it("contains the Library folder", function () {
+    describe("on mac", function () {
+        
+        beforeEach(function () {
             spyOn(os, "type").andReturn("darwin");
+        });
+
+        it("can find keys in the Library folder", function () {
             
             spyOn(path, "existsSync").andCallFake(function (path) {
                 return path.indexOf("/Library/Research In Motion/") !== -1;
@@ -130,8 +129,8 @@ describe("signing-helper", function () {
             expect(result).toContain("/Library/Research In Motion/");
         });
         
-        it("is undefined when keys cannot be found", function () {
-            spyOn(os, "type").andReturn("darwin");
+        it("returns undefined when keys cannot be found", function () {
+
             spyOn(path, "existsSync").andReturn(false);
             
             var result = signingHelper.getKeyStorePath();
