@@ -14,6 +14,9 @@ describe("signing-helper", function () {
         
         beforeEach(function () {
             
+            /* Preserve the value of the HOMEPATH and HOMEDRIVE environment
+             * variables if they are defined. If they are not defined, mark
+             * variable for deletion after the test.*/
             if (typeof process.env.HOMEPATH === 'undefined') {
                 properties.homepath = "delete";
             } else {
@@ -31,6 +34,9 @@ describe("signing-helper", function () {
         
         afterEach(function () {
 
+            /* Restore the value of the HOMEPATH and HOMEDRIVE environment
+             * variables if they are defined. If they are not defined, delete
+             * the property if it was defined in the test.*/
             if (typeof process.env.HOMEPATH === 'string') {
                 if (properties.homepath === 'delete') {
                     delete process.env.HOMEPATH;
@@ -69,20 +75,20 @@ describe("signing-helper", function () {
         });
     
         it("can find keys in home path", function () {
-            process.env.HOMEPATH = "Users\\user";
+            process.env.HOMEPATH = "\\Users\\user";
             process.env.HOMEDRIVE = "C:";
 
             spyOn(path, "existsSync").andCallFake(function (p) {
-                return p.indexOf("C:") !== -1;
+                return p.indexOf("\\Users\\user") !== -1;
             });
 
             var result = signingHelper.getKeyStorePath();
-            expect(result).toContain("C:");
+            expect(result).toContain("\\Users\\user");
         });
 
         it("can find keys on C drive", function () {
 
-            process.env.HOMEPATH = "Users\\user";
+            process.env.HOMEPATH = "\\Users\\user";
             process.env.HOMEDRIVE = "C:";
             
             spyOn(path, "existsSync").andCallFake(function (p) {
@@ -94,7 +100,7 @@ describe("signing-helper", function () {
         });
 
         it("can find keys on a drive other than C", function () {
-            process.env.HOMEPATH = "Users\\User";
+            process.env.HOMEPATH = "\\Users\\user";
             process.env.HOMEDRIVE = "D:";
 
             spyOn(path, "existsSync").andCallFake(function (path) {
@@ -103,6 +109,34 @@ describe("signing-helper", function () {
 
             var result = signingHelper.getKeyStorePath();
             expect(result).toContain("D:");
+        });
+
+        it("can find keys in Local Settings on the correct drive", function () {
+            process.env.HOMEPATH = "\\Users\\user";
+            process.env.HOMEDRIVE = "C:";
+
+            spyOn(path, "existsSync").andCallFake(function (path) {
+                return path.indexOf("C:") !== -1 &&
+                        path.indexOf("\\Local Settings") !== -1;
+            });
+
+            var result = signingHelper.getKeyStorePath();
+            expect(result).toContain("C:");
+            expect(result).toContain("\\Local Settings");
+        });
+
+        it("can find keys in AppData on the correct drive", function () {
+            process.env.HOMEPATH = "\\Users\\user";
+            process.env.HOMEDRIVE = "C:";
+
+            spyOn(path, "existsSync").andCallFake(function (path) {
+                return path.indexOf("C:") !== -1 &&
+                        path.indexOf("\\AppData") !== -1;
+            });
+
+            var result = signingHelper.getKeyStorePath();
+            expect(result).toContain("C:");
+            expect(result).toContain("\\AppData");
         });
 
         it("returns undefined when keys cannot be found", function () {
