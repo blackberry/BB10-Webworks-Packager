@@ -22,7 +22,7 @@ describe("xml parser", function () {
     it("parses standard elements in a config.xml", function () {
         configParser.parse(configPath, session, function (configObj) {
             expect(configObj.content).toEqual("local:///startPage.html");
-            expect(configObj.id).toEqual("MyWidgetId");
+            expect(configObj.id).toEqual("My WidgetId");
             expect(configObj.version).toEqual("1.0.0");
             expect(configObj.license).toEqual("My License");
             expect(configObj.licenseURL).toEqual("http://www.apache.org/licenses/LICENSE-2.0");
@@ -139,6 +139,30 @@ describe("xml parser", function () {
     it("fails when id contains a non [a-zA-Z0-9] character", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data["@"].id = "abcde#fghijk";
+        
+        mockParsing(data);
+        
+        //Should throw an EXCEPTION_INVALID_ID error
+        expect(function () {
+            configParser.parse(configPath, session, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ID"));
+    });
+
+    it("fails when id starts with a space", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["@"].id = " abcdefghijk";
+        
+        mockParsing(data);
+        
+        //Should throw an EXCEPTION_INVALID_ID error
+        expect(function () {
+            configParser.parse(configPath, session, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ID"));
+    });
+
+    it("fails when id ends with a space", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["@"].id = "abcdefghijk ";
         
         mockParsing(data);
         
