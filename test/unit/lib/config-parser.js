@@ -219,8 +219,8 @@ describe("xml parser", function () {
         configParser.parse(configPath, session, function (configObj) {
             customAccessList = testUtilities.getAccessListForUri(configObj.accessList, 'http://ci0000000094448.rim.net');
             
-            //The custom access list features should remain empty
-            expect(customAccessList.features).toEqual([]);
+            //The custom access list features should only contain free features
+            expect(customAccessList.features).toEqual(configParser.getFreeFeatures());
         });
     });
         
@@ -244,7 +244,7 @@ describe("xml parser", function () {
             //hasMultiAccess was set to false
             expect(configObj.hasMultiAccess).toEqual(false);
             expect(configObj.accessList).toEqual([ {
-                features : [],
+                features : configParser.getFreeFeatures(),
                 uri : 'WIDGET_LOCAL',
                 allowSubDomain : true
             } ]);
@@ -261,11 +261,11 @@ describe("xml parser", function () {
             //hasMultiAccess was set to false
             expect(configObj.hasMultiAccess).toEqual(false);
             expect(configObj.accessList).toEqual([ {
-                features : [],
+                features : configParser.getFreeFeatures(),
                 uri : 'WIDGET_LOCAL',
                 allowSubDomain : true
             }, {
-                "features" : [],
+                "features" : configParser.getFreeFeatures(),
                 "uri" : "http://www.somedomain1.com"
             } ]);
         });
@@ -281,7 +281,7 @@ describe("xml parser", function () {
             //hasMultiAccess was set to true
             expect(configObj.hasMultiAccess).toEqual(true);
             expect(configObj.accessList).toEqual([ {
-                features : [],
+                features : configParser.getFreeFeatures(),
                 uri : 'WIDGET_LOCAL',
                 allowSubDomain : true
             } ]);
@@ -298,11 +298,11 @@ describe("xml parser", function () {
             //hasMultiAccess was set to true
             expect(configObj.hasMultiAccess).toEqual(true);
             expect(configObj.accessList).toEqual([ {
-                features : [],
+                features : configParser.getFreeFeatures(),
                 uri : 'WIDGET_LOCAL',
                 allowSubDomain : true
             }, {
-                "features" : [],
+                "features" : configParser.getFreeFeatures(),
                 "uri" : "http://www.somedomain1.com"
             } ]);
         });
