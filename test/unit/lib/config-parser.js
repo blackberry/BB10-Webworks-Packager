@@ -185,10 +185,11 @@ describe("xml parser", function () {
     
     it("cleans source folder on error", function () {
         mockParsing({}, "ERROR");
-        
+
         spyOn(logger, "error");
         spyOn(fileManager, "cleanSource");
-        
+        spyOn(fileManager, "copyWWE");
+
         configParser.parse(configPath, session, function () {});
         
         expect(fileManager.cleanSource).toHaveBeenCalled();
@@ -220,7 +221,7 @@ describe("xml parser", function () {
             customAccessList = testUtilities.getAccessListForUri(configObj.accessList, 'http://ci0000000094448.rim.net');
             
             //The custom access list features should only contain free features
-            expect(customAccessList.features).toEqual(configParser.getFreeFeatures());
+            expect(customAccessList.features).toEqual(fileManager.getFreeFeatures());
         });
     });
         
@@ -244,7 +245,7 @@ describe("xml parser", function () {
             //hasMultiAccess was set to false
             expect(configObj.hasMultiAccess).toEqual(false);
             expect(configObj.accessList).toEqual([ {
-                features : configParser.getFreeFeatures(),
+                features : fileManager.getFreeFeatures(),
                 uri : 'WIDGET_LOCAL',
                 allowSubDomain : true
             } ]);
@@ -261,11 +262,11 @@ describe("xml parser", function () {
             //hasMultiAccess was set to false
             expect(configObj.hasMultiAccess).toEqual(false);
             expect(configObj.accessList).toEqual([ {
-                features : configParser.getFreeFeatures(),
+                features : fileManager.getFreeFeatures(),
                 uri : 'WIDGET_LOCAL',
                 allowSubDomain : true
             }, {
-                "features" : configParser.getFreeFeatures(),
+                "features" : fileManager.getFreeFeatures(),
                 "uri" : "http://www.somedomain1.com"
             } ]);
         });
@@ -281,7 +282,7 @@ describe("xml parser", function () {
             //hasMultiAccess was set to true
             expect(configObj.hasMultiAccess).toEqual(true);
             expect(configObj.accessList).toEqual([ {
-                features : configParser.getFreeFeatures(),
+                features : fileManager.getFreeFeatures(),
                 uri : 'WIDGET_LOCAL',
                 allowSubDomain : true
             } ]);
@@ -298,11 +299,11 @@ describe("xml parser", function () {
             //hasMultiAccess was set to true
             expect(configObj.hasMultiAccess).toEqual(true);
             expect(configObj.accessList).toEqual([ {
-                features : configParser.getFreeFeatures(),
+                features : fileManager.getFreeFeatures(),
                 uri : 'WIDGET_LOCAL',
                 allowSubDomain : true
             }, {
-                "features" : configParser.getFreeFeatures(),
+                "features" : fileManager.getFreeFeatures(),
                 "uri" : "http://www.somedomain1.com"
             } ]);
         });

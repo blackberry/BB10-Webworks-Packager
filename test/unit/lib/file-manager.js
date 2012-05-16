@@ -146,16 +146,28 @@ describe("File manager", function () {
     });
 
     it("generateFrameworkModulesJS() should create frameworkModules.js", function () {
-        var files = [],
+        var libFiles = [],
+            extFiles = [],
             modulesArr;
 
-        files.push(path.normalize(session.sourcePaths.CHROME + "/lib/framework.js"));
-        files.push(path.normalize(session.sourcePaths.CHROME + "/lib/config/user.js"));
-        files.push(path.normalize(session.sourcePaths.CHROME + "/lib/plugins/bridge.js"));
-        files.push(path.normalize(session.sourcePaths.CHROME + "/lib/policy/whitelist.js"));
-        files.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.app/client.js"));
+        libFiles.push(path.normalize(session.sourcePaths.CHROME + "/lib/framework.js"));
+        libFiles.push(path.normalize(session.sourcePaths.CHROME + "/lib/config/user.js"));
+        libFiles.push(path.normalize(session.sourcePaths.CHROME + "/lib/plugins/bridge.js"));
+        libFiles.push(path.normalize(session.sourcePaths.CHROME + "/lib/policy/whitelist.js"));
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.app/client.js"));
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.app/index.js"));
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.connection/client.js"));
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.connection/index.js"));        
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.event/client.js"));
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.event/index.js"));        
 
-        spyOn(wrench, "readdirSyncRecursive").andReturn(files);
+        spyOn(wrench, "readdirSyncRecursive").andCallFake(function (path) {
+            if (/ext$/.test(path)) {
+                return extFiles;
+            } else {
+                return libFiles;
+            }
+        });
         spyOn(fs, "statSync").andReturn({
             isDirectory: function () {
                 return false;
@@ -175,7 +187,10 @@ describe("File manager", function () {
         expect(modulesArr).toContain("lib/config/user.js");
         expect(modulesArr).toContain("lib/plugins/bridge.js");
         expect(modulesArr).toContain("lib/policy/whitelist.js");
-        expect(modulesArr).toContain("ext/blackberry.app/client.js");
+        expect(modulesArr).toContain("ext/blackberry.event/index.js");
+        // checks that blackberry.event is loaded before any other extensions
+        expect(modulesArr.indexOf("ext/blackberry.event/index.js")).toBeLessThan(modulesArr.indexOf("ext/blackberry.app/index.js"));
+        expect(modulesArr.indexOf("ext/blackberry.event/index.js")).toBeLessThan(modulesArr.indexOf("ext/blackberry.connection/index.js"));
     });
 
     it("unzip() should extract 'from' zip file to 'to' directory", function () {
