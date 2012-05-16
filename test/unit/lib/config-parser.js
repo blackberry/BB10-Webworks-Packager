@@ -188,7 +188,6 @@ describe("xml parser", function () {
 
         spyOn(logger, "error");
         spyOn(fileManager, "cleanSource");
-        spyOn(fileManager, "copyWWE");
 
         configParser.parse(configPath, session, function () {});
         
