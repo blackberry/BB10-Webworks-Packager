@@ -17,6 +17,7 @@
 5. On windows run `*BBNDK Installation Directory*\bbndk-env.bat`. This needs to be run each time before you configure.
    On Mac, you can simply add `source *installation directory here*/bbndk-env.sh` to your bash profile
 6. Run `./configure` on Mac (`sudo ./configure` if you get permission errors) or `sh configure` on Windows
+   Please note, on Windows the configure script needs to be run from command prompt.
 7. Run `jake test` and check that jake runs and completes
 
 ##Building an application
