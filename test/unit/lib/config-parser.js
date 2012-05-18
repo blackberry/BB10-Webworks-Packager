@@ -18,7 +18,7 @@ function mockParsing(data, error) {
     });
 }
 
-describe("xml parser", function () {
+describe("config parser", function () {
     it("parses standard elements in a config.xml", function () {
         configParser.parse(configPath, session, function (configObj) {
             expect(configObj.content).toEqual("local:///startPage.html");
@@ -219,8 +219,8 @@ describe("xml parser", function () {
         configParser.parse(configPath, session, function (configObj) {
             customAccessList = testUtilities.getAccessListForUri(configObj.accessList, 'http://ci0000000094448.rim.net');
             
-            //The custom access list features should only contain free features
-            expect(customAccessList.features).toEqual(fileManager.getFreeFeatures());
+            //The custom access list features should only contain global features
+            expect(customAccessList.features).toEqual(configParser.getGlobalFeatures());
         });
     });
         
@@ -244,7 +244,7 @@ describe("xml parser", function () {
             //hasMultiAccess was set to false
             expect(configObj.hasMultiAccess).toEqual(false);
             expect(configObj.accessList).toEqual([ {
-                features : fileManager.getFreeFeatures(),
+                features : configParser.getGlobalFeatures(),
                 uri : 'WIDGET_LOCAL',
                 allowSubDomain : true
             } ]);
@@ -261,11 +261,11 @@ describe("xml parser", function () {
             //hasMultiAccess was set to false
             expect(configObj.hasMultiAccess).toEqual(false);
             expect(configObj.accessList).toEqual([ {
-                features : fileManager.getFreeFeatures(),
+                features : configParser.getGlobalFeatures(),
                 uri : 'WIDGET_LOCAL',
                 allowSubDomain : true
             }, {
-                "features" : fileManager.getFreeFeatures(),
+                "features" : configParser.getGlobalFeatures(),
                 "uri" : "http://www.somedomain1.com"
             } ]);
         });
@@ -281,7 +281,7 @@ describe("xml parser", function () {
             //hasMultiAccess was set to true
             expect(configObj.hasMultiAccess).toEqual(true);
             expect(configObj.accessList).toEqual([ {
-                features : fileManager.getFreeFeatures(),
+                features : configParser.getGlobalFeatures(),
                 uri : 'WIDGET_LOCAL',
                 allowSubDomain : true
             } ]);
@@ -298,11 +298,11 @@ describe("xml parser", function () {
             //hasMultiAccess was set to true
             expect(configObj.hasMultiAccess).toEqual(true);
             expect(configObj.accessList).toEqual([ {
-                features : fileManager.getFreeFeatures(),
+                features : configParser.getGlobalFeatures(),
                 uri : 'WIDGET_LOCAL',
                 allowSubDomain : true
             }, {
-                "features" : fileManager.getFreeFeatures(),
+                "features" : configParser.getGlobalFeatures(),
                 "uri" : "http://www.somedomain1.com"
             } ]);
         });

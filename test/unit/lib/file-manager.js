@@ -188,9 +188,6 @@ describe("File manager", function () {
         expect(modulesArr).toContain("lib/plugins/bridge.js");
         expect(modulesArr).toContain("lib/policy/whitelist.js");
         expect(modulesArr).toContain("ext/blackberry.event/index.js");
-        // checks that blackberry.event is loaded before any other extensions
-        expect(modulesArr.indexOf("ext/blackberry.event/index.js")).toBeLessThan(modulesArr.indexOf("ext/blackberry.app/index.js"));
-        expect(modulesArr.indexOf("ext/blackberry.event/index.js")).toBeLessThan(modulesArr.indexOf("ext/blackberry.connection/index.js"));
     });
 
     it("unzip() should extract 'from' zip file to 'to' directory", function () {
