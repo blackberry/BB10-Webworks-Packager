@@ -15,6 +15,7 @@ module.exports = {
             "ROOT": path.resolve(outputDir + "/src"),
             "CHROME": path.normalize(path.resolve(outputDir + "/src") + barConf.CHROME),
             "LIB": path.normalize(path.resolve(outputDir + "/src") + barConf.LIB),
+            "UI": path.normalize(path.resolve(outputDir + "/src") + barConf.UI),
             "EXT": path.normalize(path.resolve(outputDir + "/src") + barConf.EXT),
             "PLUGINS": path.normalize(path.resolve(outputDir + "/src") + barConf.PLUGINS),
             "JNEXT_PLUGINS": path.normalize(path.resolve(outputDir + "/src") + barConf.JNEXT_PLUGINS)

@@ -15,6 +15,7 @@ describe("File manager", function () {
         fileMgr.prepareOutputFiles(session);
 
         expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
+        expect(path.existsSync(session.sourcePaths.UI)).toBeTruthy();
         expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
     });
 
