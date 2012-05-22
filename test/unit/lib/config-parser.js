@@ -329,7 +329,49 @@ describe("config parser", function () {
             configParser.parse(configPath, session, function (configObj) {});
         }).toThrow(localize.translate("EXCEPTION_FEATURE_DEFINED_WITH_WILDCARD_ACCESS_URI"));
     });
-    
+
+    it("should fail when the access uri attribute does not specify a protocol", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+
+        //Add an access element with one feature
+        data['access'] = {
+            '@': {
+                uri: 'rim.net',
+                subdomains: 'true'
+            },
+            feature: {
+                '@': { id: 'blackberry.system' }
+            }
+        };
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ACCESS_URI_NO_PROTOCOL", data['access']['@'].uri));
+    });
+
+    it("should fail when the access uri attribute does not specify a URN", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+
+        //Add an access element with one feature
+        data['access'] = {
+            '@': {
+                uri: 'http://',
+                subdomains: 'true'
+            },
+            feature: {
+                '@': { id: 'blackberry.system' }
+            }
+        };
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ACCESS_URI_NO_URN", data['access']['@'].uri));
+    });
+
     it("does not fail when there is a single feature element in the access list", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         
