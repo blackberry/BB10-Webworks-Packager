@@ -64,6 +64,26 @@ describe("signing-helper", function () {
             expect(result).toContain("\\Local Settings");
         });
         
+        it("can find barsigner.csk in Local Settings", function () {
+            
+            spyOn(path, "existsSync").andCallFake(function (path) {
+                return path.indexOf("\\Local Settings") !== -1;
+            });
+            
+            var result = signingHelper.getCskPath();
+            expect(result).toContain("\\Local Settings");
+        });
+        
+        it("can find barsigner.db in Local Settings", function () {
+            
+            spyOn(path, "existsSync").andCallFake(function (path) {
+                return path.indexOf("\\Local Settings") !== -1;
+            });
+            
+            var result = signingHelper.getDbPath();
+            expect(result).toContain("\\Local Settings");
+        });
+        
         it("can find keys in AppData", function () {
             
             spyOn(path, "existsSync").andCallFake(function (path) {
@@ -71,6 +91,26 @@ describe("signing-helper", function () {
             });
             
             var result = signingHelper.getKeyStorePath();
+            expect(result).toContain("\\AppData");
+        });
+        
+        it("can find barsigner.csk in AppData", function () {
+            
+            spyOn(path, "existsSync").andCallFake(function (path) {
+                return path.indexOf("\\AppData") !== -1;
+            });
+            
+            var result = signingHelper.getCskPath();
+            expect(result).toContain("\\AppData");
+        });
+        
+        it("can find barsigner.db in AppData", function () {
+            
+            spyOn(path, "existsSync").andCallFake(function (path) {
+                return path.indexOf("\\AppData") !== -1;
+            });
+            
+            var result = signingHelper.getDbPath();
             expect(result).toContain("\\AppData");
         });
     
@@ -110,6 +150,30 @@ describe("signing-helper", function () {
             var result = signingHelper.getKeyStorePath();
             expect(result).toContain("D:");
         });
+        
+        it("can find barsigner.csk on a drive other than C", function () {
+            process.env.HOMEPATH = "\\Users\\user";
+            process.env.HOMEDRIVE = "D:";
+
+            spyOn(path, "existsSync").andCallFake(function (path) {
+                return path.indexOf("D:") !== -1;
+            });
+
+            var result = signingHelper.getCskPath();
+            expect(result).toContain("D:");
+        });
+        
+        it("can find barsigner.db on a drive other than C", function () {
+            process.env.HOMEPATH = "\\Users\\user";
+            process.env.HOMEDRIVE = "D:";
+
+            spyOn(path, "existsSync").andCallFake(function (path) {
+                return path.indexOf("D:") !== -1;
+            });
+
+            var result = signingHelper.getDbPath();
+            expect(result).toContain("D:");
+        });
 
         it("can find keys in Local Settings on the correct drive", function () {
             process.env.HOMEPATH = "\\Users\\user";
@@ -122,6 +186,34 @@ describe("signing-helper", function () {
 
             var result = signingHelper.getKeyStorePath();
             expect(result).toContain("C:");
+            expect(result).toContain("\\Local Settings");
+        });
+        
+        it("can find barsigner.csk in Local Settings on the correct drive", function () {
+            process.env.HOMEPATH = "\\Users\\user";
+            process.env.HOMEDRIVE = "D:";
+
+            spyOn(path, "existsSync").andCallFake(function (path) {
+                return path.indexOf("D:") !== -1 &&
+                        path.indexOf("\\Local Settings") !== -1;
+            });
+
+            var result = signingHelper.getCskPath();
+            expect(result).toContain("D:");
+            expect(result).toContain("\\Local Settings");
+        });
+        
+        it("can find barsigner.db in Local Settings on the correct drive", function () {
+            process.env.HOMEPATH = "\\Users\\user";
+            process.env.HOMEDRIVE = "D:";
+
+            spyOn(path, "existsSync").andCallFake(function (path) {
+                return path.indexOf("D:") !== -1 &&
+                        path.indexOf("\\Local Settings") !== -1;
+            });
+
+            var result = signingHelper.getDbPath();
+            expect(result).toContain("D:");
             expect(result).toContain("\\Local Settings");
         });
 
@@ -138,11 +230,53 @@ describe("signing-helper", function () {
             expect(result).toContain("C:");
             expect(result).toContain("\\AppData");
         });
+        
+        it("can find barsigner.csk in AppData on the correct drive", function () {
+            process.env.HOMEPATH = "\\Users\\user";
+            process.env.HOMEDRIVE = "D:";
+
+            spyOn(path, "existsSync").andCallFake(function (path) {
+                return path.indexOf("D:") !== -1 &&
+                        path.indexOf("\\AppData") !== -1;
+            });
+
+            var result = signingHelper.getCskPath();
+            expect(result).toContain("D:");
+            expect(result).toContain("\\AppData");
+        });
+        
+        it("can find barsigner.db in AppData on the correct drive", function () {
+            process.env.HOMEPATH = "\\Users\\user";
+            process.env.HOMEDRIVE = "D:";
+
+            spyOn(path, "existsSync").andCallFake(function (path) {
+                return path.indexOf("D:") !== -1 &&
+                        path.indexOf("\\AppData") !== -1;
+            });
+
+            var result = signingHelper.getDbPath();
+            expect(result).toContain("D:");
+            expect(result).toContain("\\AppData");
+        });
 
         it("returns undefined when keys cannot be found", function () {
             spyOn(path, "existsSync").andReturn(false);
             
             var result = signingHelper.getKeyStorePath();
+            expect(result).toBeUndefined();
+        });
+        
+        it("returns undefined when barsigner.csk cannot be found", function () {
+            spyOn(path, "existsSync").andReturn(false);
+            
+            var result = signingHelper.getCskPath();
+            expect(result).toBeUndefined();
+        });
+        
+        it("returns undefined when barsigner.db cannot be found", function () {
+            spyOn(path, "existsSync").andReturn(false);
+            
+            var result = signingHelper.getDbPath();
             expect(result).toBeUndefined();
         });
     });
@@ -163,11 +297,47 @@ describe("signing-helper", function () {
             expect(result).toContain("/Library/Research In Motion/");
         });
         
+        it("can find barsigner.csk in the Library folder", function () {
+            
+            spyOn(path, "existsSync").andCallFake(function (path) {
+                return path.indexOf("/Library/Research In Motion/") !== -1;
+            });
+            
+            var result = signingHelper.getCskPath();
+            expect(result).toContain("/Library/Research In Motion/");
+        });
+        
+        it("can find barsigner.db in the Library folder", function () {
+            
+            spyOn(path, "existsSync").andCallFake(function (path) {
+                return path.indexOf("/Library/Research In Motion/") !== -1;
+            });
+            
+            var result = signingHelper.getDbPath();
+            expect(result).toContain("/Library/Research In Motion/");
+        });
+        
         it("returns undefined when keys cannot be found", function () {
 
             spyOn(path, "existsSync").andReturn(false);
             
             var result = signingHelper.getKeyStorePath();
+            expect(result).toBeUndefined();
+        });
+        
+        it("returns undefined when barsigner.csk cannot be found", function () {
+
+            spyOn(path, "existsSync").andReturn(false);
+            
+            var result = signingHelper.getCskPath();
+            expect(result).toBeUndefined();
+        });
+        
+        it("returns undefined when barsigner.db cannot be found", function () {
+
+            spyOn(path, "existsSync").andReturn(false);
+            
+            var result = signingHelper.getDbPath();
             expect(result).toBeUndefined();
         });
     });
