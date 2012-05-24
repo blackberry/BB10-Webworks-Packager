@@ -50,10 +50,22 @@ describe("Native packager", function () {
         spyOn(pkgrUtils, "writeFile");
         spyOn(childProcess, "spawn").andReturn(result);
     });
-    
+
     afterEach(function () {
         session.debug = orgDebugEnabled;
         session.conf.DEBUG_TOKEN = orgDebugTokenPath;
+    });
+
+    it("should not display empty messages in logger", function () {
+        spyOn(logger, "warn");
+        spyOn(logger, "error");
+        spyOn(logger, "info");
+
+        nativePkgr.exec(session, target, testData.config, callback);
+
+        expect(logger.warn).not.toHaveBeenCalledWith("");
+        expect(logger.error).not.toHaveBeenCalledWith("");
+        expect(logger.info).not.toHaveBeenCalledWith("");
     });
 
     it("shows debug token warning when path to file is not valid", function () {
@@ -79,7 +91,7 @@ describe("Native packager", function () {
 
         expect(logger.warn).not.toHaveBeenCalled();
     });
-    
+
     it("shows debug token warning when debug token not a .bar file", function () {
         spyOn(logger, "warn");
 
@@ -99,7 +111,7 @@ describe("Native packager", function () {
             "<author>" + config.author + "</author>" +
             "<asset entry=\"true\" type=\"qnx/elf\">wwe</asset>" +
             "<asset>abc</asset>" +
-            "<asset>xyz</asset>" +            
+            "<asset>xyz</asset>" +
             "<initialWindow><systemChrome>none</systemChrome><transparent>true</transparent></initialWindow>" +
             "<env value=\"12\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>" +
             "<permission system=\"true\">run_native</permission>" +
