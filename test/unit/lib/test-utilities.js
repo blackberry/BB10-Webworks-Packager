@@ -15,6 +15,19 @@ module.exports = {
         return getObjectByProperty(featureArray, "id", featureID);
     },
     
+    mockResolve: function (path) {
+        //Mock resolve because of a weird issue where resolve would return an 
+        //invalid path on Mac if it cannot find the directory (c:/ doesnt exist on mac)
+        spyOn(path, "resolve").andCallFake(function (to) {
+            if (arguments.length === 2) {
+                //Handle optional from attribute
+                return path.normalize(path.join(arguments[0], arguments[1]));
+            } else {
+                return path.normalize(to);
+            }
+        });
+    },
+    
     cloneObj: function (obj) {
         var newObj = (obj instanceof Array) ? [] : {}, i;
         

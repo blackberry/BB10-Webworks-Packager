@@ -1,15 +1,8 @@
 var session = require(__dirname + "/../../../lib/session"),
+    testUtils = require("./test-utilities"),
     path = require("path"),
     wrench = require("wrench"),
     zipLocation = __dirname + "/../../config.xml";
-
-function mockResolve() {
-    //Mocking resolve because of a weird issue where resolve would return an 
-    //invalid path on Mac if it cannot find the directory (c:/ doesnt exist on mac)
-    spyOn(path, "resolve").andCallFake(function (myPath) {
-        return path.normalize(myPath);
-    });
-}
     
 describe("Session", function () {
     beforeEach(function () {
@@ -18,7 +11,7 @@ describe("Session", function () {
     });
     
     it("sets the source directory correctly when specified [-s C:/sampleApp/mySource]", function () {
-        mockResolve();
+        testUtils.mockResolve(path);
         
         var data = {
             args: [ 'C:/sampleApp/sample.zip' ],
@@ -31,7 +24,7 @@ describe("Session", function () {
     });
     
     it("sets the source directory correctly when unspecified [-s] and output path set [-o]", function () {
-        mockResolve();
+        testUtils.mockResolve(path);
         
         var data = {
             args: [ 'C:/sampleApp/sample.zip' ],
@@ -45,7 +38,7 @@ describe("Session", function () {
     });
     
     it("sets the source directory correctly when unspecified [-s] and no output path is set", function () {
-        mockResolve();
+        testUtils.mockResolve(path);
         
         var data = {
             args: [ zipLocation ],
