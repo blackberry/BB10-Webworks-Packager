@@ -24,5 +24,5 @@ module.exports = {
     DEPENDENCIES: path.normalize(__dirname + "/../../dependencies"),
     NODE_MOD: path.normalize(__dirname + "/../../node_modules"),
     FRAMEWORK: path.normalize(__dirname + "/../../Framework"),
-    FRAMEWORK_DEPLOY: path.normalize(__dirname + "/../../Framework/target/zip/*")
+    FRAMEWORK_DEPLOY: path.normalize(__dirname + "/../../Framework/target/zip/")
 };
