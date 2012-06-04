@@ -7,7 +7,12 @@
     <packaging>pom</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scm>ci</scm>
+        <scm>-ci</scm>
+        <major>1</major>
+        <minor>0</minor>
+        <revision>0</revision>
+        <subrevision>7</subrevision>
+        <update.version>false</update.version>
     </properties>
     <profiles>
         <profile>
@@ -31,8 +36,9 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>configure.bat</executable>
+                                    <executable>sh</executable>
                                     <arguments>
+                                        <argument>configure</argument>
                                         <argument>${scm}</argument>
                                     </arguments>
                                 </configuration>
@@ -63,9 +69,8 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>sudo</executable>
+                                    <executable>./configure</executable>
                                     <arguments>
-                                        <argument>./configure</argument>
                                         <argument>${scm}</argument>
                                     </arguments>
                                 </configuration>
@@ -94,6 +99,11 @@
                             <pom>Framework/pom.xml</pom>
                             <properties>
                                 <scm>${scm}</scm>
+                                <major>${major}</major>
+                                <minor>${minor}</minor>
+                                <revision>${revision}</revision>
+                                <subrevision>${subrevision}</subrevision>
+                                <update.version>${update.version}</update.version>
                             </properties>
                             <streamLogs>true</streamLogs>
                             <noLog>true</noLog>                            

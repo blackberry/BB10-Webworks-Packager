@@ -2,6 +2,7 @@ var srcPath = __dirname + "/../../../lib/",
     fs = require("fsext"),
     path = require("path"),
     util = require("util"),
+    packager_utils = require(srcPath + "packager-utils"),
     localize = require(srcPath + "localize"),
     wrench = require("wrench"),
     logger = require(srcPath + "logger"),
@@ -25,23 +26,72 @@ describe("File manager", function () {
         expect(fs.copySync).toHaveBeenCalledWith(path.normalize(util.format(session.conf.DEPENDENCIES_WWE, "simulator") + "/wwe"), path.normalize(session.sourceDir + "/wwe"));
     });
 
-    it("copyExtensions() should copy files required by features listed in config.xml", function () {
+    it("copyExtensions() should copy all .js files required by features listed in config.xml", function () {
         var session = testData.session,
             feature = "blackberry.app",
-            extPath = session.sourcePaths.EXT,
-            toDir = extPath + "/" + feature,
+            toDir = path.join(session.sourcePaths.EXT, feature),
             apiDir = path.resolve(session.conf.EXT, feature),
-            accessList = testData.accessList;
+            
+            //extension javascript files
+            indexJS = path.join(apiDir, "index.js"),
+            clientJS = path.join(apiDir, "client.js"),
+            subfolderJS = path.join(apiDir, "/subfolder/myjs.js");//Sub folder js file
+            
+
+        spyOn(wrench, "mkdirSyncRecursive");
+        spyOn(packager_utils, "copyFile");
+        
+        //Mock the extension directory
+        spyOn(wrench, "readdirSyncRecursive").andCallFake(function (directory) {
+            return [
+                indexJS,
+                clientJS,
+                subfolderJS,
+            ];
+        });
+
+        fileMgr.copyExtensions(testData.accessList, session, session.targets[0]);
+
+        //Extension directory is created
+        expect(wrench.mkdirSyncRecursive).toHaveBeenCalledWith(toDir, "0755");
+        
+        //Javascript files are copied
+        expect(packager_utils.copyFile).toHaveBeenCalledWith(indexJS, toDir, apiDir);
+        expect(packager_utils.copyFile).toHaveBeenCalledWith(clientJS, toDir, apiDir);
+        expect(packager_utils.copyFile).toHaveBeenCalledWith(subfolderJS, toDir, apiDir);
+    });
+    
+    it("copyExtensions() should copy .so files required by features listed in config.xml", function () {
+        var session = testData.session,
+            feature = "blackberry.app",
+            apiDir = path.resolve(session.conf.EXT, feature),
+            soDest = session.sourcePaths.JNEXT_PLUGINS,
+            
+            //extension .so files
+            simulatorSO = path.join(apiDir, "/simulator/myso.so"),//simulator so file
+            deviceSO = path.join(apiDir, "/device/myso.so");//device so file
+            
 
         spyOn(path, "existsSync").andReturn(true);
         spyOn(wrench, "mkdirSyncRecursive");
-        spyOn(wrench, "copyDirSyncRecursive");
+        spyOn(packager_utils, "copyFile");
+        
+        //Mock the extension directory
+        spyOn(wrench, "readdirSyncRecursive").andCallFake(function (directory) {
+            return [
+                simulatorSO,
+                deviceSO
+            ];
+        });
 
-        fileMgr.copyExtensions(accessList, session.conf.EXT, extPath);
+        fileMgr.copyExtensions(testData.accessList, session, session.targets[0]);
 
-        expect(path.existsSync).toHaveBeenCalledWith(apiDir);
-        expect(wrench.mkdirSyncRecursive).toHaveBeenCalledWith(toDir, "0755");
-        expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(apiDir, toDir);
+        //plugins/jnext output directory is created
+        expect(wrench.mkdirSyncRecursive).toHaveBeenCalledWith(session.sourcePaths.JNEXT_PLUGINS, "0755");
+        
+        //The .so files are copied
+        expect(packager_utils.copyFile).toHaveBeenCalledWith(simulatorSO, soDest);
+        expect(packager_utils.copyFile).toHaveBeenCalledWith(deviceSO, soDest);
     });
 
     it("copyExtension() should throw an error when a specified feature cannot be found in ext folder", function () {
@@ -57,7 +107,7 @@ describe("File manager", function () {
             }];
 
         expect(function () {
-            fileMgr.copyExtensions(accessList, session.conf.EXT, session.sourcePaths.EXT);
+            fileMgr.copyExtensions(accessList, session);
         }).toThrow(new Error("Failed to find feature with id: abc.def.ijk"));
     });
     
@@ -74,8 +124,8 @@ describe("File manager", function () {
         spyOn(path, "resolve").andReturn("/I/DO/NOT/EXIST");
             
         expect(function () {
-            fileMgr.copyExtensions(accessList, session.conf.EXT, session.sourcePaths.EXT);
-        }).toThrow(new Error(localize.translate("EXCEPTION_MISSING_FILE_IN_API_DIR", "client.js", "/I/DO/NOT/EXIST")));
+            fileMgr.copyExtensions(accessList, session);
+        }).toThrow(new Error(path.normalize(localize.translate("EXCEPTION_MISSING_FILE_IN_API_DIR", "client.js", "/I/DO/NOT/EXIST"))));
     });
     
     it("throws an error when the index.js file does not exist in ext folder", function () {
@@ -91,36 +141,33 @@ describe("File manager", function () {
         spyOn(path, "resolve").andReturn("/I/DO/NOT/EXIST");
             
         expect(function () {
-            fileMgr.copyExtensions(accessList, session.conf.EXT, session.sourcePaths.EXT);
-        }).toThrow(new Error(localize.translate("EXCEPTION_MISSING_FILE_IN_API_DIR", "index.js", "/I/DO/NOT/EXIST")));
-    });
-    
-    it("throws an error when there are non-js files in ext folder", function () {
-        var session = testData.session,
-            accessList = testData.accessList,
-            clientJsPath = path.join(session.conf.EXT, "/blackberry.app/client.js");
-
-        //When checking if client.js is a .js file, return a .nonJsExtension
-        spyOn(path, "extname").andCallFake(function (mPath) {
-            return (mPath.indexOf("client.js") !== -1) ? ".nonJsExtension" : ".js";
-        });
-            
-        expect(function () {
-            fileMgr.copyExtensions(accessList, session.conf.EXT, session.sourcePaths.EXT);
-        }).toThrow(new Error(localize.translate("EXCEPTION_NON_JS_FILE_IN_API_DIR", clientJsPath)));
+            fileMgr.copyExtensions(accessList, session);
+        }).toThrow(new Error(path.normalize(localize.translate("EXCEPTION_MISSING_FILE_IN_API_DIR", "index.js", "/I/DO/NOT/EXIST"))));
     });
 
     it("generateFrameworkModulesJS() should create frameworkModules.js", function () {
-        var files = [],
+        var libFiles = [],
+            extFiles = [],
             modulesArr;
 
-        files.push(path.normalize(session.sourcePaths.CHROME + "/lib/framework.js"));
-        files.push(path.normalize(session.sourcePaths.CHROME + "/lib/config/user.js"));
-        files.push(path.normalize(session.sourcePaths.CHROME + "/lib/plugins/bridge.js"));
-        files.push(path.normalize(session.sourcePaths.CHROME + "/lib/policy/whitelist.js"));
-        files.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.app/client.js"));
+        libFiles.push(path.normalize(session.sourcePaths.CHROME + "/lib/framework.js"));
+        libFiles.push(path.normalize(session.sourcePaths.CHROME + "/lib/config/user.js"));
+        libFiles.push(path.normalize(session.sourcePaths.CHROME + "/lib/plugins/bridge.js"));
+        libFiles.push(path.normalize(session.sourcePaths.CHROME + "/lib/policy/whitelist.js"));
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.app/client.js"));
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.app/index.js"));
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.connection/client.js"));
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.connection/index.js"));        
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.event/client.js"));
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.event/index.js"));        
 
-        spyOn(wrench, "readdirSyncRecursive").andReturn(files);
+        spyOn(wrench, "readdirSyncRecursive").andCallFake(function (path) {
+            if (/ext$/.test(path)) {
+                return extFiles;
+            } else {
+                return libFiles;
+            }
+        });
         spyOn(fs, "statSync").andReturn({
             isDirectory: function () {
                 return false;
@@ -140,7 +187,7 @@ describe("File manager", function () {
         expect(modulesArr).toContain("lib/config/user.js");
         expect(modulesArr).toContain("lib/plugins/bridge.js");
         expect(modulesArr).toContain("lib/policy/whitelist.js");
-        expect(modulesArr).toContain("ext/blackberry.app/client.js");
+        expect(modulesArr).toContain("ext/blackberry.event/index.js");
     });
 
     it("unzip() should extract 'from' zip file to 'to' directory", function () {

@@ -1,5 +1,12 @@
-npm install -g jake jshint@0.5.2 csslint uglify-js
+if [ "`uname`" == "Darwin" ] ; then
+    sudo npm install -g jake jshint@0.5.2 csslint uglify-js
+else
+    npm install -g jake jshint@0.5.2 csslint uglify-js
+fi
 npm install
-if [ "$1" != "-scm" ]; then
+if [[ "$1" != "-scm" && "$1" != "-ci" ]]; then
     git submodule update --init
+    cd ./Framework
+    source configure
+    jake
 fi

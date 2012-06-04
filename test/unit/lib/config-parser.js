@@ -18,11 +18,11 @@ function mockParsing(data, error) {
     });
 }
 
-describe("xml parser", function () {
+describe("config parser", function () {
     it("parses standard elements in a config.xml", function () {
         configParser.parse(configPath, session, function (configObj) {
             expect(configObj.content).toEqual("local:///startPage.html");
-            expect(configObj.id).toEqual("MyWidgetId");
+            expect(configObj.id).toEqual("My WidgetId");
             expect(configObj.version).toEqual("1.0.0");
             expect(configObj.license).toEqual("My License");
             expect(configObj.licenseURL).toEqual("http://www.apache.org/licenses/LICENSE-2.0");
@@ -147,6 +147,30 @@ describe("xml parser", function () {
             configParser.parse(configPath, session, {});
         }).toThrow(localize.translate("EXCEPTION_INVALID_ID"));
     });
+
+    it("fails when id starts with a space", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["@"].id = " abcdefghijk";
+        
+        mockParsing(data);
+        
+        //Should throw an EXCEPTION_INVALID_ID error
+        expect(function () {
+            configParser.parse(configPath, session, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ID"));
+    });
+
+    it("fails when id ends with a space", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["@"].id = "abcdefghijk ";
+        
+        mockParsing(data);
+        
+        //Should throw an EXCEPTION_INVALID_ID error
+        expect(function () {
+            configParser.parse(configPath, session, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ID"));
+    });
     
     it("adds local:/// protocol to urls", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
@@ -161,10 +185,10 @@ describe("xml parser", function () {
     
     it("cleans source folder on error", function () {
         mockParsing({}, "ERROR");
-        
+
         spyOn(logger, "error");
         spyOn(fileManager, "cleanSource");
-        
+
         configParser.parse(configPath, session, function () {});
         
         expect(fileManager.cleanSource).toHaveBeenCalled();
@@ -195,8 +219,8 @@ describe("xml parser", function () {
         configParser.parse(configPath, session, function (configObj) {
             customAccessList = testUtilities.getAccessListForUri(configObj.accessList, 'http://ci0000000094448.rim.net');
             
-            //The custom access list features should remain empty
-            expect(customAccessList.features).toEqual([]);
+            //The custom access list features should only contain global features
+            expect(customAccessList.features).toEqual(configParser.getGlobalFeatures());
         });
     });
         
@@ -220,7 +244,7 @@ describe("xml parser", function () {
             //hasMultiAccess was set to false
             expect(configObj.hasMultiAccess).toEqual(false);
             expect(configObj.accessList).toEqual([ {
-                features : [],
+                features : configParser.getGlobalFeatures(),
                 uri : 'WIDGET_LOCAL',
                 allowSubDomain : true
             } ]);
@@ -237,11 +261,11 @@ describe("xml parser", function () {
             //hasMultiAccess was set to false
             expect(configObj.hasMultiAccess).toEqual(false);
             expect(configObj.accessList).toEqual([ {
-                features : [],
+                features : configParser.getGlobalFeatures(),
                 uri : 'WIDGET_LOCAL',
                 allowSubDomain : true
             }, {
-                "features" : [],
+                "features" : configParser.getGlobalFeatures(),
                 "uri" : "http://www.somedomain1.com"
             } ]);
         });
@@ -257,7 +281,7 @@ describe("xml parser", function () {
             //hasMultiAccess was set to true
             expect(configObj.hasMultiAccess).toEqual(true);
             expect(configObj.accessList).toEqual([ {
-                features : [],
+                features : configParser.getGlobalFeatures(),
                 uri : 'WIDGET_LOCAL',
                 allowSubDomain : true
             } ]);
@@ -274,11 +298,11 @@ describe("xml parser", function () {
             //hasMultiAccess was set to true
             expect(configObj.hasMultiAccess).toEqual(true);
             expect(configObj.accessList).toEqual([ {
-                features : [],
+                features : configParser.getGlobalFeatures(),
                 uri : 'WIDGET_LOCAL',
                 allowSubDomain : true
             }, {
-                "features" : [],
+                "features" : configParser.getGlobalFeatures(),
                 "uri" : "http://www.somedomain1.com"
             } ]);
         });
@@ -305,7 +329,49 @@ describe("xml parser", function () {
             configParser.parse(configPath, session, function (configObj) {});
         }).toThrow(localize.translate("EXCEPTION_FEATURE_DEFINED_WITH_WILDCARD_ACCESS_URI"));
     });
-    
+
+    it("should fail when the access uri attribute does not specify a protocol", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+
+        //Add an access element with one feature
+        data['access'] = {
+            '@': {
+                uri: 'rim.net',
+                subdomains: 'true'
+            },
+            feature: {
+                '@': { id: 'blackberry.system' }
+            }
+        };
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ACCESS_URI_NO_PROTOCOL", data['access']['@'].uri));
+    });
+
+    it("should fail when the access uri attribute does not specify a URN", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+
+        //Add an access element with one feature
+        data['access'] = {
+            '@': {
+                uri: 'http://',
+                subdomains: 'true'
+            },
+            feature: {
+                '@': { id: 'blackberry.system' }
+            }
+        };
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ACCESS_URI_NO_URN", data['access']['@'].uri));
+    });
+
     it("does not fail when there is a single feature element in the access list", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         
