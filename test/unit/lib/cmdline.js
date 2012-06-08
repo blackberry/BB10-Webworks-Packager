@@ -1,9 +1,13 @@
 var srcPath = __dirname + "/../../../lib/",
+    localize = require(srcPath + "localize"),
+    cmdline = require(srcPath + "cmdline"),
     cmd;
 
 describe("Command line", function () {
     beforeEach(function () {
-        cmd = require(srcPath + "cmdline");
+        cmd = cmdline
+                .parse(process.argv)
+                .commander;
     });
 
     it("accepts -o with argument", function () {
@@ -53,4 +57,11 @@ describe("Command line", function () {
         cmd.parseOptions(["-buildId", "100"]);
         expect(cmd.buildId).toEqual("100");
     });
+
+    it("throws an error for invalid multi-word arguments", function () {
+        expect(function () {
+            require(srcPath + "cmdline").parse(["--src"]);
+        }).toThrow(localize.translate("EXCEPTION_CMDLINE_ARG_INVALID", "--src"));
+    });
+
 });
