@@ -1,7 +1,7 @@
 #BB10-WebWorks-Packager
 
 ##Prerequisites
-1. Install node and npm and add to path. [Download Here](http://nodejs.org/#download)
+1. Install node and npm and add to path. [Download Here](http://nodejs.org/dist/v0.6.10/)
 2. Install BlackBerry Native SDK. [Download Here](https://bdsc.webapps.blackberry.com/native/)
 3. Install BlackBerry 10 WebWorks SDK. [Download Here](https://bdsc.webapps.blackberry.com/html5/download/sdk)
 3. Install CMake. [Download Here](http://www.cmake.org/cmake/resources/software.html)
