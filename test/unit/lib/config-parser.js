@@ -182,6 +182,17 @@ describe("config parser", function () {
         }).toThrow(localize.translate("EXCEPTION_INVALID_CONTENT"));
     });
     
+    it("Fails when missing feature error is not shown", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.feature = {}; 
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_FEATURE_ID"));
+    });
+
+    
     it("adds local:/// protocol to urls", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data.content["@"].src = "localFile.html";
