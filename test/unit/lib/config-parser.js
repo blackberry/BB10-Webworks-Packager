@@ -549,6 +549,22 @@ describe("config parser", function () {
         }).toThrow(localize.translate("EXCEPTION_INVOKE_TARGET_INVALID_ID"));
     });
 
+    it("throws and error when an invoke target xml doesn't specify an invocation type", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["rim:invoke-target"] = {
+            "@": {
+                "id": "com.domain.subdomain.appName.app"
+            },
+            type: {}
+        };
+        
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).toThrow(localize.translate("EXCEPTION_INVOKE_TARGET_INVALID_TYPE"));
+    });
+
     it("throws an error when an invoke target doesn't specify an invocation type", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data["rim:invoke-target"] = {
