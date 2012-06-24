@@ -26,7 +26,7 @@ describe("config parser", function () {
             expect(configObj.version).toEqual("1.0.0");
             expect(configObj.license).toEqual("My License");
             expect(configObj.licenseURL).toEqual("http://www.apache.org/licenses/LICENSE-2.0");
-            expect(configObj.icon).toEqual("test.png");
+            expect(configObj.icon.image["default"]).toEqual(["test.png"]);
             expect(configObj.configXML).toEqual("config.xml");
             expect(configObj.author).toEqual("Research In Motion Ltd.");
             expect(configObj.authorURL).toEqual("http://www.rim.com/");
@@ -670,5 +670,357 @@ describe("config parser", function () {
         expect(function () {
             configParser.parse(configPath, session, function (configObj) {});
         }).toThrow(localize.translate("EXCEPTION_INVOKE_TARGET_MIME_TYPE_INVALID"));
+    });
+
+    describe("splash screen", function () {
+        it("throws error when rim:splashScreens element does not contain any image elements", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:splashScreens"] = {};
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_EMPTY_SPLASH_SCREEN"));
+        });
+
+        it("throws error when rim:splashScreens contains empty image element", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:splashScreens"] = {
+                image: {}
+            };
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_IMAGE"));
+        });
+
+        it("throws error when rim:splashScreens contains empty text element", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:splashScreens"] = {
+                image: {
+                    text: {}
+                }
+            };
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_TEXT"));
+        });
+
+        it("throws error when rim:splashScreens contains text element that does not contain xml:lang attribute", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:splashScreens"] = {
+                image: {
+                    text: {
+                        "@": {
+                            "useless": "useless value"
+                        },
+                        "#": "image1.jpg"
+                    }
+                }
+            };
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_TEXT"));
+        });
+
+        it("throws error when rim:splashScreens contains image element contains nested element that is not text", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:splashScreens"] = {
+                image: {
+                    blah: {
+                        "#": "blah blah"
+                    },
+                    "#": "image1.jpg"
+                }
+            };
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_IMAGE"));
+        });
+
+        it("generates correct widgetConfig when there is just 1 splash screen image", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:splashScreens"] = {
+                "image": "image1.jpg"
+            };
+
+            mockParsing(data);
+
+            configParser.parse(configPath, session, function (configObj) {
+                expect(configObj.splashScreens).toBeDefined();
+                expect(configObj.splashScreens.image).toBeDefined();
+                expect(configObj.splashScreens.image["default"]).toBeDefined();
+                expect(configObj.splashScreens.image["default"].length).toBe(1);
+                configObj.splashScreens.image["default"].forEach(function (img) {
+                    expect(img).toBe("image1.jpg");
+                });
+            });
+        });
+
+        it("generates correct widgetConfig when there are no localized splash screen images", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:splashScreens"] = {
+                "image": ["image1.jpg", "image2.jpg"]
+            };
+
+            mockParsing(data);
+
+            configParser.parse(configPath, session, function (configObj) {
+                expect(configObj.splashScreens).toBeDefined();
+                expect(configObj.splashScreens.image).toBeDefined();
+                expect(configObj.splashScreens.image["default"]).toBeDefined();
+                expect(configObj.splashScreens.image["default"].length).toBe(2);
+                configObj.splashScreens.image["default"].forEach(function (img) {
+                    expect(img).toMatch(/image1\.jpg|image2\.jpg/);
+                });
+            });
+        });
+
+        it("generates correct widgetConfig when there are localized splash screen images", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:splashScreens"] = {
+                "image": [{
+                    "text": {
+                        "@": {
+                            "xml:lang": "fr"
+                        },
+                        "#": "image1.jpg"
+                    }
+                }, {
+                    "text": {
+                        "@": {
+                            "xml:lang": "fr"
+                        },
+                        "#": "image2.jpg"
+                    }
+                }, {
+                    "text": {
+                        "@": {
+                            "xml:lang": "zh-hk"
+                        },
+                        "#": "image3.jpg"
+                    }
+                }, {
+                    "text": {
+                        "@": {
+                            "xml:lang": "zh-hk"
+                        },
+                        "#": "image4.jpg"
+                    }
+                },
+                "image5.jpg",
+                "image6.jpg"]
+            };
+
+            mockParsing(data);
+
+            configParser.parse(configPath, session, function (configObj) {
+                expect(configObj.splashScreens).toBeDefined();
+                expect(configObj.splashScreens.image).toBeDefined();
+                expect(configObj.splashScreens.image["default"]).toBeDefined();
+                expect(configObj.splashScreens.image["default"].length).toBe(2);
+                configObj.splashScreens.image["default"].forEach(function (img) {
+                    expect(img).toMatch(/image5\.jpg|image6\.jpg/);
+                });
+                expect(configObj.splashScreens.image["fr"]).toBeDefined();
+                expect(configObj.splashScreens.image["fr"].length).toBe(2);
+                configObj.splashScreens.image["fr"].forEach(function (img) {
+                    expect(img).toMatch(/image1\.jpg|image2\.jpg/);
+                });
+                expect(configObj.splashScreens.image["zh-hk"]).toBeDefined();
+                expect(configObj.splashScreens.image["zh-hk"].length).toBe(2);
+                configObj.splashScreens.image["zh-hk"].forEach(function (img) {
+                    expect(img).toMatch(/image3\.jpg|image4\.jpg/);
+                });
+            });
+        });
+    });
+
+    describe("icon", function () {
+        it("throws error when rim:icon element does not contain any image elements", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:icon"] = {};
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_EMPTY_ICON"));
+        });
+
+        it("throws error when rim:icon contains empty image element", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:icon"] = {
+                image: {}
+            };
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_IMAGE"));
+        });
+
+        it("throws error when rim:icon contains empty text element", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:icon"] = {
+                image: {
+                    text: {}
+                }
+            };
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_TEXT"));
+        });
+
+        it("throws error when rim:icon contains text element that does not contain xml:lang attribute", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:icon"] = {
+                image: {
+                    text: {
+                        "@": {
+                            "useless": "useless value"
+                        },
+                        "#": "image1.jpg"
+                    }
+                }
+            };
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_TEXT"));
+        });
+
+        it("throws error when rim:icon contains image element contains nested element that is not text", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:icon"] = {
+                image: {
+                    blah: {
+                        "#": "blah blah"
+                    },
+                    "#": "image1.jpg"
+                }
+            };
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_IMAGE"));
+        });
+
+        it("generates correct widgetConfig when there is just 1 icon image", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:icon"] = {
+                "image": "image1.jpg"
+            };
+
+            mockParsing(data);
+
+            configParser.parse(configPath, session, function (configObj) {
+                expect(configObj.icon).toBeDefined();
+                expect(configObj.icon.image).toBeDefined();
+                expect(configObj.icon.image["default"]).toBeDefined();
+                expect(configObj.icon.image["default"].length).toBe(1);
+                configObj.icon.image["default"].forEach(function (img) {
+                    expect(img).toBe("image1.jpg");
+                });
+            });
+        });
+
+        it("generates correct widgetConfig when there are no localized icon images", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:icon"] = {
+                "image": ["image1.jpg", "image2.jpg"]
+            };
+
+            mockParsing(data);
+
+            configParser.parse(configPath, session, function (configObj) {
+                expect(configObj.icon).toBeDefined();
+                expect(configObj.icon.image).toBeDefined();
+                expect(configObj.icon.image["default"]).toBeDefined();
+                expect(configObj.icon.image["default"].length).toBe(2);
+                configObj.icon.image["default"].forEach(function (img) {
+                    expect(img).toMatch(/image1\.jpg|image2\.jpg/);
+                });
+            });
+        });
+
+        it("generates correct widgetConfig when there are localized splash screen images", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:icon"] = {
+                "image": [{
+                    "text": {
+                        "@": {
+                            "xml:lang": "fr"
+                        },
+                        "#": "image1.jpg"
+                    }
+                }, {
+                    "text": {
+                        "@": {
+                            "xml:lang": "fr"
+                        },
+                        "#": "image2.jpg"
+                    }
+                }, {
+                    "text": {
+                        "@": {
+                            "xml:lang": "zh-hk"
+                        },
+                        "#": "image3.jpg"
+                    }
+                }, {
+                    "text": {
+                        "@": {
+                            "xml:lang": "zh-hk"
+                        },
+                        "#": "image4.jpg"
+                    }
+                },
+                "image5.jpg",
+                "image6.jpg"]
+            };
+
+            mockParsing(data);
+
+            configParser.parse(configPath, session, function (configObj) {
+                expect(configObj.icon).toBeDefined();
+                expect(configObj.icon.image).toBeDefined();
+                expect(configObj.icon.image["default"]).toBeDefined();
+                expect(configObj.icon.image["default"].length).toBe(2);
+                configObj.icon.image["default"].forEach(function (img) {
+                    expect(img).toMatch(/image5\.jpg|image6\.jpg/);
+                });
+                expect(configObj.icon.image["fr"]).toBeDefined();
+                expect(configObj.icon.image["fr"].length).toBe(2);
+                configObj.icon.image["fr"].forEach(function (img) {
+                    expect(img).toMatch(/image1\.jpg|image2\.jpg/);
+                });
+                expect(configObj.icon.image["zh-hk"]).toBeDefined();
+                expect(configObj.icon.image["zh-hk"].length).toBe(2);
+                configObj.icon.image["zh-hk"].forEach(function (img) {
+                    expect(img).toMatch(/image3\.jpg|image4\.jpg/);
+                });
+            });
+        });
     });
 });
