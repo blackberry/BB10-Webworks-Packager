@@ -10,7 +10,9 @@
             email = "author@rim.com">Research In Motion Ltd.</author>
     <description>This app does everything.</description>
     <license href="http://www.apache.org/licenses/LICENSE-2.0">My License</license>
-    <icon src="test.png" />
+    <rim:icon>
+        <image>test.png</image>
+    </rim:icon>
     <rim:permissions>
         <rim:permit>access_shared</rim:permit>
         <rim:permit>read_geolocation</rim:permit>
