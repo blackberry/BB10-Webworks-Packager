@@ -4,6 +4,7 @@ var srcPath = __dirname + "/../../../lib/",
     localize = require(srcPath + "localize"),
     logger = require(srcPath + "logger"),
     packagerValidator = require(srcPath + "packager-validator"),
+    path = require("path"),
     cmd;
 
 describe("Packager Validator", function () {
@@ -190,4 +191,132 @@ describe("Packager Validator", function () {
         packagerValidator.validateSession(session, configObj);
         expect(logger.warn).toHaveBeenCalledWith(localize.translate("WARNING_SIGNING_PASSWORD_EXPECTED"));
     });
+});
+
+describe("Packager Validator: validateConfig", function () {
+    it("does not remove APIs that do exist from features whitelist", function () {
+        var session = testUtilities.cloneObj(testData.session),
+            configObj = {
+                accessList: [{
+                    features: [{
+                        id: "blackberry.identity",
+                        required: true,
+                        version: "1.0.0.0"
+                    }, {
+                        version: "1.0.0.0",
+                        required: true,
+                        id: "blackberry.event"
+                    }],
+                    uri: "WIDGET_LOCAL",
+                    allowSubDomain: true
+                }]
+            };
+
+        spyOn(path, "existsSync").andCallFake(function () {
+            //since both of these APIs exist, existsSync would return true
+            return true;
+        });
+
+        packagerValidator.validateConfig(session, configObj);
+        expect(configObj.accessList[0].features.length).toEqual(2);
+        
+
+    });
+
+    it("removes non-existing APIs from features whitelist", function () {
+        var session = testUtilities.cloneObj(testData.session),
+            configObj = {
+                accessList: [{
+                    features: [{
+                        version: "1.0.0.0",
+                        required: true,
+                        id: "abc.def.ijk"
+                    }, {
+                        id: "blackberry.identity",
+                        required: true,
+                        version: "1.0.0.0"
+                    }],
+                    uri: "WIDGET_LOCAL",
+                    allowSubDomain: true
+                }]    
+            };
+
+
+        spyOn(path, "existsSync").andCallFake(function (dir) {
+            return dir.indexOf("abc") !== -1 ? false : true;
+        });
+
+        spyOn(logger, "warn");
+
+        packagerValidator.validateConfig(session, configObj);
+        //expecting the features list to have shortened by 1, since one of these APIs does not exist
+        expect(configObj.accessList[0].features.length).toEqual(1);
+        //expecting warning to be logged to console because API "abc.def.ijk" does not exist"
+        expect(logger.warn).toHaveBeenCalledWith(localize.translate("EXCEPTION_FEATURE_NOT_FOUND", "abc.def.ijk"));
+
+    });
+
+    it("removes non-existing APIs from accessList with multiple features lists", function () {
+        var session = testUtilities.cloneObj(testData.session),
+        configObj = {
+            accessList: [{
+                features: [{
+                    id: "blackberry.identity",
+                    required: true,
+                    version: "1.0.0.0"
+                }, {
+                    version: "blackberry.app",
+                    required: true,
+                    id: "blackberry.app"
+                }],
+                uri: "WIDGET_LOCAL",
+                allowSubDomain: true
+            }, {
+                features: [{
+                    id: "blackberry.identity",
+                    required: true,
+                    version: "1.0.0.0"
+                }, {
+                    id: "abc.def.ijk",
+                    required: true,
+                    version: "1.0.0.0"
+                }],
+                uri: "www.cnn.com",
+                allowSubDomain: true
+            }]
+        };
+        spyOn(logger, "warn");
+        
+        spyOn(path, "existsSync").andCallFake(function (dir) {
+            return dir.indexOf("abc") !== -1 ? false : true;
+        });
+
+        packagerValidator.validateConfig(session, configObj);
+        expect(configObj.accessList[0].features.length).toEqual(2);
+        expect(configObj.accessList[1].features.length).toEqual(1);
+        expect(logger.warn).toHaveBeenCalledWith(localize.translate("EXCEPTION_FEATURE_NOT_FOUND", "abc.def.ijk"));
+    });
+
+    it("does not crash if user whitelists a feature with no id", function () {
+        var session = testUtilities.cloneObj(testData.session),
+        configObj = {
+            accessList: [{
+                features: [{
+                    id: "blackberry.identity",
+                    required: true,
+                    version: "1.0.0.0"
+                }, {
+                    version: "1.0.0.0",
+                    required: true,
+                }],
+                uri: "WIDGET_LOCAL",
+                allowSubDomain: true
+            }]
+        };
+
+        expect(function () {
+            packagerValidator.validateConfig(session, configObj);
+        }).not.toThrow();
+    });
+
 });

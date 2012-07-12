@@ -15,6 +15,7 @@ describe("File manager", function () {
         fileMgr.prepareOutputFiles(session);
 
         expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
+        expect(path.existsSync(session.sourcePaths.UI)).toBeTruthy();
         expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
     });
 
@@ -92,23 +93,6 @@ describe("File manager", function () {
         //The .so files are copied
         expect(packager_utils.copyFile).toHaveBeenCalledWith(simulatorSO, soDest);
         expect(packager_utils.copyFile).toHaveBeenCalledWith(deviceSO, soDest);
-    });
-
-    it("copyExtension() should throw an error when a specified feature cannot be found in ext folder", function () {
-        var session = testData.session,
-            accessList = [{
-                uri: "http://www.cnn.com",
-                allowSubDomain: false,
-                features: [{
-                    id: "abc.def.ijk",
-                    required: true,
-                    version: "1.0.0"
-                }]
-            }];
-
-        expect(function () {
-            fileMgr.copyExtensions(accessList, session);
-        }).toThrow(new Error("Failed to find feature with id: abc.def.ijk"));
     });
     
     it("throws an error when the client.js file does not exist in ext folder", function () {

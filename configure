@@ -1,3 +1,5 @@
+#!/bin/bash
+FRAMEWORK_DIR=$PWD/Framework
 if [ "`uname`" == "Darwin" ] ; then
     sudo npm install -g jake jshint@0.5.2 csslint uglify-js
 else
@@ -6,7 +8,8 @@ fi
 npm install
 if [[ "$1" != "-scm" && "$1" != "-ci" ]]; then
     git submodule update --init
-    cd ./Framework
+    cd $FRAMEWORK_DIR
     source configure
+    cd $FRAMEWORK_DIR #cd back into framework directory before running jake
     jake
 fi

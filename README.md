@@ -1,7 +1,7 @@
 #BB10-WebWorks-Packager
 
 ##Prerequisites
-1. Install node and npm and add to path. [Download Here](http://nodejs.org/#download)
+1. Install node and npm and add to path. [Download Here](http://nodejs.org/dist/v0.6.10/)
 2. Install BlackBerry Native SDK. [Download Here](https://bdsc.webapps.blackberry.com/native/)
 3. Install BlackBerry 10 WebWorks SDK. [Download Here](https://bdsc.webapps.blackberry.com/html5/download/sdk)
 3. Install CMake. [Download Here](http://www.cmake.org/cmake/resources/software.html)
@@ -16,7 +16,7 @@
 4. Copy the `dependencies` directory from the BlackBerry 10 WebWorks SDK installation directory into `BB10-WebWorks-Packager`
 5. On windows run `*BBNDK Installation Directory*\bbndk-env.bat`. This needs to be run each time before you configure.
    On Mac, you can simply add `source *installation directory here*/bbndk-env.sh` to your bash profile
-6. Run `./configure` on Mac (`sudo ./configure` if you get permission errors) or `bash configure` on Windows.
+6. Run `./configure` on Mac or `bash configure` on Windows.
    Please note, on Windows the configure script needs to be run from command prompt.
 7. Run `jake test` and check that jake runs and completes
 

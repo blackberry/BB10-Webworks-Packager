@@ -113,7 +113,7 @@ describe("Native packager", function () {
             "<asset entry=\"true\" type=\"qnx/elf\">wwe</asset>" +
             "<asset>abc</asset>" +
             "<asset>xyz</asset>" +
-            "<initialWindow><systemChrome>none</systemChrome><transparent>true</transparent></initialWindow>" +
+            "<initialWindow><systemChrome>none</systemChrome><transparent>true</transparent><autoOrients>true</autoOrients></initialWindow>" +
             "<env value=\"12\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>" +
             "<permission system=\"true\">run_native</permission>" +
             "<description>" + config.description + "</description></qnx>",
@@ -143,6 +143,8 @@ describe("Native packager", function () {
                 "-buildId" + NL +
                 "100" + NL +
                 path.normalize("c:/device/Demo.bar") + NL +
+                "-barVersion" + NL +
+                "1.5" + NL +
                 "-C" + NL +
                 path.normalize("c:/src/") + NL +
                 "blackberry-tablet.xml" + NL +

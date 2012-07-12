@@ -33,3 +33,33 @@ describe("Encoded Buffer data to String", function () {
         expect(utils.bufferToString(fileData)).toEqual(helloWorld);
     });
 });
+
+describe("property wrapper", function () {
+    it("wraps a property of an object in an array", function () {
+        var obj = {
+            prop: "value"
+        };
+
+        utils.wrapPropertyInArray(obj, "prop");
+        expect(obj.prop[0]).toEqual("value");
+    });
+
+    it("does not wrap an array object in an array", function () {
+        var obj = {
+            prop: ["value"]
+        };
+
+        utils.wrapPropertyInArray(obj, "prop");
+        expect(obj.prop[0][0]).not.toEqual("value");
+        expect(obj.prop[0]).toEqual("value");
+    });
+
+    it("does not wrap a property that doesn't esist in the object", function () {
+        var obj = {
+            prop: "value"
+        };
+        
+        utils.wrapPropertyInArray(obj, "secondValue");
+        expect(obj.secondValue).not.toBeDefined();
+    });
+});

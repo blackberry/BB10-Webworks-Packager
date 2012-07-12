@@ -26,7 +26,7 @@ describe("config parser", function () {
             expect(configObj.version).toEqual("1.0.0");
             expect(configObj.license).toEqual("My License");
             expect(configObj.licenseURL).toEqual("http://www.apache.org/licenses/LICENSE-2.0");
-            expect(configObj.icon).toEqual("test.png");
+            expect(configObj.icon).toEqual(["test.png"]);
             expect(configObj.configXML).toEqual("config.xml");
             expect(configObj.author).toEqual("Research In Motion Ltd.");
             expect(configObj.authorURL).toEqual("http://www.rim.com/");
@@ -95,18 +95,18 @@ describe("config parser", function () {
     });
 
     it("parses a bare minimum config.xml without error", function () {
-        configPath = path.resolve("test/config-bare-minimum.xml");
+        var bareMinimumConfigPath = path.resolve("test/config-bare-minimum.xml");
 
-        configParser.parse(configPath, session, function (configObj) {
+        configParser.parse(bareMinimumConfigPath, session, function (configObj) {
             expect(configObj.content).toEqual("local:///startPage.html");
             expect(configObj.version).toEqual("1.0.0");
         });
     });
 
     it("license url is set even if license body is empty", function () {
-        configPath = path.resolve("test/config-license.xml");
+        var licenseConfigPath = path.resolve("test/config-license.xml");
 
-        configParser.parse(configPath, session, function (configObj) {
+        configParser.parse(licenseConfigPath, session, function (configObj) {
             expect(configObj.license).toEqual("");
             expect(configObj.licenseURL).toEqual("http://www.apache.org/licenses/LICENSE-2.0");
         });
@@ -171,6 +171,27 @@ describe("config parser", function () {
             configParser.parse(configPath, session, {});
         }).toThrow(localize.translate("EXCEPTION_INVALID_ID"));
     });
+
+    it("Fails when missing content error is not shown", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.content = "";
+        mockParsing(data);
+        
+        expect(function () {
+            configParser.parse(configPath, session, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_CONTENT"));
+    });
+    
+    it("Fails when missing feature error is not shown", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.feature = {}; 
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_FEATURE_ID"));
+    });
+
     
     it("adds local:/// protocol to urls", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
@@ -443,5 +464,407 @@ describe("config parser", function () {
         expect(function () {
             configParser.parse(configPath, session, {});
         }).toThrow(localize.translate("EXCEPTION_INVALID_AUTHOR"));
+    });
+
+    it("can parse a standard rim:invoke-target element", function () {
+
+        configParser.parse(configPath, session, function (configObj) {
+            var invokeTarget = configObj["invoke-target"][0];
+
+            expect(invokeTarget).toBeDefined();
+            expect(invokeTarget["@"]).toBeDefined();
+            expect(invokeTarget["@"]["id"]).toBeDefined();
+            expect(invokeTarget["@"]["id"]).toEqual("com.domain.subdomain.appname.app1");
+            expect(invokeTarget.type).toBeDefined();
+            expect(invokeTarget.type).toEqual("APPLICATION");
+            expect(invokeTarget["require-source-permissions"]).toBeDefined();
+            expect(invokeTarget["require-source-permissions"]).toEqual("invoke_accross_perimeters,access_shared");
+            expect(invokeTarget.filter).toBeDefined();
+            expect(invokeTarget.filter[0].action).toBeDefined();
+            expect(invokeTarget.filter[0].action).toContain("bb.action.VIEW");
+            expect(invokeTarget.filter[0].action).toContain("bb.action.SET");
+            expect(invokeTarget.filter[0].action).toContain("bb.action.OPEN");
+            expect(invokeTarget.filter[0]["mime-type"]).toBeDefined();
+            expect(invokeTarget.filter[0]["mime-type"]).toContain("image/*");
+            expect(invokeTarget.filter[0]["mime-type"]).toContain("text/*");
+            expect(invokeTarget.filter[0].property).toBeDefined();
+
+            invokeTarget.filter[0].property.forEach(function (property) {
+                expect(property["@"]).toBeDefined();
+                expect(property["@"]["var"]).toBeDefined();
+                expect(property["@"]["var"]).toMatch("^(exts|uris)$");
+                if (property["@"]["var"] === "uris") {
+                    expect(property["@"]["value"]).toMatch("^(ftp|http|https):\/\/$");
+                } else if (property["@"]["var"] === "exts") {
+                    expect(property["@"]["value"]).toMatch("^(jpg|png|txt|doc)$");
+                }
+            });
+        });
+    });
+    
+    it("can parse multiple filters in one element", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["rim:invoke-target"] = {
+            "@": {
+                "id": "com.domain.subdomain.appName.app"
+            },
+            "type": "application",
+            "filter":  [{
+                    "action":  "bb.action.OPEN",
+                    "mime-type": ["text/*", "image/*"]
+                }, {
+                    "action": "bb.action.SET",
+                    "mime-type": "image/*"
+                }]
+            };
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).not.toThrow();
+    });
+
+    it("can parse multiple invoke targets", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["rim:invoke-target"] = [{
+                "@": {
+                    "id": "com.domain.subdomain.appName.app"
+                },
+                "type": "application",
+            }, {
+                "@": {
+                    "id": "com.domain.subdomain.appName.viewer"
+                },
+                "type": "viewer"
+            }];
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).not.toThrow();
+
+    });
+
+    it("throws an error when an invoke target doesn't specify an invocation id", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["rim:invoke-target"] = {
+            type: "APPLICATION"
+        };
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).toThrow(localize.translate("EXCEPTION_INVOKE_TARGET_INVALID_ID"));
+    });
+
+    it("throws and error when an invoke target xml doesn't specify an invocation type", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["rim:invoke-target"] = {
+            "@": {
+                "id": "com.domain.subdomain.appName.app"
+            },
+            type: {}
+        };
+        
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).toThrow(localize.translate("EXCEPTION_INVOKE_TARGET_INVALID_TYPE"));
+    });
+
+    it("throws an error when an invoke target doesn't specify an invocation type", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["rim:invoke-target"] = {
+            "@": {
+                "id": "com.domain.subdomain.appName.app"
+            }
+        };
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).toThrow(localize.translate("EXCEPTION_INVOKE_TARGET_INVALID_TYPE"));
+    });
+
+    it("throws an error when an invoke target specifies an invalid invocation type", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["rim:invoke-target"] = {
+            "@": {
+                "id": "com.domain.subdomain.appName.app"
+            },
+            "type": "myInvokeType"
+        };
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).toThrow(localize.translate("EXCEPTION_INVOKE_TARGET_INVALID_TYPE"));
+    });
+
+    it("throws an error when an invoke target filter doesn't contain an action",  function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["rim:invoke-target"] = {
+            "@": {
+                "id": "com.domain.subdomain.appName.app"
+            },
+            "type": "APPLICATION",
+            "filter": {
+                "mime-type": "text/*",
+                "property": [{
+                    "@": {
+                        "var": "uris",
+                        "value": "https://"
+                    }
+                }, {
+                    "@": {
+                        "var": "exts",
+                        "value": "html"
+                    }
+                }, {
+                    "@": {
+                        "var": "exts",
+                        "value": "htm"
+                    }
+                }]
+            }
+        };
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).toThrow(localize.translate("EXCEPTION_INVOKE_TARGET_ACTION_INVALID"));
+    });
+
+    it("throws an error when a filter doesn't contain a mime-type",  function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["rim:invoke-target"] = {
+            "@": {
+                "id": "com.domain.subdomain.appName.app"
+            },
+            "type": "application",
+            "filter": {
+                "action": "bb.action.OPEN",
+                "property": [{
+                    "@": {
+                        "var": "uris",
+                        "value": "https://"
+                    }
+                }, {
+                    "@": {
+                        "var": "exts",
+                        "value": "html"
+                    }
+                }]
+            }
+        };
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, function (configObj) {});
+        }).toThrow(localize.translate("EXCEPTION_INVOKE_TARGET_MIME_TYPE_INVALID"));
+    });
+
+    describe("splash screen", function () {
+        it("throws error when rim:splash element does not contain src attribute", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:splash"] = {};
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_SPLASH_SRC"));
+        });
+
+        it("throws error when rim:splash element contains empty src attribute", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:splash"] = {
+                "@": {
+                    "src": ""
+                }
+            };
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_SPLASH_SRC"));
+        });
+
+        it("throws error when one of many rim:splash elements does not contain attribute", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:splash"] = [{
+                    "@": {
+                        "src": "a.jpg"
+                    }
+                }, {
+                    "#": "blah"
+                }];
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_SPLASH_SRC"));
+        });
+
+        it("allow one rim:splash element that contains non-empty src attribute", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:splash"] = {
+                "@": {
+                    "src": "a.jpg"
+                }
+            };
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).not.toThrow();
+        });
+
+        it("allow multiple rim:splash elements that contain non-empty src attribute", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:splash"] = [{
+                    "@": {
+                        "src": "a.jpg"
+                    }
+                }, {
+                    "@": {
+                        "src": "b.jpg"
+                    }
+                }];
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).not.toThrow();
+        });
+
+        it("throws error when rim:splash src starts with 'locales' subfolder", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["rim:splash"] = [{
+                    "@": {
+                        "src": "a.jpg"
+                    }
+                }, {
+                    "@": {
+                        "src": "locales/en/b.jpg"
+                    }
+                }];
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_SPLASH_SRC_LOCALES"));
+        });
+    });
+
+    describe("icon", function () {
+        it("throws error when icon element does not contain src attribute", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["icon"] = {};
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_ICON_SRC"));
+        });
+
+        it("throws error when icon element contains empty src attribute", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["icon"] = {
+                "@": {
+                    "src": ""
+                }
+            };
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_ICON_SRC"));
+        });
+
+        it("throws error when one of many icon elements does not contain attribute", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["icon"] = [{
+                    "@": {
+                        "src": "a.jpg"
+                    }
+                }, {
+                    "#": "blah"
+                }];
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_ICON_SRC"));
+        });
+
+        it("allow one icon element that contains non-empty src attribute", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["icon"] = {
+                "@": {
+                    "src": "a.jpg"
+                }
+            };
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).not.toThrow();
+        });
+
+        it("allow multiple icon elements that contain non-empty src attribute", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["icon"] = [{
+                    "@": {
+                        "src": "a.jpg"
+                    }
+                }, {
+                    "@": {
+                        "src": "b.jpg"
+                    }
+                }];
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).not.toThrow();
+        });
+
+        it("throws error when icon src starts with 'locales' subfolder", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["icon"] = [{
+                    "@": {
+                        "src": "a.jpg"
+                    }
+                }, {
+                    "@": {
+                        "src": "locales/en/b.jpg"
+                    }
+                }];
+
+            mockParsing(data);
+
+            expect(function () {
+                configParser.parse(configPath, session, function (configObj) {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_ICON_SRC_LOCALES"));
+        });
     });
 });
