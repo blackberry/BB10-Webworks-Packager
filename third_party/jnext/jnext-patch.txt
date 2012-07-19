@@ -5,13 +5,13 @@ index 0349893..c7ce3cf
 --- a/dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/plugin.cpp
 +++ b/dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/plugin.cpp
 @@ -81,7 +81,7 @@ string& g_trim( string& str )
- 
+
  void g_tokenize( const string& str, const string& delimiters, vector<string>& tokens )
  {
 -	tokenize( str, tokens, delimiters );
 +    tokenize( str, tokens, delimiters );
  }
- 
+
  char* SetEventFunc( SendPluginEv funcPtr )
 diff --git a/dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/plugin.h b/dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/plugin.h
 old mode 100755
@@ -25,7 +25,7 @@ index f073ae4..4ef7116
  #include <vector>
 +#include <unistd.h>
  //#include "tokenizer.h"
- 
+
  using namespace std;
 @@ -29,12 +30,12 @@ extern SendPluginEv SendPluginEvent;
  /////////////////////////////////////////////////////////////////////////
@@ -35,14 +35,14 @@ index f073ae4..4ef7116
 -#define szOK			"Ok "
 +#define szERROR         "Error "
 +#define szOK            "Ok "
- 
+
 -#define szDISPOSE		"Dispose"
 -#define szINVOKE		"InvokeMethod"
 -#define szCREATE		"CreateObj"
 +#define szDISPOSE       "Dispose"
 +#define szINVOKE        "InvokeMethod"
 +#define szCREATE        "CreateObj"
- 
+
  /////////////////////////////////////////////////////////////////////////
  // Utility functions
 @@ -52,6 +53,7 @@ bool g_unregisterObject( const string& strObjId, void* pContext );
