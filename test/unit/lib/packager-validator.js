@@ -5,7 +5,16 @@ var srcPath = __dirname + "/../../../lib/",
     logger = require(srcPath + "logger"),
     packagerValidator = require(srcPath + "packager-validator"),
     path = require("path"),
-    cmd;
+    cmd,
+    extManager = {
+        getExtensionBasenameByFeatureId: function (featureId) {
+            if (featureId && featureId.indexOf("blackberry.") >= 0) {
+                return featureId.substring(featureId.indexOf(".") + 1);
+            } else {
+                return null;
+            }
+        }
+    };
 
 describe("Packager Validator", function () {
     it("throws an exception when -g set and keys were not found", function () {
@@ -217,7 +226,7 @@ describe("Packager Validator: validateConfig", function () {
             return true;
         });
 
-        packagerValidator.validateConfig(session, configObj);
+        packagerValidator.validateConfig(session, configObj, extManager);
         expect(configObj.accessList[0].features.length).toEqual(2);
         
 
@@ -248,7 +257,7 @@ describe("Packager Validator: validateConfig", function () {
 
         spyOn(logger, "warn");
 
-        packagerValidator.validateConfig(session, configObj);
+        packagerValidator.validateConfig(session, configObj, extManager);
         //expecting the features list to have shortened by 1, since one of these APIs does not exist
         expect(configObj.accessList[0].features.length).toEqual(1);
         //expecting warning to be logged to console because API "abc.def.ijk" does not exist"
@@ -291,7 +300,7 @@ describe("Packager Validator: validateConfig", function () {
             return dir.indexOf("abc") !== -1 ? false : true;
         });
 
-        packagerValidator.validateConfig(session, configObj);
+        packagerValidator.validateConfig(session, configObj, extManager);
         expect(configObj.accessList[0].features.length).toEqual(2);
         expect(configObj.accessList[1].features.length).toEqual(1);
         expect(logger.warn).toHaveBeenCalledWith(localize.translate("EXCEPTION_FEATURE_NOT_FOUND", "abc.def.ijk"));
@@ -313,9 +322,15 @@ describe("Packager Validator: validateConfig", function () {
                 allowSubDomain: true
             }]
         };
+        spyOn(logger, "warn");
+
+        spyOn(path, "existsSync").andCallFake(function () {
+            //since both of these APIs exist, existsSync would return true
+            return true;
+        });
 
         expect(function () {
-            packagerValidator.validateConfig(session, configObj);
+            packagerValidator.validateConfig(session, configObj, extManager);
         }).not.toThrow();
     });
 

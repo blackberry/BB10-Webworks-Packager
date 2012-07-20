@@ -1,3 +1,5 @@
+var xml2js = require("xml2js");
+
 function getObjectByProperty(array, propertyName, propertyValue) {
     for (var i = 0; i < array.length; i++) {
         if (propertyValue === array[i][propertyName]) {
@@ -42,6 +44,15 @@ module.exports = {
         }
     
         return newObj;
+    },
+
+    mockParsing: function (data, error) {
+        spyOn(xml2js, "Parser").andReturn({
+            parseString: function (fileData, callback) {
+                //call callback with no error and altered xml2jsConfig data
+                callback(error, data);
+            }
+        });
     }
 };
 

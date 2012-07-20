@@ -5,7 +5,8 @@ var srcPath = __dirname + "/../../../lib/",
     fileMgr = require(srcPath + "file-manager"),
     nativePkgr = require(srcPath + "native-packager"),
     logger = require(srcPath + "logger"),
-    testData = require("./test-data");
+    testData = require("./test-data"),
+    extManager = null;
 
 describe("BAR builder", function () {
     it("build() create BAR for specified session", function () {
@@ -23,12 +24,12 @@ describe("BAR builder", function () {
             callback(0);
         });
 
-        barBuilder.build(session, testData.config, callback);
+        barBuilder.build(session, testData.config, extManager, callback);
 
         expect(wrench.mkdirSyncRecursive).toHaveBeenCalledWith(session.outputDir + "/" + target);
         expect(fileMgr.copyWWE).toHaveBeenCalledWith(session, target);
         expect(fileMgr.copyBarDependencies).toHaveBeenCalledWith(session, target);
-        expect(fileMgr.copyExtensions).toHaveBeenCalledWith(config.accessList, session, target);
+        expect(fileMgr.copyExtensions).toHaveBeenCalledWith(config.accessList, session, target, extManager);
         expect(fileMgr.generateFrameworkModulesJS).toHaveBeenCalledWith(session);
         expect(nativePkgr.exec).toHaveBeenCalledWith(session, target, config, jasmine.any(Function));
         expect(callback).toHaveBeenCalledWith(0);

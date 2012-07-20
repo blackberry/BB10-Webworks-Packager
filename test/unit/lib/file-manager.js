@@ -8,7 +8,15 @@ var srcPath = __dirname + "/../../../lib/",
     logger = require(srcPath + "logger"),
     fileMgr = require(srcPath + "file-manager"),
     testData = require("./test-data"),
-    session = testData.session;
+    session = testData.session,
+    extManager = {
+        getAllExtensionsToCopy: function (accessList) {
+            return ["app"];
+        },
+        getFeatureIdByExtensionBasename: function (extBasename) {
+            return "blackberry." + extBasename;
+        }
+    };
 
 describe("File manager", function () {
     it("prepareOutputFiles() should copy files and unzip archive", function () {
@@ -29,16 +37,19 @@ describe("File manager", function () {
 
     it("copyExtensions() should copy all .js files required by features listed in config.xml", function () {
         var session = testData.session,
-            feature = "blackberry.app",
-            toDir = path.join(session.sourcePaths.EXT, feature),
-            apiDir = path.resolve(session.conf.EXT, feature),
+            featureId = "blackberry.app",
+            extBasename = "app",
+            toDir = path.join(session.sourcePaths.EXT, featureId),
+            apiDir = path.resolve(session.conf.EXT, extBasename),
             
             //extension javascript files
             indexJS = path.join(apiDir, "index.js"),
             clientJS = path.join(apiDir, "client.js"),
+            manifestJSON = path.join(apiDir, "manifest.json"),
             subfolderJS = path.join(apiDir, "/subfolder/myjs.js");//Sub folder js file
             
 
+        spyOn(path, "existsSync").andReturn(true);
         spyOn(wrench, "mkdirSyncRecursive");
         spyOn(packager_utils, "copyFile");
         
@@ -47,11 +58,12 @@ describe("File manager", function () {
             return [
                 indexJS,
                 clientJS,
+                manifestJSON,
                 subfolderJS,
             ];
         });
 
-        fileMgr.copyExtensions(testData.accessList, session, session.targets[0]);
+        fileMgr.copyExtensions(testData.accessList, session, session.targets[0], extManager);
 
         //Extension directory is created
         expect(wrench.mkdirSyncRecursive).toHaveBeenCalledWith(toDir, "0755");
@@ -59,13 +71,14 @@ describe("File manager", function () {
         //Javascript files are copied
         expect(packager_utils.copyFile).toHaveBeenCalledWith(indexJS, toDir, apiDir);
         expect(packager_utils.copyFile).toHaveBeenCalledWith(clientJS, toDir, apiDir);
+        expect(packager_utils.copyFile).toHaveBeenCalledWith(manifestJSON, toDir, apiDir);
         expect(packager_utils.copyFile).toHaveBeenCalledWith(subfolderJS, toDir, apiDir);
     });
     
     it("copyExtensions() should copy .so files required by features listed in config.xml", function () {
         var session = testData.session,
-            feature = "blackberry.app",
-            apiDir = path.resolve(session.conf.EXT, feature),
+            extBasename = "app",
+            apiDir = path.resolve(session.conf.EXT, extBasename),
             soDest = session.sourcePaths.JNEXT_PLUGINS,
             
             //extension .so files
@@ -85,7 +98,7 @@ describe("File manager", function () {
             ];
         });
 
-        fileMgr.copyExtensions(testData.accessList, session, session.targets[0]);
+        fileMgr.copyExtensions(testData.accessList, session, session.targets[0], extManager);
 
         //plugins/jnext output directory is created
         expect(wrench.mkdirSyncRecursive).toHaveBeenCalledWith(session.sourcePaths.JNEXT_PLUGINS, "0755");
@@ -108,7 +121,7 @@ describe("File manager", function () {
         spyOn(path, "resolve").andReturn("/I/DO/NOT/EXIST");
             
         expect(function () {
-            fileMgr.copyExtensions(accessList, session);
+            fileMgr.copyExtensions(accessList, session, session.targets[0], extManager);
         }).toThrow(new Error(path.normalize(localize.translate("EXCEPTION_MISSING_FILE_IN_API_DIR", "client.js", "/I/DO/NOT/EXIST"))));
     });
     
@@ -125,7 +138,7 @@ describe("File manager", function () {
         spyOn(path, "resolve").andReturn("/I/DO/NOT/EXIST");
             
         expect(function () {
-            fileMgr.copyExtensions(accessList, session);
+            fileMgr.copyExtensions(accessList, session, session.targets[0], extManager);
         }).toThrow(new Error(path.normalize(localize.translate("EXCEPTION_MISSING_FILE_IN_API_DIR", "index.js", "/I/DO/NOT/EXIST"))));
     });
 
@@ -140,10 +153,13 @@ describe("File manager", function () {
         libFiles.push(path.normalize(session.sourcePaths.CHROME + "/lib/policy/whitelist.js"));
         extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.app/client.js"));
         extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.app/index.js"));
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.app/manifest.json"));
         extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.connection/client.js"));
-        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.connection/index.js"));        
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.connection/index.js"));
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.connection/manifest.json"));
         extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.event/client.js"));
-        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.event/index.js"));        
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.event/index.js"));
+        extFiles.push(path.normalize(session.sourcePaths.CHROME + "/ext/blackberry.event/manifest.json"));
 
         spyOn(wrench, "readdirSyncRecursive").andCallFake(function (path) {
             if (/ext$/.test(path)) {
@@ -172,6 +188,9 @@ describe("File manager", function () {
         expect(modulesArr).toContain("lib/plugins/bridge.js");
         expect(modulesArr).toContain("lib/policy/whitelist.js");
         expect(modulesArr).toContain("ext/blackberry.event/index.js");
+        expect(modulesArr).not.toContain("ext/blackberry.app/manifest.json");
+        expect(modulesArr).not.toContain("ext/blackberry.connection/manifest.json");
+        expect(modulesArr).not.toContain("ext/blackberry.event/manifest.json");
     });
 
     it("unzip() should extract 'from' zip file to 'to' directory", function () {
