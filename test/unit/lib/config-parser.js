@@ -597,22 +597,6 @@ describe("config parser", function () {
         }).toThrow(localize.translate("EXCEPTION_INVOKE_TARGET_INVALID_TYPE"));
     });
 
-    it("throws an error when an invoke target specifies an invalid invocation type", function () {
-        var data = testUtilities.cloneObj(testData.xml2jsConfig);
-        data["rim:invoke-target"] = {
-            "@": {
-                "id": "com.domain.subdomain.appName.app"
-            },
-            "type": "myInvokeType"
-        };
-
-        mockParsing(data);
-
-        expect(function () {
-            configParser.parse(configPath, session, extManager, function (configObj) {});
-        }).toThrow(localize.translate("EXCEPTION_INVOKE_TARGET_INVALID_TYPE"));
-    });
-
     it("throws an error when an invoke target filter doesn't contain an action",  function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data["rim:invoke-target"] = {
