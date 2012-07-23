@@ -51,4 +51,5 @@ module.exports = function (src, baton) {
     utils.copyFile(bbwpBatFile, _c.DEPLOY);
     utils.copyFile(licenseFile, _c.DEPLOY);
     utils.copyFile(readMeFile, _c.DEPLOY);
+    utils.copyFile(defaultIcon, _c.DEPLOY);
 };
