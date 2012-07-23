@@ -1,0 +1,12 @@
+{
+    "_comment": "You can specify additional parameters to be passed to downstream tools by using the bbwp --params option",
+    "blackberry-signer": {
+        "-proxyhost": "host",
+        "-proxyport": "port",
+        "-proxyusername": "user name",
+        "-proxypassword": "password"
+    },
+    "blackberry-nativepackager": {
+
+    }
+}

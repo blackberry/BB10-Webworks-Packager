@@ -1,12 +1,15 @@
 var testData = require('./test-data'),
     signingHelper = require(testData.libPath + '/signing-helper'),
     localize = require(testData.libPath + '/localize'),
+    pkgrUtils = require(testData.libPath + "/packager-utils"),
     path = require('path'),
     os = require('os'),
+    childProcess = require("child_process"),
     properties = { 
         homepath: "",
         homedrive: ""
-    };
+    },
+    session;
 
 describe("signing-helper", function () {
 
@@ -339,6 +342,69 @@ describe("signing-helper", function () {
             
             var result = signingHelper.getDbPath();
             expect(result).toBeUndefined();
+        });
+    });
+
+    describe("Exec blackberry-signer", function () {
+        var stdoutOn = jasmine.createSpy("stdout on"),
+            stderrOn = jasmine.createSpy("stderr on");
+
+        beforeEach(function () {
+            session = testData.session;
+            session.keystore = "/blah/author.p12";
+            session.storepass = "123";
+            session.barPath = path.normalize("c:/%s/" + "Demo.bar");
+
+            spyOn(childProcess, "spawn").andReturn({
+                stdout: {
+                    on: stdoutOn
+                },
+                stderr: {
+                    on: stderrOn
+                },
+                on: jasmine.createSpy("on").andCallFake(function (event, callback) {
+                    if (callback && typeof callback === "function") {
+                        callback(0);
+                    }
+                })
+            });
+        });
+
+        it("exec blackberry-signer without extra params", function () {
+            var callback = jasmine.createSpy("callback"),
+                cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-signer" + (pkgrUtils.isWindows() ? ".bat" : ""));
+
+            session.getParams = jasmine.createSpy("session getParams").andReturn(null);
+            signingHelper.execSigner(session, "device", callback);
+            expect(childProcess.spawn).toHaveBeenCalledWith(cmd, ["-keystore", session.keystore, "-storepass", session.storepass, path.resolve("c:/device/Demo.bar")], jasmine.any(Object));
+            expect(stdoutOn).toHaveBeenCalledWith("data", pkgrUtils.handleProcessOutput);
+            expect(stderrOn).toHaveBeenCalledWith("data", pkgrUtils.handleProcessOutput);
+            expect(callback).toHaveBeenCalledWith(0);
+        });
+
+        it("exec blackberry-signer with extra params", function () {
+            var callback = jasmine.createSpy("callback"),
+                cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-signer" + (pkgrUtils.isWindows() ? ".bat" : ""));
+
+            session.getParams = jasmine.createSpy("session getParams").andReturn({
+                "-proxyhost": "abc.com",
+                "-proxyport": "80"
+            });
+            signingHelper.execSigner(session, "device", callback);
+            expect(childProcess.spawn.mostRecentCall.args[0]).toBe(cmd);
+            expect(childProcess.spawn.mostRecentCall.args[1]).toContain("-keystore");
+            expect(childProcess.spawn.mostRecentCall.args[1]).toContain(session.keystore);
+            expect(childProcess.spawn.mostRecentCall.args[1]).toContain("-storepass");
+            expect(childProcess.spawn.mostRecentCall.args[1]).toContain(session.storepass);
+            expect(childProcess.spawn.mostRecentCall.args[1]).toContain("-proxyport");
+            expect(childProcess.spawn.mostRecentCall.args[1]).toContain("80");
+            expect(childProcess.spawn.mostRecentCall.args[1]).toContain("-proxyhost");
+            expect(childProcess.spawn.mostRecentCall.args[1]).toContain("abc.com");
+            expect(childProcess.spawn.mostRecentCall.args[1]).toContain(path.resolve("c:/device/Demo.bar"));
+            expect(childProcess.spawn.mostRecentCall.args[1].length).toBe(9);
+            expect(stdoutOn).toHaveBeenCalledWith("data", pkgrUtils.handleProcessOutput);
+            expect(stderrOn).toHaveBeenCalledWith("data", pkgrUtils.handleProcessOutput);
+            expect(callback).toHaveBeenCalledWith(0);
         });
     });
 });

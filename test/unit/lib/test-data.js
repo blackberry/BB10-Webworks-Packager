@@ -22,7 +22,13 @@ module.exports = {
         },
         "archivePath": path.resolve("test/test.zip"),
         "conf": require(path.resolve(libPath + "/conf")),
-        "targets": ["simulator"]
+        "targets": ["simulator"],
+        isSigningRequired: function () {
+            return false;
+        },
+        getParams: function () {
+            return null;
+        }
     },
     config: {
         "id": 'Demo',

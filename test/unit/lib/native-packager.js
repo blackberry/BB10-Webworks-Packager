@@ -16,7 +16,8 @@ var path = require("path"),
     target,
     result,
     orgDebugEnabled,
-    orgDebugTokenPath;
+    orgDebugTokenPath,
+    NL = pkgrUtils.isWindows() ? "\r\n" : "\n";
 
 describe("Native packager", function () {
     beforeEach(function () {
@@ -133,13 +134,7 @@ describe("Native packager", function () {
         var session = testUtils.cloneObj(testData.session),
             config = testUtils.cloneObj(testData.config),
             target = "device",
-            NL = pkgrUtils.isWindows() ? "\r\n" : "\n",
             optionsFile = "-package" + NL +
-                "-sign" + NL +
-                "-keystore" + NL +
-                path.normalize("c:/author.p12") + NL +
-                "-storepass" + NL +
-                "password" + NL +
                 "-buildId" + NL +
                 "100" + NL +
                 path.normalize("c:/device/Demo.bar") + NL +
@@ -158,6 +153,9 @@ describe("Native packager", function () {
         
         session.barPath = path.normalize("c:/%s/" + "Demo.bar");
         session.sourceDir = path.normalize("c:/src/");
+        session.isSigningRequired = function () {
+            return true;
+        };
         
         //Set -d param
         session.debug = "";
@@ -166,5 +164,27 @@ describe("Native packager", function () {
 
         //options file should NOT contain -devMode
         expect(fs.writeFileSync).toHaveBeenCalledWith(jasmine.any(String), optionsFile);
+    });
+
+    it("exec blackberry-nativepackager with additional params", function () {
+        var cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-nativepackager" + (pkgrUtils.isWindows() ? ".bat" : ""));
+
+        session.getParams = jasmine.createSpy("session getParams").andReturn({
+            "-installApp": "",
+            "-device": "192.168.1.114",
+            "-password": "abc"
+        });
+
+        nativePkgr.exec(session, "simulator", testData.config, callback);
+
+        expect(fs.writeFileSync.mostRecentCall.args[0]).toBe(path.resolve(session.sourceDir, "options"));
+        expect(fs.writeFileSync.mostRecentCall.args[1]).toContain("-package" + NL);
+        expect(fs.writeFileSync.mostRecentCall.args[1]).toContain("-password" + NL);
+        expect(fs.writeFileSync.mostRecentCall.args[1]).toContain("abc" + NL);
+        expect(fs.writeFileSync.mostRecentCall.args[1]).toContain("-device" + NL);
+        expect(fs.writeFileSync.mostRecentCall.args[1]).toContain("192.168.1.114" + NL);
+        expect(fs.writeFileSync.mostRecentCall.args[1]).toContain("-installApp" + NL);
+        expect(childProcess.spawn).toHaveBeenCalledWith(cmd, ["@options"], {"cwd": session.sourceDir, "env": process.env});
+        expect(callback).toHaveBeenCalledWith(0);
     });
 });

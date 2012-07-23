@@ -1,4 +1,5 @@
 var session = require(__dirname + "/../../../lib/session"),
+    localize = require(__dirname + "/../../../lib/localize"),
     testUtils = require("./test-utilities"),
     path = require("path"),
     wrench = require("wrench"),
@@ -94,5 +95,63 @@ describe("Session", function () {
         
         //output should be set to bbwp location + outputFolder
         expect(result.outputDir).toEqual(path.normalize(path.join(bbwpDir, "myOutput")));
+    });
+
+    describe("get params", function () {
+        beforeEach(function () {
+            delete require.cache[require.resolve(__dirname + "/../../../lib/session")];
+            session = require(__dirname + "/../../../lib/session");
+        });
+
+        it("get params from external file", function () {
+            var data = {
+                    args: [ 'C:/sampleApp/sample.zip' ],
+                    params: "params.json"
+                },
+                result;
+
+            spyOn(path, "resolve").andReturn("test/params.json");
+            spyOn(path, "existsSync").andReturn(true);
+
+            result = session.initialize(data);
+
+            expect(result.getParams("blackberry-signer")).toEqual({
+                "-proxyhost": "abc.com",
+                "-proxyport": "80"
+            });
+        });
+
+        it("get params from non-existent file should throw error", function () {
+            var data = {
+                    args: [ 'C:/sampleApp/sample.zip' ],
+                    params: "blah.json"
+                },
+                result;
+
+            spyOn(path, "existsSync").andReturn(false);
+
+            result = session.initialize(data);
+
+            expect(function () {
+                result.getParams("blackberry-signer");
+            }).toThrow(localize.translate("EXCEPTION_PARAMS_FILE_NOT_FOUND", path.resolve("blah.json")));
+        });
+
+        it("get params from bad JSON file should throw error", function () {
+            var data = {
+                    args: [ 'C:/sampleApp/sample.zip' ],
+                    params: "params-bad.json"
+                },
+                result;
+
+            spyOn(path, "resolve").andReturn("test/params-bad.json");
+            spyOn(path, "existsSync").andReturn(true);
+
+            result = session.initialize(data);
+
+            expect(function () {
+                result.getParams("blackberry-signer");
+            }).toThrow(localize.translate("EXCEPTION_PARAMS_FILE_ERROR", path.resolve("blah.json")));
+        });
     });
 });

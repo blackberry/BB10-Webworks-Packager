@@ -38,7 +38,8 @@ module.exports = function (src, baton) {
         bbwpBatFile = path.join(_c.ROOT, 'bbwp.bat'),
         licenseFile = path.join(_c.ROOT, 'licenses.txt'),
         defaultIcon = path.join(_c.ROOT, 'default-icon.png'),
-		readMeFile = path.join(_c.ROOT, 'README.txt');
+        readMeFile = path.join(_c.ROOT, 'README.txt'),
+        paramsExampleFile = path.join(_c.ROOT, "params-example.json");
 
     //Copy folders to target directory
     copyFolder(_c.FRAMEWORK_DEPLOY, frameworkDest);
@@ -52,4 +53,5 @@ module.exports = function (src, baton) {
     utils.copyFile(licenseFile, _c.DEPLOY);
     utils.copyFile(readMeFile, _c.DEPLOY);
     utils.copyFile(defaultIcon, _c.DEPLOY);
+    utils.copyFile(paramsExampleFile, _c.DEPLOY);
 };
