@@ -15,6 +15,8 @@ function loadModule(module) {
         namespace,
         dependencies = [];
 
+    module = module.split(path.sep);
+
     if (module.indexOf("app") >= 0) {
         namespace = "blackberry.app";
     } else if (module.indexOf("event") >= 0) {
