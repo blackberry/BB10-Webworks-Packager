@@ -36,7 +36,8 @@ module.exports = {
         "version": '1.0.0',
         "author": 'Research In Motion Ltd.',
         "description": 'This is a test!',
-        "image": 'test.png'
+        "image": 'test.png',
+        "autoOrientation": true
     },
     accessList: [{
         uri: "http://google.com",

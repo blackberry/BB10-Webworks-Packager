@@ -553,13 +553,13 @@ describe("config parser", function () {
             },
             "type": "application",
             "filter":  [{
-                    "action":  "bb.action.OPEN",
-                    "mime-type": ["text/*", "image/*"]
-                }, {
-                    "action": "bb.action.SET",
-                    "mime-type": "image/*"
-                }]
-            };
+                "action":  "bb.action.OPEN",
+                "mime-type": ["text/*", "image/*"]
+            }, {
+                "action": "bb.action.SET",
+                "mime-type": "image/*"
+            }]
+        };
 
         mockParsing(data);
 
@@ -571,16 +571,16 @@ describe("config parser", function () {
     it("can parse multiple invoke targets", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data["rim:invoke-target"] = [{
-                "@": {
-                    "id": "com.domain.subdomain.appName.app"
-                },
-                "type": "application",
-            }, {
-                "@": {
-                    "id": "com.domain.subdomain.appName.viewer"
-                },
-                "type": "viewer"
-            }];
+            "@": {
+                "id": "com.domain.subdomain.appName.app"
+            },
+            "type": "application",
+        }, {
+            "@": {
+                "id": "com.domain.subdomain.appName.viewer"
+            },
+            "type": "viewer"
+        }];
 
         mockParsing(data);
 
@@ -729,12 +729,12 @@ describe("config parser", function () {
         it("throws error when one of many rim:splash elements does not contain attribute", function () {
             var data = testUtilities.cloneObj(testData.xml2jsConfig);
             data["rim:splash"] = [{
-                    "@": {
-                        "src": "a.jpg"
-                    }
-                }, {
-                    "#": "blah"
-                }];
+                "@": {
+                    "src": "a.jpg"
+                }
+            }, {
+                "#": "blah"
+            }];
 
             mockParsing(data);
 
@@ -761,14 +761,14 @@ describe("config parser", function () {
         it("allow multiple rim:splash elements that contain non-empty src attribute", function () {
             var data = testUtilities.cloneObj(testData.xml2jsConfig);
             data["rim:splash"] = [{
-                    "@": {
-                        "src": "a.jpg"
-                    }
-                }, {
-                    "@": {
-                        "src": "b.jpg"
-                    }
-                }];
+                "@": {
+                    "src": "a.jpg"
+                }
+            }, {
+                "@": {
+                    "src": "b.jpg"
+                }
+            }];
 
             mockParsing(data);
 
@@ -780,14 +780,14 @@ describe("config parser", function () {
         it("throws error when rim:splash src starts with 'locales' subfolder", function () {
             var data = testUtilities.cloneObj(testData.xml2jsConfig);
             data["rim:splash"] = [{
-                    "@": {
-                        "src": "a.jpg"
-                    }
-                }, {
-                    "@": {
-                        "src": "locales/en/b.jpg"
-                    }
-                }];
+                "@": {
+                    "src": "a.jpg"
+                }
+            }, {
+                "@": {
+                    "src": "locales/en/b.jpg"
+                }
+            }];
 
             mockParsing(data);
 
@@ -827,12 +827,12 @@ describe("config parser", function () {
         it("throws error when one of many icon elements does not contain attribute", function () {
             var data = testUtilities.cloneObj(testData.xml2jsConfig);
             data["icon"] = [{
-                    "@": {
-                        "src": "a.jpg"
-                    }
-                }, {
-                    "#": "blah"
-                }];
+                "@": {
+                    "src": "a.jpg"
+                }
+            }, {
+                "#": "blah"
+            }];
 
             mockParsing(data);
 
@@ -859,14 +859,14 @@ describe("config parser", function () {
         it("allow multiple icon elements that contain non-empty src attribute", function () {
             var data = testUtilities.cloneObj(testData.xml2jsConfig);
             data["icon"] = [{
-                    "@": {
-                        "src": "a.jpg"
-                    }
-                }, {
-                    "@": {
-                        "src": "b.jpg"
-                    }
-                }];
+                "@": {
+                    "src": "a.jpg"
+                }
+            }, {
+                "@": {
+                    "src": "b.jpg"
+                }
+            }];
 
             mockParsing(data);
 
@@ -878,14 +878,14 @@ describe("config parser", function () {
         it("throws error when icon src starts with 'locales' subfolder", function () {
             var data = testUtilities.cloneObj(testData.xml2jsConfig);
             data["icon"] = [{
-                    "@": {
-                        "src": "a.jpg"
-                    }
-                }, {
-                    "@": {
-                        "src": "locales/en/b.jpg"
-                    }
-                }];
+                "@": {
+                    "src": "a.jpg"
+                }
+            }, {
+                "@": {
+                    "src": "locales/en/b.jpg"
+                }
+            }];
 
             mockParsing(data);
 
@@ -931,6 +931,93 @@ describe("config parser", function () {
                 expect(configObj.icon).not.toEqual(["default-icon.png"]);
                 expect(configObj.icon).not.toContain("default-icon.png");
             });
+        });
+
+        it("sets orientation to landscape when specified", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data['feature'] = { '@': { id: 'blackberry.app.orientation', required: true },
+                param: { '@': { name: 'mode', value: 'landscape' } } };
+
+            mockParsing(data);
+
+            configParser.parse(configPath, session, extManager, function (configObj) {
+                expect(configObj.orientation).toEqual("landscape");
+                expect(configObj.autoOrientation).toEqual(false);
+            });
+        });
+
+        it("sets orientation to portrait when specified", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data['feature'] = { '@': { id: 'blackberry.app.orientation', required: true },
+                param: { '@': { name: 'mode', value: 'portrait' } } };
+
+            mockParsing(data);
+
+            configParser.parse(configPath, session, extManager, function (configObj) {
+                expect(configObj.orientation).toEqual("portrait");
+                expect(configObj.autoOrientation).toEqual(false);
+            });
+        });
+
+        it("sets auto orientation to true by default", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            delete data["feature"];//Remove any orientation data
+
+            mockParsing(data);
+
+            configParser.parse(configPath, session, extManager, function (configObj) {
+                expect(configObj.autoOrientation).toEqual(true);
+            });
+        });
+
+        it("throws an error when blackberry.app.orientation exists with no mode param", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data['feature'] = { '@': { id: 'blackberry.app.orientation', required: true }};
+
+            mockParsing(data);
+
+            //Should throw an EXCEPTION_EMPTY_ORIENTATION_MODE error
+            expect(function () {
+                configParser.parse(configPath, session, extManager, {});
+            }).toThrow(localize.translate("EXCEPTION_EMPTY_ORIENTATION_MODE"));
+        });
+
+        it("throws an error when blackberry.app.orientation exists with an invalid mode param", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data['feature'] = { '@': { id: 'blackberry.app.orientation', required: true },
+                param: { '@': { name: 'mode', value: 'notAValidMode' } } };
+
+            mockParsing(data);
+
+            //Should throw an EXCEPTION_INVALID_ORIENTATION_MODE error
+            expect(function () {
+                configParser.parse(configPath, session, extManager, {});
+            }).toThrow(localize.translate("EXCEPTION_INVALID_ORIENTATION_MODE", "notAValidMode"));
+        });
+
+        it("sets backgroundColor when specified via blackberry.app namespace", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data['feature'] = { '@': { id: 'blackberry.app', required: true },
+                param: { '@': { name: 'backgroundColor', value: '0xffffff' } } };
+
+            mockParsing(data);
+
+            configParser.parse(configPath, session, extManager, function (configObj) {
+                expect(configObj.backgroundColor).toEqual(16777215);//Decimal value of 0xffffff
+            });
+        });
+
+        it("throws an error when blackberry.app backgroundColor param is not a number", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data['feature'] = { '@': { id: 'blackberry.app', required: true },
+                param: { '@': { name: 'backgroundColor', value: '$UI*@@$' } } };
+
+            mockParsing(data);
+
+            //Should throw an EXCEPTION_BGCOLOR_INVALID error
+            expect(function () {
+                configParser.parse(configPath, session, extManager, {});
+            }).toThrow(localize.translate("EXCEPTION_BGCOLOR_INVALID", "$UI*@@$"));
         });
     });
 });
