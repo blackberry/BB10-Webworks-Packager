@@ -32,7 +32,7 @@ describe("File manager", function () {
 
         fileMgr.copyWWE(session, "simulator");
 
-        expect(fs.copySync).toHaveBeenCalledWith(path.normalize(util.format(session.conf.DEPENDENCIES_WWE, "simulator") + "/wwe"), path.normalize(session.sourceDir + "/wwe"));
+        expect(fs.copySync).toHaveBeenCalledWith(path.normalize(session.conf.DEPENDENCIES_BOOTSTRAP + "/wwe"), path.normalize(session.sourceDir + "/wwe"));
     });
 
     it("copyExtensions() should copy all .js files required by features listed in config.xml", function () {
@@ -41,18 +41,18 @@ describe("File manager", function () {
             extBasename = "app",
             toDir = path.join(session.sourcePaths.EXT, featureId),
             apiDir = path.resolve(session.conf.EXT, extBasename),
-            
+
             //extension javascript files
             indexJS = path.join(apiDir, "index.js"),
             clientJS = path.join(apiDir, "client.js"),
             manifestJSON = path.join(apiDir, "manifest.json"),
             subfolderJS = path.join(apiDir, "/subfolder/myjs.js");//Sub folder js file
-            
+
 
         spyOn(path, "existsSync").andReturn(true);
         spyOn(wrench, "mkdirSyncRecursive");
         spyOn(packager_utils, "copyFile");
-        
+
         //Mock the extension directory
         spyOn(wrench, "readdirSyncRecursive").andCallFake(function (directory) {
             return [
@@ -67,29 +67,29 @@ describe("File manager", function () {
 
         //Extension directory is created
         expect(wrench.mkdirSyncRecursive).toHaveBeenCalledWith(toDir, "0755");
-        
+
         //Javascript files are copied
         expect(packager_utils.copyFile).toHaveBeenCalledWith(indexJS, toDir, apiDir);
         expect(packager_utils.copyFile).toHaveBeenCalledWith(clientJS, toDir, apiDir);
         expect(packager_utils.copyFile).toHaveBeenCalledWith(manifestJSON, toDir, apiDir);
         expect(packager_utils.copyFile).toHaveBeenCalledWith(subfolderJS, toDir, apiDir);
     });
-    
+
     it("copyExtensions() should copy .so files required by features listed in config.xml", function () {
         var session = testData.session,
             extBasename = "app",
             apiDir = path.resolve(session.conf.EXT, extBasename),
             soDest = session.sourcePaths.JNEXT_PLUGINS,
-            
+
             //extension .so files
             simulatorSO = path.join(apiDir, "/simulator/myso.so"),//simulator so file
             deviceSO = path.join(apiDir, "/device/myso.so");//device so file
-            
+
 
         spyOn(path, "existsSync").andReturn(true);
         spyOn(wrench, "mkdirSyncRecursive");
         spyOn(packager_utils, "copyFile");
-        
+
         //Mock the extension directory
         spyOn(wrench, "readdirSyncRecursive").andCallFake(function (directory) {
             return [
@@ -102,12 +102,12 @@ describe("File manager", function () {
 
         //plugins/jnext output directory is created
         expect(wrench.mkdirSyncRecursive).toHaveBeenCalledWith(session.sourcePaths.JNEXT_PLUGINS, "0755");
-        
+
         //The .so files are copied
         expect(packager_utils.copyFile).toHaveBeenCalledWith(simulatorSO, soDest);
         expect(packager_utils.copyFile).toHaveBeenCalledWith(deviceSO, soDest);
     });
-    
+
     it("throws an error when the client.js file does not exist in ext folder", function () {
         var session = testData.session,
             accessList = testData.accessList;
@@ -117,14 +117,14 @@ describe("File manager", function () {
             return mPath.indexOf("client.js") === -1;
         });
 
-        //Return a dummy path 
+        //Return a dummy path
         spyOn(path, "resolve").andReturn("/I/DO/NOT/EXIST");
-            
+
         expect(function () {
             fileMgr.copyExtensions(accessList, session, session.targets[0], extManager);
         }).toThrow(new Error(path.normalize(localize.translate("EXCEPTION_MISSING_FILE_IN_API_DIR", "client.js", "/I/DO/NOT/EXIST"))));
     });
-    
+
     it("throws an error when the index.js file does not exist in ext folder", function () {
         var session = testData.session,
             accessList = testData.accessList;
@@ -134,9 +134,9 @@ describe("File manager", function () {
             return mPath.indexOf("index.js") === -1;
         });
 
-        //Return a dummy path 
+        //Return a dummy path
         spyOn(path, "resolve").andReturn("/I/DO/NOT/EXIST");
-            
+
         expect(function () {
             fileMgr.copyExtensions(accessList, session, session.targets[0], extManager);
         }).toThrow(new Error(path.normalize(localize.translate("EXCEPTION_MISSING_FILE_IN_API_DIR", "index.js", "/I/DO/NOT/EXIST"))));
