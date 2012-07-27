@@ -372,7 +372,7 @@ describe("signing-helper", function () {
 
         it("exec blackberry-signer without extra params", function () {
             var callback = jasmine.createSpy("callback"),
-                cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-signer" + (pkgrUtils.isWindows() ? ".bat" : ""));
+                cmd = "blackberry-signer" + (pkgrUtils.isWindows() ? ".bat" : "");
 
             session.getParams = jasmine.createSpy("session getParams").andReturn(null);
             signingHelper.execSigner(session, "device", callback);
@@ -384,7 +384,7 @@ describe("signing-helper", function () {
 
         it("exec blackberry-signer with extra params", function () {
             var callback = jasmine.createSpy("callback"),
-                cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-signer" + (pkgrUtils.isWindows() ? ".bat" : ""));
+                cmd = "blackberry-signer" + (pkgrUtils.isWindows() ? ".bat" : "");
 
             session.getParams = jasmine.createSpy("session getParams").andReturn({
                 "-proxyhost": "abc.com",
