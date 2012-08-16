@@ -1,6 +1,6 @@
 <project>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.rim.BBXwebworks</groupId>
+    <groupId>net.rim.BB10webworks</groupId>
     <artifactId>BB10webworks</artifactId>
     <version>1.0.0.0</version>
     <name>${project.artifactId}-${project.version}</name>
@@ -183,7 +183,7 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>net.rim.BBXwebworks</groupId>
+                                    <groupId>net.rim.BB10webworks</groupId>
                                     <artifactId>packager-bin</artifactId>
                                     <version>1.0.0.23</version>
                                     <type>zip</type>
@@ -201,7 +201,7 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>net.rim.BBXwebworks</groupId>
+                                    <groupId>net.rim.BB10webworks</groupId>
                                     <artifactId>bar-dependencies</artifactId>
                                     <version>1.0.0.3</version>
                                     <type>zip</type>
