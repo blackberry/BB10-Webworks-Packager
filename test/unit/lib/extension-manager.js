@@ -4,6 +4,7 @@ var testData = require("./test-data"),
     extManager = require(testData.libPath + "/extension-manager"),
     packagerUtils = require(testData.libPath + "/packager-utils"),
     configParser = require(testData.libPath + "/config-parser"),
+    logger = require(testData.libPath + "/logger"),
     configPath = path.resolve("test/config.xml"),
     testUtilities = require("./test-utilities"),
     session = testData.session,
@@ -86,6 +87,37 @@ describe("Extension manager", function () {
             expect(allExt).toContain("event");
             expect(allExt.length).toBe(4);
         });
+    });
+
+    it("getAllExtensionsToCopy does not throw error when access list contains non-existent feature", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+
+        data["access"] = {
+            "@": {
+                uri: "http://blah.com",
+                subdomains: "true"
+            },
+            feature: [{
+                "@": { id: "i.am.bad" }
+            }, {
+                "@": { id: "i.am.bad.too"}
+            }]
+        };
+
+        mockParsing(data);
+
+        spyOn(fs, "copySync");
+        spyOn(logger, "warn");
+
+        expect(function () {
+            configParser.parse(configPath, session, result, function (config) {
+                var allExt = result.getAllExtensionsToCopy(config.accessList);
+
+                expect(logger.warn).toHaveBeenCalled();
+                expect(allExt).toContain("event");
+                expect(allExt.length).toBe(1);
+            });
+        }).not.toThrow();
     });
 
     it("getExtensionBasenameByFeatureId returns extension basename given feature id", function () {

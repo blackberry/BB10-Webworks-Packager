@@ -244,6 +244,18 @@ describe("Packager Validator: validateConfig", function () {
                         id: "blackberry.identity",
                         required: true,
                         version: "1.0.0.0"
+                    }, {
+                        version: "1.0.0.0",
+                        required: true,
+                        id: "abc.def.mno"
+                    }, {
+                        version: "1.0.0.0",
+                        required: true,
+                        id: "abc.def.qrp"
+                    }, {
+                        version: "1.0.0.0",
+                        required: true,
+                        id: "blackberry.event"
                     }],
                     uri: "WIDGET_LOCAL",
                     allowSubDomain: true
@@ -258,11 +270,13 @@ describe("Packager Validator: validateConfig", function () {
         spyOn(logger, "warn");
 
         packagerValidator.validateConfig(session, configObj, extManager);
-        //expecting the features list to have shortened by 1, since one of these APIs does not exist
-        expect(configObj.accessList[0].features.length).toEqual(1);
-        //expecting warning to be logged to console because API "abc.def.ijk" does not exist"
+        //expecting the features list to have shortened by 3, since 3 of these APIs does not exist
+        expect(configObj.accessList[0].features.length).toEqual(2);
+        //expecting warning to be logged to console because API "abc.def.ijk", "abc.def.mno", and "abc.def.qrp" do not exist"
+        expect(logger.warn.calls.length).toBe(3);
         expect(logger.warn).toHaveBeenCalledWith(localize.translate("EXCEPTION_FEATURE_NOT_FOUND", "abc.def.ijk"));
-
+        expect(logger.warn).toHaveBeenCalledWith(localize.translate("EXCEPTION_FEATURE_NOT_FOUND", "abc.def.mno"));
+        expect(logger.warn).toHaveBeenCalledWith(localize.translate("EXCEPTION_FEATURE_NOT_FOUND", "abc.def.qrp"));
     });
 
     it("removes non-existing APIs from accessList with multiple features lists", function () {
