@@ -2,6 +2,7 @@ var testData = require('./test-data'),
     signingHelper = require(testData.libPath + '/signing-helper'),
     localize = require(testData.libPath + '/localize'),
     pkgrUtils = require(testData.libPath + "/packager-utils"),
+    conf = require(testData.libPath + "/conf"),
     path = require('path'),
     os = require('os'),
     childProcess = require("child_process"),
@@ -374,6 +375,10 @@ describe("signing-helper", function () {
             var callback = jasmine.createSpy("callback"),
                 cmd = "blackberry-signer" + (pkgrUtils.isWindows() ? ".bat" : "");
 
+            if (!pkgrUtils.isWindows()) {
+                cmd = path.normalize(conf.DEPENDENCIES_TOOLS + "/bin/") + cmd;
+            }
+
             session.getParams = jasmine.createSpy("session getParams").andReturn(null);
             signingHelper.execSigner(session, "device", callback);
             expect(childProcess.spawn).toHaveBeenCalledWith(cmd, ["-keystore", session.keystore, "-storepass", session.storepass, path.resolve("c:/device/Demo.bar")], jasmine.any(Object));
@@ -385,6 +390,10 @@ describe("signing-helper", function () {
         it("exec blackberry-signer with extra params", function () {
             var callback = jasmine.createSpy("callback"),
                 cmd = "blackberry-signer" + (pkgrUtils.isWindows() ? ".bat" : "");
+
+            if (!pkgrUtils.isWindows()) {
+                cmd = path.normalize(conf.DEPENDENCIES_TOOLS + "/bin/") + cmd;
+            }
 
             session.getParams = jasmine.createSpy("session getParams").andReturn({
                 "-proxyhost": "abc.com",
