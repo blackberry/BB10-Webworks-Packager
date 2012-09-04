@@ -264,6 +264,19 @@ describe("config parser", function () {
         });
     });
 
+    it("does not enable the enable-flash feature when specified in an access element", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+
+        //Add the enable-flash to an access element
+        data['access'] = {"@" : {"uri" : "http://somewebsite.com"}, "feature" : {"@": {id: 'enable-flash'}}};
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.enableFlash).toEqual(false);
+        });
+    });
+
     it("disables the enable-flash feature by default", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data['feature'] = undefined;//no features
