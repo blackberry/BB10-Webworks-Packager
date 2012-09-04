@@ -182,7 +182,7 @@ describe("config parser", function () {
         data.content = "";
 
         mockParsing(data);
-        
+
         expect(function () {
             configParser.parse(configPath, session, extManager, {});
         }).toThrow(localize.translate("EXCEPTION_INVALID_CONTENT"));
@@ -204,7 +204,7 @@ describe("config parser", function () {
         data.content["@"].src = "localFile.html";
 
         mockParsing(data);
-        
+
         configParser.parse(configPath, session, extManager, function (configObj) {
             expect(configObj.content).toEqual("local:///localFile.html");
         });
@@ -226,7 +226,7 @@ describe("config parser", function () {
         data['rim:permit'] = [];
 
         mockParsing(data);
-        
+
         configParser.parse(configPath, session, extManager, function (configObj) {
             //access_internet permission was set
             expect(configObj.permissions).toContain('access_internet');
@@ -248,6 +248,30 @@ describe("config parser", function () {
 
             //The custom access list features should only contain global features
             expect(customAccessList.features).toEqual(extManager.getGlobalFeatures());
+        });
+    });
+
+    it("enables the enable-flash feature when specified", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+
+        //Add the enable-flash feature element
+        data['feature'] = {'@': {id: 'enable-flash'}};
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.enableFlash).toEqual(true);
+        });
+    });
+
+    it("disables the enable-flash feature by default", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['feature'] = undefined;//no features
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.enableFlash).toEqual(false);
         });
     });
 
@@ -419,13 +443,13 @@ describe("config parser", function () {
             configParser.parse(configPath, session, extManager, function (configObj) {});
         }).not.toThrow();
     });
-    
+
     it("supports 4 digit version [build id]", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data["@"].version = "1.0.0.50";
 
         mockParsing(data);
-        
+
         configParser.parse(configPath, session, extManager, function (configObj) {
             expect(configObj.version).toEqual("1.0.0");
             expect(configObj.buildId).toEqual("50");
@@ -434,12 +458,12 @@ describe("config parser", function () {
 
     it("uses --buildId when set", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
-        
+
         //--buildId 100
         session.buildId = "100";
 
         mockParsing(data);
-        
+
         configParser.parse(configPath, session, extManager, function (configObj) {
             expect(configObj.buildId).toEqual("100");
         });
