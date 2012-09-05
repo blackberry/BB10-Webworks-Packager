@@ -10,6 +10,7 @@ var path = require("path"),
     testData = require("./test-data"),
     logger = require(srcPath + "logger"),
     localize = require(srcPath + "/localize"),
+    conf = require(srcPath + "./conf"),
     callback,
     config,
     session,
@@ -121,16 +122,16 @@ describe("Native packager", function () {
             cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-nativepackager" + (pkgrUtils.isWindows() ? ".bat" : ""));
 
         nativePkgr.exec(session, target, testData.config, callback);
-            
+
         expect(fs.writeFileSync).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(String));
-        expect(pkgrUtils.writeFile).toHaveBeenCalledWith(session.sourceDir, "blackberry-tablet.xml", bbTabletXML);
+        expect(pkgrUtils.writeFile).toHaveBeenCalledWith(session.sourceDir, conf.BAR_DESCRIPTOR, bbTabletXML);
         expect(childProcess.spawn).toHaveBeenCalledWith(cmd, ["@options"], {"cwd": session.sourceDir, "env": process.env});
         expect(callback).toHaveBeenCalledWith(0);
     });
-    
+
     it("omits -devMode when signing and specifying -d", function () {
         testUtils.mockResolve(path);
-        
+
         var session = testUtils.cloneObj(testData.session),
             config = testUtils.cloneObj(testData.config),
             target = "device",
@@ -142,7 +143,7 @@ describe("Native packager", function () {
                 "1.5" + NL +
                 "-C" + NL +
                 path.normalize("c:/src/") + NL +
-                "blackberry-tablet.xml" + NL +
+                conf.BAR_DESCRIPTOR + NL +
                 path.normalize("c:/src/abc") + NL +
                 path.normalize("c:/src/xyz") + NL;
 
