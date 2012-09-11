@@ -228,6 +228,50 @@ describe("config parser", function () {
         });
     });
 
+    it("sets autoDeferNetworkingAndJavaScript to false when the blackberry.push feature is specified", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+
+        //Add the blackberry.push feature element
+        data["rim:permissions"] = {}; // ensure no run_when_backgrounded permission exists
+        data['feature'] = {'@': {id: 'blackberry.push'}};
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.autoDeferNetworkingAndJavaScript).toEqual(false);
+        });
+    });
+
+    it("sets autoDeferNetworkingAndJavaScript to false when the run_when_backgrounded permission is specified", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+
+        //Add the run_when_backgrounded permission
+        data['feature'] = undefined; // no features
+        data["rim:permissions"] = {
+            "rim:permit" : [ 'read_geolocation', 'run_when_backgrounded', 'access_internet' ]
+        };
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.permissions).toContain('run_when_backgrounded');
+            expect(configObj.autoDeferNetworkingAndJavaScript).toEqual(false);
+        });
+    });   
+
+    it("sets autoDeferNetworkingAndJavaScript to true by default", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        
+        data['feature'] = undefined; // no features
+        data["rim:permissions"] = {}; // ensure no run_when_backgrounded permission exists
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.autoDeferNetworkingAndJavaScript).toEqual(true);
+        });
+    });    
+    
     it("does not throw an exception with empty permit tags", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data['rim:permit'] = ['read_geolocation', {}, 'access_internet' ];
