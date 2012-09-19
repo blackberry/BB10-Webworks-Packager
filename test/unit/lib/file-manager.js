@@ -1,4 +1,5 @@
 var srcPath = __dirname + "/../../../lib/",
+    barconf = require(srcPath + "bar-conf.js"),
     fs = require("fsext"),
     path = require("path"),
     util = require("util"),
@@ -19,11 +20,13 @@ var srcPath = __dirname + "/../../../lib/",
     };
 
 describe("File manager", function () {
+
     it("prepareOutputFiles() should copy files and unzip archive", function () {
+        spyOn(wrench, "copyDirSyncRecursive");
         fileMgr.prepareOutputFiles(session);
 
         expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
-        expect(path.existsSync(session.sourcePaths.UI)).toBeTruthy();
+        expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(session.conf.UI, session.sourcePaths.UI);
         expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
     });
 
