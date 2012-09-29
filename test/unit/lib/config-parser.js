@@ -9,6 +9,7 @@ var testData = require("./test-data"),
     fs = require("fsext"),
     session = testData.session,
     configPath = path.resolve("test/config.xml"),
+    configBadPath = path.resolve("test2/config.xml"),
     configBareMinimumPath = path.resolve("test/config-bare-minimum.xml"),
     extManager = {
         getGlobalFeatures: function () {
@@ -22,6 +23,12 @@ var testData = require("./test-data"),
 describe("config parser", function () {
     beforeEach(function () {
         spyOn(fs, "copySync");
+    });
+
+    it("tries to open a config.xml file that doesn't exist", function () {
+        expect(function () {
+            configParser.parse(configBadPath, session, extManager, {});
+        }).toThrow(localize.translate("EXCEPTION_CONFIG_NOT_FOUND"));
     });
 
     it("parses standard elements in a config.xml", function () {
@@ -257,11 +264,11 @@ describe("config parser", function () {
             expect(configObj.permissions).toContain('run_when_backgrounded');
             expect(configObj.autoDeferNetworkingAndJavaScript).toEqual(false);
         });
-    });   
+    });
 
     it("sets autoDeferNetworkingAndJavaScript to true by default", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
-        
+
         data['feature'] = undefined; // no features
         data["rim:permissions"] = {}; // ensure no run_when_backgrounded permission exists
 
@@ -270,8 +277,8 @@ describe("config parser", function () {
         configParser.parse(configPath, session, extManager, function (configObj) {
             expect(configObj.autoDeferNetworkingAndJavaScript).toEqual(true);
         });
-    });    
-    
+    });
+
     it("does not throw an exception with empty permit tags", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data['rim:permit'] = ['read_geolocation', {}, 'access_internet' ];
@@ -558,7 +565,7 @@ describe("config parser", function () {
             "@": {
                 "id": "com.domain.subdomain.appName.app"
             },
-            "type": "application",
+            "type": "application"
         }, {
             "@": {
                 "id": "com.domain.subdomain.appName.viewer"
