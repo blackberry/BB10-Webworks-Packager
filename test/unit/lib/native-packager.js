@@ -115,8 +115,9 @@ describe("Native packager", function () {
             "<asset entry=\"true\" type=\"qnx/elf\">wwe</asset>" +
             "<asset>abc</asset>" +
             "<asset>xyz</asset>" +
+            "<entryPointType>Qnx/WebKit</entryPointType>" +
             "<initialWindow><systemChrome>none</systemChrome><transparent>true</transparent><autoOrients>true</autoOrients></initialWindow>" +
-            "<env value=\"12\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>" +
+            "<env value=\"8\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>" +
             "<permission system=\"true\">run_native</permission>" +
             "<description>" + config.description + "</description></qnx>",
             cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-nativepackager" + (pkgrUtils.isWindows() ? ".bat" : ""));
@@ -151,13 +152,13 @@ describe("Native packager", function () {
         session.keystore = path.normalize("c:/author.p12");
         session.storepass = "password";
         config.buildId = "100";
-        
+
         session.barPath = path.normalize("c:/%s/" + "Demo.bar");
         session.sourceDir = path.normalize("c:/src/");
         session.isSigningRequired = function () {
             return true;
         };
-        
+
         //Set -d param
         session.debug = "";
 
