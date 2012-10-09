@@ -50,6 +50,7 @@ describe("config parser", function () {
             expect(configObj.permissions).toContain('access_shared');
             expect(configObj.permissions).toContain('read_geolocation');
             expect(configObj.permissions).toContain('use_camera');
+            expect(configObj.enableChildWebView).toBe(false);
         });
     });
 
@@ -1088,6 +1089,37 @@ describe("config parser", function () {
             configParser.parse(configPath, session, extManager, function (configObj) {
                 expect(configObj.id).toEqual("myID");
                 expect(configObj.customHeaders).toEqual(undefined);
+            });
+        });
+
+        describe('disabling childBrowser (childWebView)', function () {
+
+            // { '@': { id: 'blackberry.app', required: true, version: '1.0.0.0' },
+            //   param: { '@': { name: 'childBrowser', value: 'disable' } } }
+
+
+            it("sets enableChildWebView to true when childBrowser value is enable", function () {
+                var data = testUtilities.cloneObj(testData.xml2jsConfig);
+                data['feature'] = { '@': { id: 'blackberry.app' },
+                    param: { '@': { name: 'childBrowser', value: 'enable' } } };
+
+                mockParsing(data);
+
+                configParser.parse(configPath, session, extManager, function (configObj) {
+                    expect(configObj.enableChildWebView).toBe(true);
+                });
+            });
+
+            it("sets enableChildWebView to false when value is disable", function () {
+                var data = testUtilities.cloneObj(testData.xml2jsConfig);
+                data['feature'] = { '@': { id: 'blackberry.app' },
+                    param: { '@': { name: 'childBrowser', value: 'disable' } } };
+
+                mockParsing(data);
+
+                configParser.parse(configPath, session, extManager, function (configObj) {
+                    expect(configObj.enableChildWebView).toBe(false);
+                });
             });
         });
     });
