@@ -15,6 +15,22 @@
 */
 var path = require("path");
 
+function getToolsDir() {
+    var localTools = path.normalize(__dirname + "/../../dependencies/tools"),
+        bbndkDir;
+
+    //Check if dependencies/tools folder exists
+    if (path.existsSync(localTools)) {
+        return localTools;
+    } else if (process.env && process.env["QNX_HOST"]) {
+        bbndkDir = path.join(process.env["QNX_HOST"], "usr");
+        if (path.existsSync(bbndkDir)) {
+            //BBNDK exists on path, use its tools
+            return bbndkDir;
+        }
+    }
+}
+
 module.exports = {
     ROOT: path.normalize(__dirname + "/../../"),
     DEPLOY: path.normalize(__dirname + "/../../target/zip/"),
@@ -22,6 +38,7 @@ module.exports = {
     BUILD: path.normalize(__dirname + "/.."),
     LIB: path.normalize(__dirname + "/../../lib"),
     DEPENDENCIES: path.normalize(__dirname + "/../../dependencies"),
+    TOOLS: getToolsDir(),
     NODE_MOD: path.normalize(__dirname + "/../../node_modules"),
     FRAMEWORK: path.normalize(__dirname + "/../../Framework"),
     FRAMEWORK_DEPLOY: path.normalize(__dirname + "/../../Framework/target/zip/"),

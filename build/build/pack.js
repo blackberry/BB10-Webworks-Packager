@@ -16,15 +16,18 @@
 var wrench = require("../../node_modules/wrench"),
     utils = require("./utils"),
     _c = require("./conf"),
+    fs = require("fs"),
     path = require("path");
 
 function copyFolder(source, destination) {
-    //create the destination folder if it does not exist
-    if (!path.existsSync(destination)) {
-        wrench.mkdirSyncRecursive(destination, "0755");
-    }
+    if (path.existsSync(source)) {
+        //create the destination folder if it does not exist
+        if (!path.existsSync(destination)) {
+            wrench.mkdirSyncRecursive(destination, "0755");
+        }
 
-    wrench.copyDirSyncRecursive(source, destination);
+        wrench.copyDirSyncRecursive(source, destination);
+    }
 }
 
 module.exports = function (src, baton) {
@@ -32,6 +35,11 @@ module.exports = function (src, baton) {
         libDest = path.join(_c.DEPLOY, 'lib'),
         nodeModulesDest = path.join(_c.DEPLOY, 'node_modules'),
         thirdPartyDest = path.join(_c.DEPLOY, 'third_party'),
+        toolsDest = path.join(_c.DEPLOY, 'dependencies', 'tools'),
+        nodeDirDest = path.join(thirdPartyDest, 'node'),
+        nodeFileLinux = path.join(nodeDirDest, 'linux', 'node'),
+        nodeFileMac = path.join(nodeDirDest, 'mac', 'node'),
+        nodeFileWindows = path.join(nodeDirDest, 'windows', 'node.exe'),
 
         //files
         bbwpFile = path.join(_c.ROOT, 'bbwp'),
@@ -46,6 +54,11 @@ module.exports = function (src, baton) {
     copyFolder(_c.LIB, libDest);
     copyFolder(_c.NODE_MOD, nodeModulesDest);
     copyFolder(_c.THIRD_PARTY, thirdPartyDest);
+    //Copy bin/lib folders for tools individually. This ensure we don't copy any extra folders that may come from BBNDK tools.
+    if (_c.TOOLS) {
+        copyFolder(path.join(_c.TOOLS, "bin"), path.join(toolsDest, "bin"));
+        copyFolder(path.join(_c.TOOLS, "lib"), path.join(toolsDest, "lib"));
+    }
 
     //Copy files to target directory
     utils.copyFile(bbwpFile, _c.DEPLOY);
@@ -54,4 +67,22 @@ module.exports = function (src, baton) {
     utils.copyFile(readMeFile, _c.DEPLOY);
     utils.copyFile(defaultIcon, _c.DEPLOY);
     utils.copyFile(paramsExampleFile, _c.DEPLOY);
+
+
+    //Add execute permissions to node binaries
+    fs.chmodSync(nodeFileMac, '0755');
+    fs.chmodSync(nodeFileWindows, '0755');
+    if (path.existsSync(nodeFileLinux)) {
+        //User included linux binary, chmod that as well
+        fs.chmodSync(nodeFileLinux, '0755');
+    }
+
+    //Add execute permissions to bbwp script
+    fs.chmodSync(path.join(_c.DEPLOY, "bbwp"), '0755');
+    fs.chmodSync(path.join(_c.DEPLOY, "bbwp.bat"), '0755');
+
+    if (path.existsSync(toolsDest)) {
+        //Add execute permissions to bbndk tools directory
+        wrench.chmodSyncRecursive(toolsDest, '0755');
+    }
 };
