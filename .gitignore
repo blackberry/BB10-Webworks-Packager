@@ -13,3 +13,4 @@ build_output/
 pkg
 target/
 clientFiles/
+dependencies/

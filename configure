@@ -1,6 +1,8 @@
 #!/bin/bash
+echo "Please note: If you are running a Linux or Mac OS, you may be prompted for the system password"
+echo "This is to allow the Packager to install node dependencies globally."
 FRAMEWORK_DIR=$PWD/Framework
-if [ "`uname`" == "Darwin" ] ; then
+if [ "`uname`" == "Linux" ] || [ "`uname`" == "Darwin" ] ; then
     sudo npm install -g jake jshint@0.5.2 csslint uglify-js
 else
     npm install -g jake jshint@0.5.2 csslint uglify-js
