@@ -52,6 +52,10 @@ describe("Native packager", function () {
         spyOn(fs, "writeFileSync");
         spyOn(pkgrUtils, "writeFile");
         spyOn(childProcess, "spawn").andReturn(result);
+        spyOn(path, "existsSync").andCallFake(function (path) {
+            //Return true if this is the dependencies folder check
+            return path.indexOf("dependencies") !== -1;
+        });
     });
 
     afterEach(function () {
@@ -151,13 +155,13 @@ describe("Native packager", function () {
         session.keystore = path.normalize("c:/author.p12");
         session.storepass = "password";
         config.buildId = "100";
-        
+
         session.barPath = path.normalize("c:/%s/" + "Demo.bar");
         session.sourceDir = path.normalize("c:/src/");
         session.isSigningRequired = function () {
             return true;
         };
-        
+
         //Set -d param
         session.debug = "";
 
