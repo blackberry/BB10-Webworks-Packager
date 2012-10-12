@@ -52,6 +52,10 @@ describe("Native packager", function () {
         spyOn(fs, "writeFileSync");
         spyOn(pkgrUtils, "writeFile");
         spyOn(childProcess, "spawn").andReturn(result);
+        spyOn(path, "existsSync").andCallFake(function (path) {
+            //Return true if this is the dependencies folder check
+            return path.indexOf("dependencies") !== -1;
+        });
     });
 
     afterEach(function () {
