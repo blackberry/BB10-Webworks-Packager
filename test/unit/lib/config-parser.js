@@ -168,15 +168,68 @@ describe("config parser", function () {
         expect(fileManager.cleanSource).toHaveBeenCalled();
     });
 
-    it("adds the access_internet permission if unprovided", function () {
+    it("parses a single permission (comes in as string)", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
-        data['rim:permit'] = [];
+        data['rim:permissions'] = {};
+        data['rim:permissions']['rim:permit'] = 'onePermissionNoAttribs';
 
         mockParsing(data);
 
         configParser.parse(configPath, session, extManager, function (configObj) {
-            //access_internet permission was set
-            expect(configObj.permissions).toContain('access_internet');
+            expect(configObj.permissions).toContain('onePermissionNoAttribs');
+        });
+    });
+
+    it("parses a single permission with attribs (comes in as object)", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['rim:permissions'] = {};
+        data['rim:permissions']['rim:permit'] = { '#': 'systemPerm', '@': { system: 'true' } };
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.permissions).toContain({ '#': 'systemPerm', '@': { system: 'true' } });
+        });
+    });
+
+    it("parses multiple permissions with no attribs (comes in as array)", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['rim:permissions'] = {};
+        data['rim:permissions']['rim:permit'] = [ 'access_shared', 'read_geolocation', 'use_camera' ];
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.permissions).toContain('access_shared');
+            expect(configObj.permissions).toContain('read_geolocation');
+            expect(configObj.permissions).toContain('use_camera');
+        });
+    });
+
+    it("parses multiple permissions with attribs (comes in as array)", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['rim:permissions'] = {};
+        data['rim:permissions']['rim:permit'] = [
+            { '#': 'systemPerm', '@': { system: 'true' } },
+            { '#': 'nonSystemPerm', '@': { system: 'false' } }
+        ];
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.permissions).toContain({ '#': 'systemPerm', '@': { system: 'true' } });
+            expect(configObj.permissions).toContain({ '#': 'nonSystemPerm', '@': { system: 'false' } });
+        });
+    });
+
+    it("parses a config with no permissions set", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        delete data['rim:permissions']; //No permissions set in config
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.permissions).toEqual([]);
         });
     });
 
