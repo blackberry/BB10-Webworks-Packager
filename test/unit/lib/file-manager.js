@@ -7,6 +7,7 @@ var srcPath = __dirname + "/../../../lib/",
     localize = require(srcPath + "localize"),
     wrench = require("wrench"),
     logger = require(srcPath + "logger"),
+    conf = require(srcPath + "conf"),
     fileMgr = require(srcPath + "file-manager"),
     testData = require("./test-data"),
     session = testData.session,
@@ -29,6 +30,7 @@ describe("File manager", function () {
         expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(session.conf.UI, session.sourcePaths.UI);
         expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
     });
+
 
     it("copyWWE() should copy wwe of the specified target", function () {
         spyOn(fs, "copySync");
@@ -231,6 +233,28 @@ describe("File manager", function () {
         expect(fs.statSync(session.sourceDir).isDirectory()).toBeTruthy();
         fileMgr.cleanSource(session);
         expect(path.existsSync(session.sourceDir)).toBeFalsy();
+    });
+
+    it("prepareOutputFiles() should copy files if a folder is sent in", function () {
+        spyOn(wrench, "copyDirSyncRecursive");
+        fileMgr.prepareOutputFiles(session);
+
+        expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
+        expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(session.conf.UI, session.sourcePaths.UI);
+        expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
+    });
+
+    it("prepareOutputFiles() should copy files if a folder is sent in without .bbwpignore", function () {
+        var oldPathExistsSync = path.existsSync;
+        spyOn(path, "existsSync").andCallFake(function (ipath) {
+            return path.basename(ipath) === conf.BBWP_IGNORE_FILENAME ? false : oldPathExistsSync(ipath);
+        });
+        spyOn(wrench, "copyDirSyncRecursive");
+        fileMgr.prepareOutputFiles(session);
+
+        expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
+        expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(session.conf.UI, session.sourcePaths.UI);
+        expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
     });
 
 });
