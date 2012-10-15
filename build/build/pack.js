@@ -30,7 +30,7 @@ function copyFolder(source, destination) {
     }
 }
 
-module.exports = function (src, baton) {
+module.exports = function (buildEnv) {
     var frameworkDest = path.join(_c.DEPLOY, 'Framework/'),
         libDest = path.join(_c.DEPLOY, 'lib'),
         nodeModulesDest = path.join(_c.DEPLOY, 'node_modules'),
@@ -55,7 +55,7 @@ module.exports = function (src, baton) {
     copyFolder(_c.NODE_MOD, nodeModulesDest);
     copyFolder(_c.THIRD_PARTY, thirdPartyDest);
     //Copy bin/lib folders for tools individually. This ensure we don't copy any extra folders that may come from BBNDK tools.
-    if (_c.TOOLS) {
+    if (_c.TOOLS && buildEnv !== "-ci" && buildEnv !== "-scm") {
         copyFolder(path.join(_c.TOOLS, "bin"), path.join(toolsDest, "bin"));
         copyFolder(path.join(_c.TOOLS, "lib"), path.join(toolsDest, "lib"));
     }
