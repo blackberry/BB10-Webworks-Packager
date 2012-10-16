@@ -18,6 +18,7 @@ describe("BAR builder", function () {
         spyOn(wrench, "mkdirSyncRecursive");
         spyOn(fileMgr, "copyWWE");
         spyOn(fileMgr, "copyWebplatform");
+        spyOn(fileMgr, "copyWebworks");
         spyOn(fileMgr, "copyJnextDependencies");
         spyOn(fileMgr, "copyExtensions");
         spyOn(fileMgr, "generateFrameworkModulesJS");
@@ -30,6 +31,7 @@ describe("BAR builder", function () {
         expect(wrench.mkdirSyncRecursive).toHaveBeenCalledWith(session.outputDir + "/" + target);
         expect(fileMgr.copyWWE).toHaveBeenCalledWith(session, target);
         expect(fileMgr.copyWebplatform).toHaveBeenCalledWith(session, target);
+        expect(fileMgr.copyWebworks).toHaveBeenCalledWith(session);
         expect(fileMgr.copyJnextDependencies).toHaveBeenCalledWith(session);
         expect(fileMgr.copyExtensions).toHaveBeenCalledWith(config.accessList, session, target, extManager);
         expect(fileMgr.generateFrameworkModulesJS).toHaveBeenCalledWith(session);

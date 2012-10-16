@@ -209,7 +209,21 @@ describe("File manager", function () {
         expect(fs.statSync(session.sourceDir + "/startPage.html").isFile()).toBeTruthy();
         expect(fs.statSync(session.sourceDir + "/config.xml").isFile()).toBeTruthy();
         expect(fs.statSync(session.sourceDir + "/test.png").isFile()).toBeTruthy();
-        expect(fs.statSync(session.sourceDir + "/webworks.js").isFile()).toBeTruthy();
+    });
+
+
+    it("copyWebworks() should copy and rename versioned webworks.js", function () {
+        fileMgr.copyWebworks(session);
+        expect(fs.statSync(session.sourceDir + "/chrome/webworks.js").isFile()).toBeTruthy();
+    });
+
+    it("copyWebworks() throws an error when too many webworks.js files exist", function () {
+        var tmpFilePath = path.normalize(session.conf.ROOT + "/clientFiles/webworks-1.0.0.2.js");
+        fs.writeFileSync(tmpFilePath, "Mock webworks.js");
+        expect(function () {
+            fileMgr.copyWebworks(session);
+        }).toThrow(new Error(localize.translate("EXCEPTION_WEBWORKS_JS_IN_CLIENT_FILES_DIR", 2)));
+        fs.unlinkSync(tmpFilePath);
     });
 
     it("cleanSource() should delete source folder", function () {
@@ -218,4 +232,5 @@ describe("File manager", function () {
         fileMgr.cleanSource(session);
         expect(path.existsSync(session.sourceDir)).toBeFalsy();
     });
+
 });
