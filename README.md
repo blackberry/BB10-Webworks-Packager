@@ -6,20 +6,20 @@ This repo contains the code for the BlackBerry 10 WebWorks Packager and submodul
 1. Install [node[v0.6.10] and npm](http://nodejs.org/dist/v0.6.10/) and add to path.
 2. Install [BlackBerry Native SDK](https://bdsc.webapps.blackberry.com/native/).
 3. Install [BlackBerry 10 WebWorks SDK](https://developer.blackberry.com/html5/download/sdk).
-4. Install [CMake](http://www.cmake.org/cmake/resources/software.html).
-5. [*Windows*] Add CMake bin to path. i.e.`\*Installation Directory\*\bin`
-6. [*Windows*] Add Git bin to PATH. i.e. `\*Installation Directory\*\bin`
+4. [*Windows*] Add Git bin to PATH. i.e. `*Installation Directory*\bin`
 
 ##Setup and Build
 1. `git clone https://github.com/blackberry-webworks/BB10-Webworks-Packager.git`
 2. `cd BB10-WebWorks-Packager`
 3. `git checkout master`
 4. **Setup bbndk environment variables:** (must be done within each session, prior to jake)
-    - [*Mac/Linux*] `source \*BBNDK installation directory\*/bbndk-env.sh`
-    - [*Windows*] `\*BBNDK installation directory\*\bbndk-env.bat`
+    - [*Mac/Linux*] `source *BBNDK installation directory*/bbndk-env.sh`
+    - [*Windows*] `*BBNDK installation directory*\bbndk-env.bat`
 5. **Webplatform setup:**<br />
     Copy the following webplatform files from the latest [BlackBerry 10 WebWorks SDK](https://developer.blackberry.com/html5/download/sdk) into `./dependencies/webplatform/framework/clientFiles/`. For more details on how to install go [here](https://developer.blackberry.com/html5/documentation/install_and_configure_ww_bb10_2007535_11.html).
-    - `Framework/dependencies/bootstrap/webplatform.js`
+    - `Framework/webplatform.js`
+    - `Framework/ui-resources/`
+    - `Framework/i18n.js`
 6. **Copy Dependencies:** <br />
     Copy the `dependencies` directory from the latest [BlackBerry 10 WebWorks SDK](https://developer.blackberry.com/html5/download/sdk) into the cloned `BB10-WebWorks-Packager` folder. For more details on how to install go [here](https://developer.blackberry.com/html5/documentation/install_and_configure_ww_bb10_2007535_11.html).
 7. **Configuration:**
