@@ -124,6 +124,7 @@ describe("Native packager", function () {
             "<entryPointType>Qnx/WebKit</entryPointType>" +
             "<initialWindow><systemChrome>none</systemChrome><transparent>true</transparent><autoOrients>true</autoOrients></initialWindow>" +
             "<env value=\"8\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>" +
+            "<env value=\"1.0.0.7\" var=\"WEBWORKS_VERSION\"></env>" +
             "<permission system=\"true\">run_native</permission>" +
             "<permission system=\"false\">access_internet</permission>" +
             "<name>" + config.name['default'] + "</name>" +
