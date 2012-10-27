@@ -15,18 +15,13 @@ This repo contains the code for the BlackBerry 10 WebWorks Packager and submodul
 4. **Setup bbndk environment variables:** (must be done within each session, prior to jake)
     - [*Mac/Linux*] `source *BBNDK installation directory*/bbndk-env.sh`
     - [*Windows*] `*BBNDK installation directory*\bbndk-env.bat`
-5. **Webplatform setup:**<br />
-    Copy the following webplatform files from the latest [BlackBerry 10 WebWorks SDK](https://developer.blackberry.com/html5/download/sdk) into `./dependencies/webplatform/framework/clientFiles/`. For more details on how to install go [here](https://developer.blackberry.com/html5/documentation/install_and_configure_ww_bb10_2007535_11.html).
-    - `Framework/webplatform.js`
-    - `Framework/ui-resources/`
-    - `Framework/i18n.js`
-6. **Copy Dependencies:** <br />
+5. **Copy Dependencies:** <br />
     Copy the `dependencies` directory from the latest [BlackBerry 10 WebWorks SDK](https://developer.blackberry.com/html5/download/sdk) into the cloned `BB10-WebWorks-Packager` folder. For more details on how to install go [here](https://developer.blackberry.com/html5/documentation/install_and_configure_ww_bb10_2007535_11.html).
-7. **Configuration:**
+6. **Configuration:**
     - [*Mac/Linux*] `./configure` [from terminal]
     - [*Windows*] `bash configure` [from command prompt]
-8. Run `jake` or `jake build` and check that the output folder is created under the "target/zip" subfolder.
-9. Run `jake test` and check that jake runs and completes
+7. Run `jake` or `jake build` and check that the output folder is created under the "target/zip" subfolder.
+8. Run `jake test` and check that jake runs and completes
 
 ##Building an application
 [Mac/Linux] `./bbwp test/test.zip -o <output dir>`<br />

@@ -27,7 +27,7 @@ describe("File manager", function () {
         fileMgr.prepareOutputFiles(session);
 
         expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
-        expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(session.conf.UI, session.sourcePaths.UI);
+        expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(session.conf.DEPENDENCIES_BOOTSTRAP, session.sourcePaths.CHROME);
         expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
     });
 
@@ -240,7 +240,7 @@ describe("File manager", function () {
         fileMgr.prepareOutputFiles(session);
 
         expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
-        expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(session.conf.UI, session.sourcePaths.UI);
+        expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(session.conf.DEPENDENCIES_BOOTSTRAP, session.sourcePaths.CHROME);
         expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
     });
 
@@ -253,7 +253,7 @@ describe("File manager", function () {
         fileMgr.prepareOutputFiles(session);
 
         expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
-        expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(session.conf.UI, session.sourcePaths.UI);
+        expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(session.conf.DEPENDENCIES_BOOTSTRAP, session.sourcePaths.CHROME);
         expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
     });
 
