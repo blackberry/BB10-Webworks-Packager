@@ -10,6 +10,7 @@ var srcPath = __dirname + "/../../../lib/",
     conf = require(srcPath + "conf"),
     fileMgr = require(srcPath + "file-manager"),
     testData = require("./test-data"),
+    testUtilities = require("./test-utilities"),
     session = testData.session,
     extManager = {
         getAllExtensionsToCopy: function (accessList) {
@@ -255,6 +256,15 @@ describe("File manager", function () {
         expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
         expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(session.conf.DEPENDENCIES_BOOTSTRAP, session.sourcePaths.CHROME);
         expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
+    });
+
+    it("prepareOutputFiles() should throw an error if the archive path doesn't exist", function () {
+        spyOn(wrench, "copyDirSyncRecursive");
+        var tempSession = testUtilities.cloneObj(session);
+        tempSession.archivePath = path.resolve("test/non-existant.zip");
+        expect(function () {
+            fileMgr.prepareOutputFiles(tempSession);
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ARCHIVE_PATH", tempSession.archivePath));
     });
 
 });
