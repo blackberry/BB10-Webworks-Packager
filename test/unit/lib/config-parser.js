@@ -35,6 +35,7 @@ describe("config parser", function () {
         configParser.parse(configPath, session, extManager, function (configObj) {
             expect(configObj.content).toEqual("local:///startPage.html");
             expect(configObj.id).toEqual("My WidgetId");
+            expect(configObj.customHeaders).toEqual({ 'RIM-Widget' : 'rim/widget'});
             expect(configObj.version).toEqual("1.0.0");
             expect(configObj.license).toEqual("My License");
             expect(configObj.licenseURL).toEqual("http://www.apache.org/licenses/LICENSE-2.0");
@@ -1062,6 +1063,32 @@ describe("config parser", function () {
             expect(function () {
                 configParser.parse(configPath, session, extManager, {});
             }).toThrow(localize.translate("EXCEPTION_BGCOLOR_INVALID", "$UI*@@$"));
+        });
+
+        it("can properly parse the custom RIM-Wiget:rim/wiget element", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            mockParsing(data);
+
+            configParser.parse(configPath, session, extManager, function (configObj) {
+                expect(configObj.customHeaders).toEqual({ 'RIM-Widget' : 'rim/widget'});
+            });
+        });
+
+        it("can properly parse the custom attributes but ignores improper headers", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["@"] = {
+                "xmlns": " http://www.w3.org/ns/widgets",
+                "xmlns:rim": "http://www.blackberry.com/ns/widgets",
+                "version": "1.0.0",
+                "id": "myID"
+            };
+
+            mockParsing(data);
+
+            configParser.parse(configPath, session, extManager, function (configObj) {
+                expect(configObj.id).toEqual("myID");
+                expect(configObj.customHeaders).toEqual(undefined);
+            });
         });
     });
 });

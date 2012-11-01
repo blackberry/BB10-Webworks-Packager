@@ -2,7 +2,8 @@
 <widget xmlns=" http://www.w3.org/ns/widgets"
         xmlns:rim="http://www.blackberry.com/ns/widgets"
         version="1.0.0"
-        id="My WidgetId">
+        id="My WidgetId"
+        rim:header="RIM-Widget:rim/widget">
     <name>Demo</name>
     <content src="local:///startPage.html"/>
     <author rim:copyright="No Copyright"
