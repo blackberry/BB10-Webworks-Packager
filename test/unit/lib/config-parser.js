@@ -23,6 +23,7 @@ var testData = require("./test-data"),
 describe("config parser", function () {
     beforeEach(function () {
         spyOn(fs, "copySync");
+        spyOn(logger, "warn");
     });
 
     it("tries to open a config.xml file that doesn't exist", function () {
@@ -981,8 +982,8 @@ describe("config parser", function () {
 
         it("sets orientation to landscape when specified", function () {
             var data = testUtilities.cloneObj(testData.xml2jsConfig);
-            data['feature'] = { '@': { id: 'blackberry.app.orientation', required: true },
-                param: { '@': { name: 'mode', value: 'landscape' } } };
+            data['feature'] = { '@': { id: 'blackberry.app', required: true },
+                param: { '@': { name: 'orientation', value: 'landscape' } } };
 
             mockParsing(data);
 
@@ -994,8 +995,8 @@ describe("config parser", function () {
 
         it("sets orientation to portrait when specified", function () {
             var data = testUtilities.cloneObj(testData.xml2jsConfig);
-            data['feature'] = { '@': { id: 'blackberry.app.orientation', required: true },
-                param: { '@': { name: 'mode', value: 'portrait' } } };
+            data['feature'] = { '@': { id: 'blackberry.app', required: true },
+                param: { '@': { name: 'orientation', value: 'portrait' } } };
 
             mockParsing(data);
 
@@ -1016,28 +1017,27 @@ describe("config parser", function () {
             });
         });
 
-        it("throws an error when blackberry.app.orientation exists with no mode param", function () {
+        it("throws a warning when blackberry.app.orientation exists", function () {
             var data = testUtilities.cloneObj(testData.xml2jsConfig);
-            data['feature'] = { '@': { id: 'blackberry.app.orientation', required: true }};
+            data['feature'] = { '@': { id: 'blackberry.app.orientation', required: true },
+                param: { '@': { name: 'mode', value: 'portrait' } } };
 
             mockParsing(data);
 
-            //Should throw an EXCEPTION_EMPTY_ORIENTATION_MODE error
-            expect(function () {
-                configParser.parse(configPath, session, extManager, {});
-            }).toThrow(localize.translate("EXCEPTION_EMPTY_ORIENTATION_MODE"));
+            configParser.parse(configPath, session, extManager, function (configObj) {});
+            expect(logger.warn).toHaveBeenCalled();
         });
 
-        it("throws an error when blackberry.app.orientation exists with an invalid mode param", function () {
+        it("throws an error when blackberry.app orientation exists with an invalid mode param", function () {
             var data = testUtilities.cloneObj(testData.xml2jsConfig);
-            data['feature'] = { '@': { id: 'blackberry.app.orientation', required: true },
-                param: { '@': { name: 'mode', value: 'notAValidMode' } } };
+            data['feature'] = { '@': { id: 'blackberry.app', required: true },
+                param: { '@': { name: 'orientation', value: 'notAValidMode' } } };
 
             mockParsing(data);
 
             //Should throw an EXCEPTION_INVALID_ORIENTATION_MODE error
             expect(function () {
-                configParser.parse(configPath, session, extManager, {});
+                configParser.parse(configPath, session, extManager, function (configObj) {});
             }).toThrow(localize.translate("EXCEPTION_INVALID_ORIENTATION_MODE", "notAValidMode"));
         });
 
