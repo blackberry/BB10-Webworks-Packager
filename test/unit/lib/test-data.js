@@ -32,10 +32,10 @@ module.exports = {
     },
     config: {
         "id": 'Demo',
-        "name": 'Demo',
+        "name": { 'default': 'Demo' },
         "version": '1.0.0',
         "author": 'Research In Motion Ltd.',
-        "description": 'This is a test!',
+        "description": { 'default': 'This is a test!' },
         "image": 'test.png',
         "autoOrientation": true,
     },

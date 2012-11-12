@@ -116,7 +116,6 @@ describe("Native packager", function () {
     it("exec blackberry-nativepackager", function () {
         var bbTabletXML = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
             "<qnx><id>" + config.id + "</id>" +
-            "<name>" + config.name + "</name>" +
             "<versionNumber>" + config.version + "</versionNumber>" +
             "<author>" + config.author + "</author>" +
             "<asset entry=\"true\" type=\"qnx/elf\">wwe</asset>" +
@@ -127,7 +126,8 @@ describe("Native packager", function () {
             "<env value=\"8\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>" +
             "<permission system=\"true\">run_native</permission>" +
             "<permission system=\"false\">access_internet</permission>" +
-            "<description>" + config.description + "</description></qnx>",
+            "<name>" + config.name['default'] + "</name>" +
+            "<description>" + config.description['default'] + "</description></qnx>",
             cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-nativepackager" + (pkgrUtils.isWindows() ? ".bat" : ""));
 
         spyOn(pkgrUtils, "writeFile");
@@ -137,6 +137,82 @@ describe("Native packager", function () {
         expect(pkgrUtils.writeFile).toHaveBeenCalledWith(session.sourceDir, conf.BAR_DESCRIPTOR, bbTabletXML);
         expect(childProcess.spawn).toHaveBeenCalledWith(cmd, ["@options"], {"cwd": session.sourceDir, "env": process.env});
         expect(callback).toHaveBeenCalledWith(0);
+    });
+
+    it("can process application name", function () {
+        var config = testUtils.cloneObj(testData.config);
+        config.name = {"default": "API Smoke Test"};
+
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (fileLocation, fileName, fileData) {
+            expect(fileData).toContain("<name>API Smoke Test</name>");
+        });
+
+        nativePkgr.exec(session, target, config, callback);
+
+    });
+
+    it("can process localized application name", function () {
+        var config = testUtils.cloneObj(testData.config);
+        config.name = {"FR": "API Smoke Test - FR"};
+
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (fileLocation, fileName, fileData) {
+            expect(fileData).toContain('<name><text xml:lang="FR">API Smoke Test - FR</text></name>');
+        });
+
+        nativePkgr.exec(session, target, config, callback);
+    });
+
+    it("can process mutiple application names", function () {
+        var config = testUtils.cloneObj(testData.config);
+        config.name = {
+            "default": "API Smoke Test",
+            "EN": "API Smoke Test - EN",
+            "FR": "API Smoke Test - FR"
+        };
+
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (fileLocation, fileName, fileData) {
+            expect(fileData).toContain('<name>API Smoke Test<text xml:lang="EN">API Smoke Test - EN</text><text xml:lang="FR">API Smoke Test - FR</text></name>');
+        });
+
+        nativePkgr.exec(session, target, config, callback);
+    });
+
+    it("can process application description", function () {
+        var config = testUtils.cloneObj(testData.config);
+        config.description = {"default": "My app description"};
+
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (fileLocation, fileName, fileData) {
+            expect(fileData).toContain("<description>My app description</description>");
+        });
+
+        nativePkgr.exec(session, target, config, callback);
+
+    });
+
+    it("can process localized application description", function () {
+        var config = testUtils.cloneObj(testData.config);
+        config.description = {"FR": "My app description - FR"};
+
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (fileLocation, fileName, fileData) {
+            expect(fileData).toContain('<description><text xml:lang="FR">My app description - FR</text></description>');
+        });
+
+        nativePkgr.exec(session, target, config, callback);
+    });
+
+    it("can process mutiple application descriptions", function () {
+        var config = testUtils.cloneObj(testData.config);
+        config.description = {
+            "default": "My app description",
+            "EN": "My app description - EN",
+            "FR": "My app description - FR"
+        };
+
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (fileLocation, fileName, fileData) {
+            expect(fileData).toContain('<description>My app description<text xml:lang="EN">My app description - EN</text><text xml:lang="FR">My app description - FR</text></description>');
+        });
+
+        nativePkgr.exec(session, target, config, callback);
     });
 
     it("can process permissions with no attributes", function () {

@@ -46,8 +46,8 @@ describe("config parser", function () {
             expect(configObj.authorURL).toEqual("http://www.rim.com/");
             expect(configObj.copyright).toEqual("No Copyright");
             expect(configObj.authorEmail).toEqual("author@rim.com");
-            expect(configObj.name).toEqual("Demo");
-            expect(configObj.description).toEqual("This app does everything.");
+            expect(configObj.name).toEqual({ default : 'Demo' });
+            expect(configObj.description).toEqual({ default : 'This app does everything.' });
             expect(configObj.permissions).toContain('access_shared');
             expect(configObj.permissions).toContain('read_geolocation');
             expect(configObj.permissions).toContain('use_camera');
@@ -124,6 +124,128 @@ describe("config parser", function () {
         configParser.parse(licenseConfigPath, session, extManager, function (configObj) {
             expect(configObj.license).toEqual("");
             expect(configObj.licenseURL).toEqual("http://www.apache.org/licenses/LICENSE-2.0");
+        });
+    });
+
+    it("Fails when no name was provided - single element", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.name = "";
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, extManager, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_NAME"));
+    });
+
+    it("Fails when no name was provided - multiple elements", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.name = ["",
+            { '#': 'API Smoke Test-FR', '@': { 'xml:lang': 'FR' } },
+        ];
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, extManager, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_NAME"));
+    });
+
+    it("Fails when localized name was provided but empty", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.name = ["API Smoke Test",
+            { '#': '', '@': { 'xml:lang': 'FR' } },
+        ];
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, extManager, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_NAME"));
+    });
+
+    it("Parses a name element - single element", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.name = "API Smoke Test";
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.name).toEqual({"default": "API Smoke Test"});
+        });
+    });
+
+    it("Parses a name element with xml:lang - single element", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.name = { '#': 'EN VALUE', '@': { 'xml:lang': 'EN' } };
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.name).toEqual({"EN": "EN VALUE"});
+        });
+    });
+
+    it("Parses a name element with xml:lang - multi element", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.name = ['API Smoke Test',
+            { '#': 'EN VALUE', '@': { 'xml:lang': 'EN' } },
+            { '#': 'FR VALUE', '@': { 'xml:lang': 'FR' } }
+
+        ];
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.name).toEqual({"default": "API Smoke Test", "EN": "EN VALUE", "FR": "FR VALUE"});
+        });
+    });
+
+    it("Fails when localized name was provided but empty", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.name = ['API Smoke Test',
+            { '#': '', '@': { 'xml:lang': 'FR' } },
+        ];
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, extManager, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_NAME"));
+    });
+
+    it("Parses a description element - single element", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.description = "This is my app";
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.description).toEqual({"default": "This is my app"});
+        });
+    });
+
+    it("Parses a description element with xml:lang - single element", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.description = { '#': 'EN VALUE', '@': { 'xml:lang': 'EN' } };
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.description).toEqual({"EN": "EN VALUE"});
+        });
+    });
+
+    it("Parses a description element with xml:lang - multi element", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.description = ['This is my app',
+            { '#': 'EN VALUE', '@': { 'xml:lang': 'EN' } },
+            { '#': 'FR VALUE', '@': { 'xml:lang': 'FR' } }
+
+        ];
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.description).toEqual({"default": "This is my app", "EN": "EN VALUE", "FR": "FR VALUE"});
         });
     });
 
