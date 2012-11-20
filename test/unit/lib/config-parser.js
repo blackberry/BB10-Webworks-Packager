@@ -141,7 +141,7 @@ describe("config parser", function () {
     it("Fails when no name was provided - multiple elements", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data.name = ["",
-            { '#': 'API Smoke Test-FR', '@': { 'xml:lang': 'FR' } },
+            { '#': 'API Smoke Test-FR', '@': { 'xml:lang': 'fr' } },
         ];
 
         mockParsing(data);
@@ -154,7 +154,7 @@ describe("config parser", function () {
     it("Fails when localized name was provided but empty", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data.name = ["API Smoke Test",
-            { '#': '', '@': { 'xml:lang': 'FR' } },
+            { '#': '', '@': { 'xml:lang': 'fr' } },
         ];
 
         mockParsing(data);
@@ -177,33 +177,44 @@ describe("config parser", function () {
 
     it("Parses a name element with xml:lang - single element", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
-        data.name = { '#': 'EN VALUE', '@': { 'xml:lang': 'EN' } };
+        data.name = { '#': 'EN VALUE', '@': { 'xml:lang': 'en' } };
 
         mockParsing(data);
 
         configParser.parse(configPath, session, extManager, function (configObj) {
-            expect(configObj.name).toEqual({"EN": "EN VALUE"});
+            expect(configObj.name).toEqual({"en": "EN VALUE"});
+        });
+    });
+
+    it("Parses a name element that is not case sensitive", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.name = { '#': 'EN VALUE', '@': { 'xml:lang': 'eN' } };
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.name).toEqual({"en": "EN VALUE"});
         });
     });
 
     it("Parses a name element with xml:lang - multi element", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data.name = ['API Smoke Test',
-            { '#': 'EN VALUE', '@': { 'xml:lang': 'EN' } },
-            { '#': 'FR VALUE', '@': { 'xml:lang': 'FR' } }
+            { '#': 'EN VALUE', '@': { 'xml:lang': 'en' } },
+            { '#': 'FR VALUE', '@': { 'xml:lang': 'fr' } }
 
         ];
         mockParsing(data);
 
         configParser.parse(configPath, session, extManager, function (configObj) {
-            expect(configObj.name).toEqual({"default": "API Smoke Test", "EN": "EN VALUE", "FR": "FR VALUE"});
+            expect(configObj.name).toEqual({"default": "API Smoke Test", "en": "EN VALUE", "fr": "FR VALUE"});
         });
     });
 
     it("Fails when localized name was provided but empty", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data.name = ['API Smoke Test',
-            { '#': '', '@': { 'xml:lang': 'FR' } },
+            { '#': '', '@': { 'xml:lang': 'fr' } },
         ];
 
         mockParsing(data);
@@ -226,26 +237,37 @@ describe("config parser", function () {
 
     it("Parses a description element with xml:lang - single element", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
-        data.description = { '#': 'EN VALUE', '@': { 'xml:lang': 'EN' } };
+        data.description = { '#': 'EN VALUE', '@': { 'xml:lang': 'en' } };
 
         mockParsing(data);
 
         configParser.parse(configPath, session, extManager, function (configObj) {
-            expect(configObj.description).toEqual({"EN": "EN VALUE"});
+            expect(configObj.description).toEqual({"en": "EN VALUE"});
+        });
+    });
+
+    it("Parses a description element that is not case sensitive", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.description = { '#': 'EN VALUE', '@': { 'xml:lang': 'eN' } };
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.description).toEqual({"en": "EN VALUE"});
         });
     });
 
     it("Parses a description element with xml:lang - multi element", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data.description = ['This is my app',
-            { '#': 'EN VALUE', '@': { 'xml:lang': 'EN' } },
-            { '#': 'FR VALUE', '@': { 'xml:lang': 'FR' } }
+            { '#': 'EN VALUE', '@': { 'xml:lang': 'en' } },
+            { '#': 'FR VALUE', '@': { 'xml:lang': 'fr' } }
 
         ];
         mockParsing(data);
 
         configParser.parse(configPath, session, extManager, function (configObj) {
-            expect(configObj.description).toEqual({"default": "This is my app", "EN": "EN VALUE", "FR": "FR VALUE"});
+            expect(configObj.description).toEqual({"default": "This is my app", "en": "EN VALUE", "fr": "FR VALUE"});
         });
     });
 
