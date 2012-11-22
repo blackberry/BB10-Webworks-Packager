@@ -9,6 +9,7 @@ var testData = require("./test-data"),
     fs = require("fsext"),
     session = testData.session,
     configPath = path.resolve("test/config.xml"),
+    configBadPath = path.resolve("test2/config.xml"),
     configBareMinimumPath = path.resolve("test/config-bare-minimum.xml"),
     extManager = {
         getGlobalFeatures: function () {
@@ -22,12 +23,20 @@ var testData = require("./test-data"),
 describe("config parser", function () {
     beforeEach(function () {
         spyOn(fs, "copySync");
+        spyOn(logger, "warn");
+    });
+
+    it("tries to open a config.xml file that doesn't exist", function () {
+        expect(function () {
+            configParser.parse(configBadPath, session, extManager, {});
+        }).toThrow(localize.translate("EXCEPTION_CONFIG_NOT_FOUND"));
     });
 
     it("parses standard elements in a config.xml", function () {
         configParser.parse(configPath, session, extManager, function (configObj) {
             expect(configObj.content).toEqual("local:///startPage.html");
             expect(configObj.id).toEqual("My WidgetId");
+            expect(configObj.customHeaders).toEqual({ 'RIM-Widget' : 'rim/widget'});
             expect(configObj.version).toEqual("1.0.0");
             expect(configObj.license).toEqual("My License");
             expect(configObj.licenseURL).toEqual("http://www.apache.org/licenses/LICENSE-2.0");
@@ -37,11 +46,12 @@ describe("config parser", function () {
             expect(configObj.authorURL).toEqual("http://www.rim.com/");
             expect(configObj.copyright).toEqual("No Copyright");
             expect(configObj.authorEmail).toEqual("author@rim.com");
-            expect(configObj.name).toEqual("Demo");
-            expect(configObj.description).toEqual("This app does everything.");
+            expect(configObj.name).toEqual({ default : 'Demo' });
+            expect(configObj.description).toEqual({ default : 'This app does everything.' });
             expect(configObj.permissions).toContain('access_shared');
             expect(configObj.permissions).toContain('read_geolocation');
             expect(configObj.permissions).toContain('use_camera');
+            expect(configObj.enableChildWebView).toBe(false);
         });
     });
 
@@ -117,6 +127,150 @@ describe("config parser", function () {
         });
     });
 
+    it("Fails when no name was provided - single element", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.name = "";
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, extManager, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_NAME"));
+    });
+
+    it("Fails when no name was provided - multiple elements", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.name = ["",
+            { '#': 'API Smoke Test-FR', '@': { 'xml:lang': 'fr' } },
+        ];
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, extManager, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_NAME"));
+    });
+
+    it("Fails when localized name was provided but empty", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.name = ["API Smoke Test",
+            { '#': '', '@': { 'xml:lang': 'fr' } },
+        ];
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, extManager, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_NAME"));
+    });
+
+    it("Parses a name element - single element", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.name = "API Smoke Test";
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.name).toEqual({"default": "API Smoke Test"});
+        });
+    });
+
+    it("Parses a name element with xml:lang - single element", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.name = { '#': 'EN VALUE', '@': { 'xml:lang': 'en' } };
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.name).toEqual({"en": "EN VALUE"});
+        });
+    });
+
+    it("Parses a name element that is not case sensitive", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.name = { '#': 'EN VALUE', '@': { 'xml:lang': 'eN' } };
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.name).toEqual({"en": "EN VALUE"});
+        });
+    });
+
+    it("Parses a name element with xml:lang - multi element", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.name = ['API Smoke Test',
+            { '#': 'EN VALUE', '@': { 'xml:lang': 'en' } },
+            { '#': 'FR VALUE', '@': { 'xml:lang': 'fr' } }
+
+        ];
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.name).toEqual({"default": "API Smoke Test", "en": "EN VALUE", "fr": "FR VALUE"});
+        });
+    });
+
+    it("Fails when localized name was provided but empty", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.name = ['API Smoke Test',
+            { '#': '', '@': { 'xml:lang': 'fr' } },
+        ];
+
+        mockParsing(data);
+
+        expect(function () {
+            configParser.parse(configPath, session, extManager, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_NAME"));
+    });
+
+    it("Parses a description element - single element", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.description = "This is my app";
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.description).toEqual({"default": "This is my app"});
+        });
+    });
+
+    it("Parses a description element with xml:lang - single element", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.description = { '#': 'EN VALUE', '@': { 'xml:lang': 'en' } };
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.description).toEqual({"en": "EN VALUE"});
+        });
+    });
+
+    it("Parses a description element that is not case sensitive", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.description = { '#': 'EN VALUE', '@': { 'xml:lang': 'eN' } };
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.description).toEqual({"en": "EN VALUE"});
+        });
+    });
+
+    it("Parses a description element with xml:lang - multi element", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data.description = ['This is my app',
+            { '#': 'EN VALUE', '@': { 'xml:lang': 'en' } },
+            { '#': 'FR VALUE', '@': { 'xml:lang': 'fr' } }
+
+        ];
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.description).toEqual({"default": "This is my app", "en": "EN VALUE", "fr": "FR VALUE"});
+        });
+    });
+
     it("Fails when missing content error is not shown", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data.content = "";
@@ -161,15 +315,68 @@ describe("config parser", function () {
         expect(fileManager.cleanSource).toHaveBeenCalled();
     });
 
-    it("adds the access_internet permission if unprovided", function () {
+    it("parses a single permission (comes in as string)", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
-        data['rim:permit'] = [];
+        data['rim:permissions'] = {};
+        data['rim:permissions']['rim:permit'] = 'onePermissionNoAttribs';
 
         mockParsing(data);
 
         configParser.parse(configPath, session, extManager, function (configObj) {
-            //access_internet permission was set
-            expect(configObj.permissions).toContain('access_internet');
+            expect(configObj.permissions).toContain('onePermissionNoAttribs');
+        });
+    });
+
+    it("parses a single permission with attribs (comes in as object)", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['rim:permissions'] = {};
+        data['rim:permissions']['rim:permit'] = { '#': 'systemPerm', '@': { system: 'true' } };
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.permissions).toContain({ '#': 'systemPerm', '@': { system: 'true' } });
+        });
+    });
+
+    it("parses multiple permissions with no attribs (comes in as array)", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['rim:permissions'] = {};
+        data['rim:permissions']['rim:permit'] = [ 'access_shared', 'read_geolocation', 'use_camera' ];
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.permissions).toContain('access_shared');
+            expect(configObj.permissions).toContain('read_geolocation');
+            expect(configObj.permissions).toContain('use_camera');
+        });
+    });
+
+    it("parses multiple permissions with attribs (comes in as array)", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data['rim:permissions'] = {};
+        data['rim:permissions']['rim:permit'] = [
+            { '#': 'systemPerm', '@': { system: 'true' } },
+            { '#': 'nonSystemPerm', '@': { system: 'false' } }
+        ];
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.permissions).toContain({ '#': 'systemPerm', '@': { system: 'true' } });
+            expect(configObj.permissions).toContain({ '#': 'nonSystemPerm', '@': { system: 'false' } });
+        });
+    });
+
+    it("parses a config with no permissions set", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        delete data['rim:permissions']; //No permissions set in config
+
+        mockParsing(data);
+
+        configParser.parse(configPath, session, extManager, function (configObj) {
+            expect(configObj.permissions).toEqual([]);
         });
     });
 
@@ -257,11 +464,11 @@ describe("config parser", function () {
             expect(configObj.permissions).toContain('run_when_backgrounded');
             expect(configObj.autoDeferNetworkingAndJavaScript).toEqual(false);
         });
-    });   
+    });
 
     it("sets autoDeferNetworkingAndJavaScript to true by default", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
-        
+
         data['feature'] = undefined; // no features
         data["rim:permissions"] = {}; // ensure no run_when_backgrounded permission exists
 
@@ -270,8 +477,8 @@ describe("config parser", function () {
         configParser.parse(configPath, session, extManager, function (configObj) {
             expect(configObj.autoDeferNetworkingAndJavaScript).toEqual(true);
         });
-    });    
-    
+    });
+
     it("does not throw an exception with empty permit tags", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data['rim:permit'] = ['read_geolocation', {}, 'access_internet' ];
@@ -558,7 +765,7 @@ describe("config parser", function () {
             "@": {
                 "id": "com.domain.subdomain.appName.app"
             },
-            "type": "application",
+            "type": "application"
         }, {
             "@": {
                 "id": "com.domain.subdomain.appName.viewer"
@@ -919,8 +1126,8 @@ describe("config parser", function () {
 
         it("sets orientation to landscape when specified", function () {
             var data = testUtilities.cloneObj(testData.xml2jsConfig);
-            data['feature'] = { '@': { id: 'blackberry.app.orientation', required: true },
-                param: { '@': { name: 'mode', value: 'landscape' } } };
+            data['feature'] = { '@': { id: 'blackberry.app', required: true },
+                param: { '@': { name: 'orientation', value: 'landscape' } } };
 
             mockParsing(data);
 
@@ -932,8 +1139,8 @@ describe("config parser", function () {
 
         it("sets orientation to portrait when specified", function () {
             var data = testUtilities.cloneObj(testData.xml2jsConfig);
-            data['feature'] = { '@': { id: 'blackberry.app.orientation', required: true },
-                param: { '@': { name: 'mode', value: 'portrait' } } };
+            data['feature'] = { '@': { id: 'blackberry.app', required: true },
+                param: { '@': { name: 'orientation', value: 'portrait' } } };
 
             mockParsing(data);
 
@@ -954,28 +1161,27 @@ describe("config parser", function () {
             });
         });
 
-        it("throws an error when blackberry.app.orientation exists with no mode param", function () {
+        it("throws a warning when blackberry.app.orientation exists", function () {
             var data = testUtilities.cloneObj(testData.xml2jsConfig);
-            data['feature'] = { '@': { id: 'blackberry.app.orientation', required: true }};
+            data['feature'] = { '@': { id: 'blackberry.app.orientation', required: true },
+                param: { '@': { name: 'mode', value: 'portrait' } } };
 
             mockParsing(data);
 
-            //Should throw an EXCEPTION_EMPTY_ORIENTATION_MODE error
-            expect(function () {
-                configParser.parse(configPath, session, extManager, {});
-            }).toThrow(localize.translate("EXCEPTION_EMPTY_ORIENTATION_MODE"));
+            configParser.parse(configPath, session, extManager, function (configObj) {});
+            expect(logger.warn).toHaveBeenCalled();
         });
 
-        it("throws an error when blackberry.app.orientation exists with an invalid mode param", function () {
+        it("throws an error when blackberry.app orientation exists with an invalid mode param", function () {
             var data = testUtilities.cloneObj(testData.xml2jsConfig);
-            data['feature'] = { '@': { id: 'blackberry.app.orientation', required: true },
-                param: { '@': { name: 'mode', value: 'notAValidMode' } } };
+            data['feature'] = { '@': { id: 'blackberry.app', required: true },
+                param: { '@': { name: 'orientation', value: 'notAValidMode' } } };
 
             mockParsing(data);
 
             //Should throw an EXCEPTION_INVALID_ORIENTATION_MODE error
             expect(function () {
-                configParser.parse(configPath, session, extManager, {});
+                configParser.parse(configPath, session, extManager, function (configObj) {});
             }).toThrow(localize.translate("EXCEPTION_INVALID_ORIENTATION_MODE", "notAValidMode"));
         });
 
@@ -1002,6 +1208,63 @@ describe("config parser", function () {
             expect(function () {
                 configParser.parse(configPath, session, extManager, {});
             }).toThrow(localize.translate("EXCEPTION_BGCOLOR_INVALID", "$UI*@@$"));
+        });
+
+        it("can properly parse the custom RIM-Wiget:rim/wiget element", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            mockParsing(data);
+
+            configParser.parse(configPath, session, extManager, function (configObj) {
+                expect(configObj.customHeaders).toEqual({ 'RIM-Widget' : 'rim/widget'});
+            });
+        });
+
+        it("can properly parse the custom attributes but ignores improper headers", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["@"] = {
+                "xmlns": " http://www.w3.org/ns/widgets",
+                "xmlns:rim": "http://www.blackberry.com/ns/widgets",
+                "version": "1.0.0",
+                "id": "myID"
+            };
+
+            mockParsing(data);
+
+            configParser.parse(configPath, session, extManager, function (configObj) {
+                expect(configObj.id).toEqual("myID");
+                expect(configObj.customHeaders).toEqual(undefined);
+            });
+        });
+
+        describe('disabling childBrowser (childWebView)', function () {
+
+            // { '@': { id: 'blackberry.app', required: true, version: '1.0.0.0' },
+            //   param: { '@': { name: 'childBrowser', value: 'disable' } } }
+
+
+            it("sets enableChildWebView to true when childBrowser value is enable", function () {
+                var data = testUtilities.cloneObj(testData.xml2jsConfig);
+                data['feature'] = { '@': { id: 'blackberry.app' },
+                    param: { '@': { name: 'childBrowser', value: 'enable' } } };
+
+                mockParsing(data);
+
+                configParser.parse(configPath, session, extManager, function (configObj) {
+                    expect(configObj.enableChildWebView).toBe(true);
+                });
+            });
+
+            it("sets enableChildWebView to false when value is disable", function () {
+                var data = testUtilities.cloneObj(testData.xml2jsConfig);
+                data['feature'] = { '@': { id: 'blackberry.app' },
+                    param: { '@': { name: 'childBrowser', value: 'disable' } } };
+
+                mockParsing(data);
+
+                configParser.parse(configPath, session, extManager, function (configObj) {
+                    expect(configObj.enableChildWebView).toBe(false);
+                });
+            });
         });
     });
 });

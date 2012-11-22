@@ -32,12 +32,12 @@ module.exports = {
     },
     config: {
         "id": 'Demo',
-        "name": 'Demo',
+        "name": { 'default': 'Demo' },
         "version": '1.0.0',
         "author": 'Research In Motion Ltd.',
-        "description": 'This is a test!',
+        "description": { 'default': 'This is a test!' },
         "image": 'test.png',
-        "autoOrientation": true
+        "autoOrientation": true,
     },
     accessList: [{
         uri: "http://google.com",
@@ -65,7 +65,8 @@ module.exports = {
             "xmlns": " http://www.w3.org/ns/widgets",
             "xmlns:rim": "http://www.blackberry.com/ns/widgets",
             "version": "1.0.0",
-            "id": "myID"
+            "id": "myID",
+            "rim:header" : "RIM-Widget:rim/widget"
         },
         "name": "Demo",
         "content": {
