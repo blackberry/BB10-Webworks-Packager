@@ -50,7 +50,6 @@ describe("Native packager", function () {
             }
         });
         spyOn(fs, "writeFileSync");
-        spyOn(pkgrUtils, "writeFile");
         spyOn(childProcess, "spawn").andReturn(result);
         spyOn(path, "existsSync").andCallFake(function (path) {
             //Return true if this is the dependencies folder check
@@ -64,6 +63,7 @@ describe("Native packager", function () {
     });
 
     it("should not display empty messages in logger", function () {
+        spyOn(pkgrUtils, "writeFile");
         spyOn(logger, "warn");
         spyOn(logger, "error");
         spyOn(logger, "info");
@@ -76,6 +76,7 @@ describe("Native packager", function () {
     });
 
     it("shows debug token warning when path to file is not valid", function () {
+        spyOn(pkgrUtils, "writeFile");
         spyOn(logger, "warn");
 
         session.debug = true;
@@ -88,6 +89,7 @@ describe("Native packager", function () {
     });
 
     it("won't show debug token warning when -d options wasn't provided", function () {
+        spyOn(pkgrUtils, "writeFile");
         spyOn(logger, "warn");
 
         session.debug = false;
@@ -100,6 +102,7 @@ describe("Native packager", function () {
     });
 
     it("shows debug token warning when debug token not a .bar file", function () {
+        spyOn(pkgrUtils, "writeFile");
         spyOn(logger, "warn");
 
         session.debug = true;
@@ -113,28 +116,153 @@ describe("Native packager", function () {
     it("exec blackberry-nativepackager", function () {
         var bbTabletXML = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
             "<qnx><id>" + config.id + "</id>" +
-            "<name>" + config.name + "</name>" +
             "<versionNumber>" + config.version + "</versionNumber>" +
             "<author>" + config.author + "</author>" +
             "<asset entry=\"true\" type=\"qnx/elf\">wwe</asset>" +
             "<asset>abc</asset>" +
             "<asset>xyz</asset>" +
+            "<entryPointType>Qnx/WebKit</entryPointType>" +
             "<initialWindow><systemChrome>none</systemChrome><transparent>true</transparent><autoOrients>true</autoOrients></initialWindow>" +
-            "<env value=\"12\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>" +
-            "<permission system=\"true\">run_native</permission>" +
-            "<description>" + config.description + "</description></qnx>",
+            "<env value=\"8\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>",
+
+            bbTabletXML2 = "<permission system=\"true\">run_native</permission>" +
+            "<permission system=\"false\">access_internet</permission>" +
+            "<name>" + config.name['default'] + "</name>" +
+            "<description>" + config.description['default'] + "</description></qnx>",
             cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-nativepackager" + (pkgrUtils.isWindows() ? ".bat" : ""));
 
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (sourceDir, outputDir, data) {
+            expect(sourceDir).toEqual(session.sourceDir);
+            expect(outputDir).toEqual(conf.BAR_DESCRIPTOR);
+
+            //We have to validate the xml data in 2 chucks, because the WEBWORKS_VERSION env variable
+            //has a different value for SCM builds and we can't mock the webworks-info file
+            expect(data).toContain(bbTabletXML);
+            expect(data).toContain(bbTabletXML2);
+        });
         nativePkgr.exec(session, target, testData.config, callback);
 
         expect(fs.writeFileSync).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(String));
-        expect(pkgrUtils.writeFile).toHaveBeenCalledWith(session.sourceDir, conf.BAR_DESCRIPTOR, bbTabletXML);
         expect(childProcess.spawn).toHaveBeenCalledWith(cmd, ["@options"], {"cwd": session.sourceDir, "env": process.env});
         expect(callback).toHaveBeenCalledWith(0);
     });
 
+    it("can process application name", function () {
+        var config = testUtils.cloneObj(testData.config);
+        config.name = {"default": "API Smoke Test"};
+
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (fileLocation, fileName, fileData) {
+            expect(fileData).toContain("<name>API Smoke Test</name>");
+        });
+
+        nativePkgr.exec(session, target, config, callback);
+
+    });
+
+    it("can process localized application name", function () {
+        var config = testUtils.cloneObj(testData.config);
+        config.name = {"FR": "API Smoke Test - FR"};
+
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (fileLocation, fileName, fileData) {
+            expect(fileData).toContain('<name><text xml:lang="FR">API Smoke Test - FR</text></name>');
+        });
+
+        nativePkgr.exec(session, target, config, callback);
+    });
+
+    it("can process mutiple application names", function () {
+        var config = testUtils.cloneObj(testData.config);
+        config.name = {
+            "default": "API Smoke Test",
+            "EN": "API Smoke Test - EN",
+            "FR": "API Smoke Test - FR"
+        };
+
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (fileLocation, fileName, fileData) {
+            expect(fileData).toContain('<name>API Smoke Test<text xml:lang="EN">API Smoke Test - EN</text><text xml:lang="FR">API Smoke Test - FR</text></name>');
+        });
+
+        nativePkgr.exec(session, target, config, callback);
+    });
+
+    it("can process application description", function () {
+        var config = testUtils.cloneObj(testData.config);
+        config.description = {"default": "My app description"};
+
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (fileLocation, fileName, fileData) {
+            expect(fileData).toContain("<description>My app description</description>");
+        });
+
+        nativePkgr.exec(session, target, config, callback);
+
+    });
+
+    it("can process localized application description", function () {
+        var config = testUtils.cloneObj(testData.config);
+        config.description = {"FR": "My app description - FR"};
+
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (fileLocation, fileName, fileData) {
+            expect(fileData).toContain('<description><text xml:lang="FR">My app description - FR</text></description>');
+        });
+
+        nativePkgr.exec(session, target, config, callback);
+    });
+
+    it("can process mutiple application descriptions", function () {
+        var config = testUtils.cloneObj(testData.config);
+        config.description = {
+            "default": "My app description",
+            "EN": "My app description - EN",
+            "FR": "My app description - FR"
+        };
+
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (fileLocation, fileName, fileData) {
+            expect(fileData).toContain('<description>My app description<text xml:lang="EN">My app description - EN</text><text xml:lang="FR">My app description - FR</text></description>');
+        });
+
+        nativePkgr.exec(session, target, config, callback);
+    });
+
+    it("can process permissions with no attributes", function () {
+        var config = testUtils.cloneObj(testData.config);
+        config.permissions = ['read_device_identifying_information'];
+
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (fileLocation, fileName, fileData) {
+            expect(fileData).toContain("<permission>read_device_identifying_information</permission>");
+        });
+
+        nativePkgr.exec(session, target, config, callback);
+
+    });
+
+    it("can process permissions with attributes", function () {
+        var config = testUtils.cloneObj(testData.config);
+        config.permissions = [{ '#': 'systemPerm', '@': {"system": "true"}}];
+
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (fileLocation, fileName, fileData) {
+            expect(fileData).toContain("<permission system=\"true\">systemPerm</permission>");
+        });
+
+        nativePkgr.exec(session, target, config, callback);
+
+    });
+
+    it("adds the mandatory permissions for webworks", function () {
+        var config = testUtils.cloneObj(testData.config);
+        config.permissions = [];
+
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (fileLocation, fileName, fileData) {
+            expect(fileData).toContain("<permission system=\"false\">access_internet</permission>");
+            expect(fileData).toContain("<permission system=\"true\">run_native</permission>");
+        });
+
+        nativePkgr.exec(session, target, config, callback);
+
+    });
+
     it("omits -devMode when signing and specifying -d", function () {
         testUtils.mockResolve(path);
+        spyOn(pkgrUtils, "writeFile");
 
         var session = testUtils.cloneObj(testData.session),
             config = testUtils.cloneObj(testData.config),
@@ -173,6 +301,7 @@ describe("Native packager", function () {
 
     it("exec blackberry-nativepackager with additional params", function () {
         var cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-nativepackager" + (pkgrUtils.isWindows() ? ".bat" : ""));
+        spyOn(pkgrUtils, "writeFile");
 
         session.getParams = jasmine.createSpy("session getParams").andReturn({
             "-installApp": "",

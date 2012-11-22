@@ -40,13 +40,16 @@ function loadModule(module) {
 }
 
 describe("Extension manager", function () {
-    spyOn(path, "existsSync").andReturn(true);
-    spyOn(fs, "readdirSync").andReturn(["app", "event", "system", "identity", "complex"]);
-    spyOn(packagerUtils, "loadModule").andCallFake(loadModule);
 
-    result = extManager.initialize(session);
+    beforeEach(function () {
+        spyOn(path, "existsSync").andReturn(true);
+        spyOn(fs, "readdirSync").andReturn(["app", "event", "system", "identity", "complex"]);
+        spyOn(packagerUtils, "loadModule").andCallFake(loadModule);
+
+    });
 
     it("initialize returns the actual extension manager object", function () {
+        result = extManager.initialize(session);
         expect(result.getGlobalFeatures).toBeDefined();
         expect(result.getAllExtensionsToCopy).toBeDefined();
         expect(result.getExtensionBasenameByFeatureId).toBeDefined();

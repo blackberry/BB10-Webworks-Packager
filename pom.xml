@@ -160,7 +160,7 @@
                         <configuration>
                             <executable>jake</executable>
                             <arguments>
-                                <argument>build</argument>
+                                <argument>build[${scm}]</argument>
                             </arguments>
                             <successCodes>
                                 <successCode>0</successCode>
