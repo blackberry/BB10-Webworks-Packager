@@ -2,7 +2,8 @@
 <widget xmlns=" http://www.w3.org/ns/widgets"
         xmlns:rim="http://www.blackberry.com/ns/widgets"
         version="1.0.0"
-        id="My WidgetId">
+        id="My WidgetId"
+        rim:header="RIM-Widget:rim/widget">
     <name>Demo</name>
     <content src="local:///startPage.html"/>
     <author rim:copyright="No Copyright"
@@ -16,8 +17,13 @@
         <rim:permit>read_geolocation</rim:permit>
         <rim:permit>use_camera</rim:permit>
     </rim:permissions>
-    <rim:orientation mode="portrait" />
-    <feature id="blackberry.app" required="true" version="1.0.0.0"/>
+    <feature id="blackberry.app.orientation">
+        <param name="mode" value="portrait" />
+        <param name="other" value="portrait" />
+      </feature>
+    <feature id="blackberry.app" required="true" version="1.0.0.0">
+        <param name="childBrowser" value="disable" />
+    </feature>
     <feature id="blackberry.system" required="true" version="1.0.0.3"/>
     <access uri="http://www.somedomain1.com" subdomains="true">
         <feature id="blackberry.app" required="true" version="1.0.0.0"/>

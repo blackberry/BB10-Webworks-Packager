@@ -39,9 +39,11 @@ function _handle(func) {
     };
 }
 
-module.exports = _handle(function () {
+module.exports = _handle(function (buildEnv) {
     var build = jWorkflow.order(clean)
-                        .andThen(pack);
+                        .andThen(function () {
+                            pack(buildEnv);
+                        });
 
     build.start(function (error) {
         _done(error);

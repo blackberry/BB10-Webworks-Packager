@@ -1,4 +1,5 @@
 var srcPath = __dirname + "/../../../lib/",
+    barconf = require(srcPath + "bar-conf.js"),
     fs = require("fsext"),
     path = require("path"),
     util = require("util"),
@@ -6,8 +7,10 @@ var srcPath = __dirname + "/../../../lib/",
     localize = require(srcPath + "localize"),
     wrench = require("wrench"),
     logger = require(srcPath + "logger"),
+    conf = require(srcPath + "conf"),
     fileMgr = require(srcPath + "file-manager"),
     testData = require("./test-data"),
+    testUtilities = require("./test-utilities"),
     session = testData.session,
     extManager = {
         getAllExtensionsToCopy: function (accessList) {
@@ -19,13 +22,16 @@ var srcPath = __dirname + "/../../../lib/",
     };
 
 describe("File manager", function () {
+
     it("prepareOutputFiles() should copy files and unzip archive", function () {
+        spyOn(wrench, "copyDirSyncRecursive");
         fileMgr.prepareOutputFiles(session);
 
         expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
-        expect(path.existsSync(session.sourcePaths.UI)).toBeTruthy();
+        expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(session.conf.DEPENDENCIES_BOOTSTRAP, session.sourcePaths.CHROME);
         expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
     });
+
 
     it("copyWWE() should copy wwe of the specified target", function () {
         spyOn(fs, "copySync");
@@ -206,7 +212,21 @@ describe("File manager", function () {
         expect(fs.statSync(session.sourceDir + "/startPage.html").isFile()).toBeTruthy();
         expect(fs.statSync(session.sourceDir + "/config.xml").isFile()).toBeTruthy();
         expect(fs.statSync(session.sourceDir + "/test.png").isFile()).toBeTruthy();
-        expect(fs.statSync(session.sourceDir + "/webworks.js").isFile()).toBeTruthy();
+    });
+
+
+    it("copyWebworks() should copy and rename versioned webworks.js", function () {
+        fileMgr.copyWebworks(session);
+        expect(fs.statSync(session.sourceDir + "/chrome/webworks.js").isFile()).toBeTruthy();
+    });
+
+    it("copyWebworks() throws an error when too many webworks.js files exist", function () {
+        var tmpFilePath = path.normalize(session.conf.ROOT + "/clientFiles/webworks-1.0.0.2.js");
+        fs.writeFileSync(tmpFilePath, "Mock webworks.js");
+        expect(function () {
+            fileMgr.copyWebworks(session);
+        }).toThrow(new Error(localize.translate("EXCEPTION_WEBWORKS_JS_IN_CLIENT_FILES_DIR", 2)));
+        fs.unlinkSync(tmpFilePath);
     });
 
     it("cleanSource() should delete source folder", function () {
@@ -215,4 +235,36 @@ describe("File manager", function () {
         fileMgr.cleanSource(session);
         expect(path.existsSync(session.sourceDir)).toBeFalsy();
     });
+
+    it("prepareOutputFiles() should copy files if a folder is sent in", function () {
+        spyOn(wrench, "copyDirSyncRecursive");
+        fileMgr.prepareOutputFiles(session);
+
+        expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
+        expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(session.conf.DEPENDENCIES_BOOTSTRAP, session.sourcePaths.CHROME);
+        expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
+    });
+
+    it("prepareOutputFiles() should copy files if a folder is sent in without .bbwpignore", function () {
+        var oldPathExistsSync = path.existsSync;
+        spyOn(path, "existsSync").andCallFake(function (ipath) {
+            return path.basename(ipath) === conf.BBWP_IGNORE_FILENAME ? false : oldPathExistsSync(ipath);
+        });
+        spyOn(wrench, "copyDirSyncRecursive");
+        fileMgr.prepareOutputFiles(session);
+
+        expect(path.existsSync(session.sourcePaths.CHROME)).toBeTruthy();
+        expect(wrench.copyDirSyncRecursive).toHaveBeenCalledWith(session.conf.DEPENDENCIES_BOOTSTRAP, session.sourcePaths.CHROME);
+        expect(path.existsSync(session.sourcePaths.LIB)).toBeTruthy();
+    });
+
+    it("prepareOutputFiles() should throw an error if the archive path doesn't exist", function () {
+        spyOn(wrench, "copyDirSyncRecursive");
+        var tempSession = testUtilities.cloneObj(session);
+        tempSession.archivePath = path.resolve("test/non-existant.zip");
+        expect(function () {
+            fileMgr.prepareOutputFiles(tempSession);
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ARCHIVE_PATH", tempSession.archivePath));
+    });
+
 });
