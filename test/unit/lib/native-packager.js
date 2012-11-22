@@ -123,19 +123,26 @@ describe("Native packager", function () {
             "<asset>xyz</asset>" +
             "<entryPointType>Qnx/WebKit</entryPointType>" +
             "<initialWindow><systemChrome>none</systemChrome><transparent>true</transparent><autoOrients>true</autoOrients></initialWindow>" +
-            "<env value=\"8\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>" +
-            "<env value=\"1.0.0.7\" var=\"WEBWORKS_VERSION\"></env>" +
-            "<permission system=\"true\">run_native</permission>" +
+            "<env value=\"8\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>",
+
+            bbTabletXML2 = "<permission system=\"true\">run_native</permission>" +
             "<permission system=\"false\">access_internet</permission>" +
             "<name>" + config.name['default'] + "</name>" +
             "<description>" + config.description['default'] + "</description></qnx>",
             cmd = path.normalize(session.conf.DEPENDENCIES_TOOLS + "/bin/blackberry-nativepackager" + (pkgrUtils.isWindows() ? ".bat" : ""));
 
-        spyOn(pkgrUtils, "writeFile");
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (sourceDir, outputDir, data) {
+            expect(sourceDir).toEqual(session.sourceDir);
+            expect(outputDir).toEqual(conf.BAR_DESCRIPTOR);
+
+            //We have to validate the xml data in 2 chucks, because the WEBWORKS_VERSION env variable
+            //has a different value for SCM builds and we can't mock the webworks-info file
+            expect(data).toContain(bbTabletXML);
+            expect(data).toContain(bbTabletXML2);
+        });
         nativePkgr.exec(session, target, testData.config, callback);
 
         expect(fs.writeFileSync).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(String));
-        expect(pkgrUtils.writeFile).toHaveBeenCalledWith(session.sourceDir, conf.BAR_DESCRIPTOR, bbTabletXML);
         expect(childProcess.spawn).toHaveBeenCalledWith(cmd, ["@options"], {"cwd": session.sourceDir, "env": process.env});
         expect(callback).toHaveBeenCalledWith(0);
     });
