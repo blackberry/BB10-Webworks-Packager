@@ -66,7 +66,8 @@ module.exports = {
             "xmlns:rim": "http://www.blackberry.com/ns/widgets",
             "version": "1.0.0",
             "id": "myID",
-            "rim:header" : "RIM-Widget:rim/widget"
+            "rim:header" : "RIM-Widget:rim/widget",
+            "rim:userAgent" : "A Test-User-Agent/(Blackberry-Agent)"
         },
         "name": "Demo",
         "content": {

@@ -3,7 +3,8 @@
         xmlns:rim="http://www.blackberry.com/ns/widgets"
         version="1.0.0"
         id="My WidgetId"
-        rim:header="RIM-Widget:rim/widget">
+        rim:header="RIM-Widget:rim/widget"
+        rim:userAgent="A Test-User-Agent/(Blackberry-Agent)">
     <name>Demo</name>
     <content src="local:///startPage.html"/>
     <author rim:copyright="No Copyright"
