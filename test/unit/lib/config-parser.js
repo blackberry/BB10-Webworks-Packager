@@ -1236,6 +1236,24 @@ describe("config parser", function () {
             });
         });
 
+        it("can properly parse the custom attributes but ignores improper headers", function () {
+            var data = testUtilities.cloneObj(testData.xml2jsConfig);
+            data["@"] = {
+                "xmlns": " http://www.w3.org/ns/widgets",
+                "xmlns:rim": "http://www.blackberry.com/ns/widgets",
+                "version": "1.0.0",
+                "id": "myID",
+                "rim:userAgent" : "A Test-User-Agent/(Blackberry-Agent)"
+            };
+
+            mockParsing(data);
+
+            configParser.parse(configPath, session, extManager, function (configObj) {
+                expect(configObj.id).toEqual("myID");
+                expect(configObj.userAgent).toEqual("A Test-User-Agent/(Blackberry-Agent)");
+            });
+        });
+
         describe('disabling childBrowser (childWebView)', function () {
 
             // { '@': { id: 'blackberry.app', required: true, version: '1.0.0.0' },
