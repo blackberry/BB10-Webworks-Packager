@@ -85,6 +85,29 @@ describe("Session", function () {
         expect(result.buildId).toEqual('100');
     });
     
+    it("sets the appdesc correctly when specified [--appdesc C:/path/bardescriptor.xml]", function () {
+        testUtils.mockResolve(path);
+
+        var data = {
+            args: [ 'C:/sampleApp/sample.zip' ],
+            appdesc: 'C:/path/bardescriptor.xml' //equivalent to [--appdesc C:/path/bardescriptor.xml]
+        },
+        result = session.initialize(data);
+
+        expect(result.appdesc).toEqual(path.normalize("C:/path/bardescriptor.xml"));
+    });
+    
+    it("sets the appdesc correctly when not specified", function () {
+        testUtils.mockResolve(path);
+
+        var data = {
+            args: [ 'C:/sampleApp/sample.zip' ]
+        },
+        result = session.initialize(data);
+
+        expect(result.appdesc).toBeUndefined();
+    });
+    
     it("sets the output directory correctly when specified with a relative path [-o myOutput]", function () {
         var bbwpDir = __dirname + "/../../../",
         data = {

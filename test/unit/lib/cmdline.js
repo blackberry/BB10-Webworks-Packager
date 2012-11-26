@@ -58,6 +58,11 @@ describe("Command line", function () {
         expect(cmd.buildId).toEqual("100");
     });
 
+    it("accepts --appdesc with argument", function () {
+        cmd.parseOptions(["--appdesc", "bardescriptor"]);
+        expect(cmd.appdesc).toEqual("bardescriptor");
+    });
+
     it("throws an error for invalid multi-word arguments", function () {
         expect(function () {
             require(srcPath + "cmdline").parse(["--src"]);

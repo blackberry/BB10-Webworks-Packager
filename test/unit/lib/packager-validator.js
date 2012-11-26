@@ -152,6 +152,20 @@ describe("Packager Validator", function () {
         expect(logger.warn).toHaveBeenCalledWith(localize.translate("WARNING_MISSING_SIGNING_KEY_FILE", "barsigner.db"));
     });
     
+    it("throws an exception when appdesc was not found", function () {
+        var session = testUtilities.cloneObj(testData.session),
+            configObj = testUtilities.cloneObj(testData.config);
+
+        //setup appdesc which is not existing
+        session.buildId = undefined;
+        configObj.buildId = undefined;
+        session.appdesc = "c:/bardescriptor.xml";
+
+        expect(function () {
+            packagerValidator.validateSession(session, configObj);
+        }).toThrow(localize.translate("EXCEPTION_APPDESC_NOT_FOUND", "c:/bardescriptor.xml"));
+    });
+    
     it("throws an exception when a password [-g] was set with no buildId", function () {
         var session = testUtilities.cloneObj(testData.session),
             configObj = testUtilities.cloneObj(testData.config);
