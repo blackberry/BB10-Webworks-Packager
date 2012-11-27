@@ -1284,5 +1284,33 @@ describe("config parser", function () {
                 });
             });
         });
+
+        describe('disabling formcontrol', function () {
+
+            it("sets enableFormControl to true when formControl value is enable", function () {
+                var data = testUtilities.cloneObj(testData.xml2jsConfig);
+                data['feature'] = { '@': { id: 'blackberry.app' },
+                    param: { '@': { name: 'formControl', value: 'enable' } } };
+
+                mockParsing(data);
+
+                configParser.parse(configPath, session, extManager, function (configObj) {
+                    expect(configObj.enableFormControl).toBe(true);
+                });
+            });
+
+            it("sets enableFormControl to false when value is disable", function () {
+                var data = testUtilities.cloneObj(testData.xml2jsConfig);
+                data['feature'] = { '@': { id: 'blackberry.app' },
+                    param: { '@': { name: 'formControl', value: 'disable' } } };
+
+                mockParsing(data);
+
+                configParser.parse(configPath, session, extManager, function (configObj) {
+                    expect(configObj.enableFormControl).toBe(false);
+                });
+            });
+        });
+
     });
 });
