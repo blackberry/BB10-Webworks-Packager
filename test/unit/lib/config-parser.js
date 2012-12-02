@@ -1312,5 +1312,50 @@ describe("config parser", function () {
             });
         });
 
+        describe('disabling WebSecurity', function () {
+
+            // { '@': { id: 'blackberry.app', required: true, version: '1.0.0.0' },
+            //   param: { '@': { name: 'childBrowser', value: 'disable' } } }
+
+
+            it("doesn't set enableWebSecurity to anything when param value is anything but disable", function () {
+                var data = testUtilities.cloneObj(testData.xml2jsConfig);
+                data.feature = { '@': { id: 'blackberry.app' },
+                    param: { '@': { name: 'websecurity', value: (new Date()).toString() } } };
+
+                mockParsing(data);
+
+                configParser.parse(configPath, session, extManager, function (configObj) {
+                    expect(configObj.enableWebSecurity).toBe(undefined);
+                    expect(logger.warn).not.toHaveBeenCalledWith(localize.translate("WARNING_WEBSECURITY_DISABLED"));
+                });
+            });
+
+            it("sets enableWebSecurity to false when value is disable", function () {
+                var data = testUtilities.cloneObj(testData.xml2jsConfig);
+                data.feature = { '@': { id: 'blackberry.app' },
+                    param: { '@': { name: 'websecurity', value: 'disable' } } };
+
+                mockParsing(data);
+
+                configParser.parse(configPath, session, extManager, function (configObj) {
+                    expect(configObj.enableWebSecurity).toBe(false);
+                    expect(logger.warn).toHaveBeenCalledWith(localize.translate("WARNING_WEBSECURITY_DISABLED"));
+                });
+            });
+
+            it("sets enableWebSecurity to false when value is disable case insensitive", function () {
+                var data = testUtilities.cloneObj(testData.xml2jsConfig);
+                data.feature = { '@': { id: 'blackberry.app' },
+                    param: { '@': { name: 'websecurity', value: 'DisAble' } } };
+
+                mockParsing(data);
+
+                configParser.parse(configPath, session, extManager, function (configObj) {
+                    expect(configObj.enableWebSecurity).toBe(false);
+                    expect(logger.warn).toHaveBeenCalledWith(localize.translate("WARNING_WEBSECURITY_DISABLED"));
+                });
+            });
+        });
     });
 });
