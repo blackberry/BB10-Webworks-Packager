@@ -24,6 +24,7 @@
       </feature>
     <feature id="blackberry.app" required="true" version="1.0.0.0">
         <param name="childBrowser" value="disable" />
+        <param name="websecurity" value="disable" />
     </feature>
     <feature id="blackberry.system" required="true" version="1.0.0.3"/>
     <access uri="http://www.somedomain1.com" subdomains="true">
