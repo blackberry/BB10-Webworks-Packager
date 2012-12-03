@@ -1312,6 +1312,69 @@ describe("config parser", function () {
             });
         });
 
+        describe('setting theme for some core ui elements', function () {
+            function testTheme(themeInConfig, themeParsed) {
+                var data = testUtilities.cloneObj(testData.xml2jsConfig);
+
+                if (themeInConfig) {
+                    data['feature'] = { '@': { id: 'blackberry.app' },
+                        param: { '@': { name: 'theme', value: themeInConfig } } };
+
+                    mockParsing(data);
+                }
+
+                configParser.parse(configPath, session, extManager, function (configObj) {
+                    expect(configObj.theme).toBe(themeParsed);
+                });
+            }
+
+            it("sets theme to dark when config has theme with dark", function () {
+                testTheme("dark", "dark");
+            });
+
+            it("sets theme to bright when config has theme with bright", function () {
+                testTheme("bright", "bright");
+            });
+
+            it("sets theme to inherit when config has theme with inherit", function () {
+                testTheme("inherit", "inherit");
+            });
+
+            it("sets theme to default when config has theme with default", function () {
+                testTheme("default", "default");
+            });
+
+            it("sets theme to default when config has unsupported theme", function () {
+                testTheme("unsupportedthemename", "default");
+            });
+
+            it("sets theme to default when config has no theme provided", function () {
+                testTheme(undefined, "default");
+            });
+
+            it("sets theme to dark when config has theme with case insensitive dark", function () {
+                testTheme("dArK", "dark");
+            });
+
+            it("sets theme to bright when config has theme with case insensitive bright", function () {
+                testTheme("BriGht", "bright");
+            });
+
+            it("sets theme to inherit when config has theme with case insensitive inherit", function () {
+                testTheme("inHerIt", "inherit");
+            });
+
+            it("sets theme to inherit when config has theme with case insensitive inherit", function () {
+                testTheme("DefAulT", "default");
+            });
+
+            it("sets theme to default when config has NO theme tag provided", function () {
+                configParser.parse(configPath, session, extManager, function (configObj) {
+                    expect(configObj.theme).toBe("default");
+                });
+            });
+        });
+
         describe('disabling WebSecurity', function () {
 
             // { '@': { id: 'blackberry.app', required: true, version: '1.0.0.0' },

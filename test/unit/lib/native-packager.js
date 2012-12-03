@@ -122,6 +122,7 @@ describe("Native packager", function () {
             "<asset>abc</asset>" +
             "<asset>xyz</asset>" +
             "<entryPointType>Qnx/WebKit</entryPointType>" +
+            "<cascadesTheme>" + config.theme + "</cascadesTheme>" +
             "<initialWindow><systemChrome>none</systemChrome><transparent>true</transparent><autoOrients>true</autoOrients></initialWindow>" +
             "<env value=\"8\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>",
 
