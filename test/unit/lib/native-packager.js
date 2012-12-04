@@ -147,6 +147,30 @@ describe("Native packager", function () {
         expect(callback).toHaveBeenCalledWith(0);
     });
 
+    it("makes sure slog2 logging is enabled in debug mode", function () {
+        var tabletXMLEntry = "<env value=\"slog2\" var=\"CONSOLE_MODE\"></env>";
+
+        //Silence the logger during unit tests
+        spyOn(logger, "warn").andCallFake(function () { });
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (sourceDir, outputDir, data) {
+            expect(data).toContain(tabletXMLEntry);
+        });
+
+        session.debug = true;
+        nativePkgr.exec(session, target, testData.config, callback);
+    });
+
+    it("makes sure slog2 logging is not enabled when not in debug mode", function () {
+            var tabletXMLEntry = "<env value=\"slog2\" var=\"CONSOLE_MODE\"></env>";
+
+        spyOn(pkgrUtils, "writeFile").andCallFake(function (sourceDir, outputDir, data) {
+            expect(data).not.toContain(tabletXMLEntry);
+        });
+
+        session.debug = false;
+        nativePkgr.exec(session, target, testData.config, callback);
+    });
+
     it("can process application name", function () {
         var config = testUtils.cloneObj(testData.config);
         config.name = {"default": "API Smoke Test"};
