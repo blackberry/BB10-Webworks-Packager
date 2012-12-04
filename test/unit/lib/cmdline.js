@@ -38,11 +38,16 @@ describe("Command line", function () {
         expect(cmd.debug).toBeTruthy();
     });
 
-    it("accepts -v", function () {
-        cmd.parseOptions(["-v"]);
-        expect(cmd.verbose).toBeTruthy();
+    it("accepts --loglevel with argument", function () {
+        cmd.parseOptions(["--loglevel", "warn"]);
+        expect(cmd.loglevel).toBe("warn");
     });
-    
+
+    it("accepts -ll", function () {
+        cmd.parseOptions(["-ll", "error"]);
+        expect(cmd.loglevel).toBe("error");
+    });
+
     it("accepts -g with argument", function () {
         cmd.parseOptions(["-g", "myPassword"]);
         expect(cmd.password).toEqual("myPassword");

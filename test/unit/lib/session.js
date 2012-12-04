@@ -177,4 +177,32 @@ describe("Session", function () {
             }).toThrow(localize.translate("EXCEPTION_PARAMS_FILE_ERROR", path.resolve("blah.json")));
         });
     });
+
+    describe("when setting the log level", function () {
+        var logger = require(__dirname + "/../../../lib/logger");
+
+        beforeEach(function () {
+            spyOn(logger, "level");
+        });
+
+        it("defaults to verbose with no args", function () {
+            session.initialize({args: []});
+            expect(logger.level).toHaveBeenCalledWith("verbose");
+        });
+
+        it("sets level to verbose", function () {
+            session.initialize({args: [], loglevel: 'verbose'});
+            expect(logger.level).toHaveBeenCalledWith("verbose");
+        });
+
+        it("sets level to warn", function () {
+            session.initialize({args: [], loglevel: 'warn'});
+            expect(logger.level).toHaveBeenCalledWith("warn");
+        });
+
+        it("sets level to error", function () {
+            session.initialize({args: [], loglevel: 'error'});
+            expect(logger.level).toHaveBeenCalledWith("error");
+        });
+    });
 });
