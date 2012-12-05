@@ -7,6 +7,7 @@ This repo contains the code for the BlackBerry 10 WebWorks Packager and submodul
 2. Install [BlackBerry 10 Native SDK](http://developer.blackberry.com/native/beta/download/).
 3. Install [BlackBerry 10 WebWorks SDK](https://developer.blackberry.com/html5/download/sdk).
 4. [*Windows*] Add Git bin to PATH. i.e. `*Installation Directory*\bin`
+5. [*Linux*] Build node[v0.6.10+], ensure it works on your distro and copy the binary into `third_party\node\linux\` folder.
 
 ##Setup and Build
 1. `git clone https://github.com/blackberry-webworks/BB10-Webworks-Packager.git`
