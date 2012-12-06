@@ -161,7 +161,7 @@ describe("Native packager", function () {
     });
 
     it("makes sure slog2 logging is not enabled when not in debug mode", function () {
-            var tabletXMLEntry = "<env value=\"slog2\" var=\"CONSOLE_MODE\"></env>";
+        var tabletXMLEntry = "<env value=\"slog2\" var=\"CONSOLE_MODE\"></env>";
 
         spyOn(pkgrUtils, "writeFile").andCallFake(function (sourceDir, outputDir, data) {
             expect(data).not.toContain(tabletXMLEntry);
