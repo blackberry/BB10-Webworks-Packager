@@ -1,5 +1,5 @@
 var testData = require("./test-data"),
-    fs = require("fsext"),
+    fs = require("fs"),
     path = require("path"),
     extManager = require(testData.libPath + "/extension-manager"),
     packagerUtils = require(testData.libPath + "/packager-utils"),
@@ -42,7 +42,7 @@ function loadModule(module) {
 describe("Extension manager", function () {
 
     beforeEach(function () {
-        spyOn(path, "existsSync").andReturn(true);
+        spyOn(fs, "existsSync").andReturn(true);
         spyOn(fs, "readdirSync").andReturn(["app", "event", "system", "identity", "complex"]);
         spyOn(packagerUtils, "loadModule").andCallFake(loadModule);
 
@@ -80,7 +80,8 @@ describe("Extension manager", function () {
 
         mockParsing(data);
 
-        spyOn(fs, "copySync");
+        spyOn(fs, "readFileSync");
+        spyOn(fs, "writeFileSync");
 
         configParser.parse(configPath, session, result, function (config) {
             var allExt = result.getAllExtensionsToCopy(config.accessList);
@@ -109,7 +110,8 @@ describe("Extension manager", function () {
 
         mockParsing(data);
 
-        spyOn(fs, "copySync");
+        spyOn(fs, "readFileSync");
+        spyOn(fs, "writeFileSync");
         spyOn(logger, "warn");
 
         expect(function () {

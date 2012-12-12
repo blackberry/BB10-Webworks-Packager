@@ -1,12 +1,13 @@
 var testData = require("./test-data"),
     configParser = require(testData.libPath + "/config-parser"),
+    packagerUtils = require(testData.libPath + "/packager-utils"),
     fileManager = require(testData.libPath + "/file-manager"),
     logger = require(testData.libPath + "./logger"),
     testUtilities = require("./test-utilities"),
     xml2js = require('xml2js'),
     localize = require(testData.libPath + "/localize"),
     path = require("path"),
-    fs = require("fsext"),
+    fs = require("fs"),
     session = testData.session,
     configPath = path.resolve("test/config.xml"),
     configBadPath = path.resolve("test2/config.xml"),
@@ -22,8 +23,8 @@ var testData = require("./test-data"),
 
 describe("config parser", function () {
     beforeEach(function () {
-        spyOn(fs, "copySync");
         spyOn(logger, "warn");
+        spyOn(packagerUtils, "copyFile");
     });
 
     it("tries to open a config.xml file that doesn't exist", function () {
@@ -1087,14 +1088,13 @@ describe("config parser", function () {
 
         it("should copy the default icon to the src dir when no icon specified", function () {
             var data = testUtilities.cloneObj(testData.xml2jsConfig);
-
             mockParsing(data);
 
             expect(function () {
                 configParser.parse(configPath, session, extManager, function (configObj) {});
             }).not.toThrow();
 
-            expect(fs.copySync).toHaveBeenCalled();
+            expect(packagerUtils.copyFile).toHaveBeenCalled();
         });
 
         it("should use the default icon config when no icon is specified", function () {

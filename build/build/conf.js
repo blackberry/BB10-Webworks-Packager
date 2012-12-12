@@ -13,18 +13,19 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-var path = require("path");
+var path = require("path"),
+    fs = require("fs");
 
 function getToolsDir() {
     var localTools = path.normalize(__dirname + "/../../dependencies/tools"),
         bbndkDir;
 
     //Check if dependencies/tools folder exists
-    if (path.existsSync(localTools)) {
+    if (fs.existsSync(localTools)) {
         return localTools;
     } else if (process.env && process.env["QNX_HOST"]) {
         bbndkDir = path.join(process.env["QNX_HOST"], "usr");
-        if (path.existsSync(bbndkDir)) {
+        if (fs.existsSync(bbndkDir)) {
             //BBNDK exists on path, use its tools
             return bbndkDir;
         }

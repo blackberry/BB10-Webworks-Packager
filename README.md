@@ -3,7 +3,7 @@ WebWorks is an application framework and packaging tool that allows a developer 
 This repo contains the code for the BlackBerry 10 WebWorks Packager and submodules the Framework.
 
 ##Prerequisites
-1. Install [node[v0.6.10] and npm](http://nodejs.org/dist/v0.6.10/) and add to path.
+1. Install [node and npm](http://nodejs.org/download/)[v0.8.14+] and add to path.
 2. Install [BlackBerry 10 Native SDK](http://developer.blackberry.com/native/beta/download/).
 3. Install [BlackBerry 10 WebWorks SDK](https://developer.blackberry.com/html5/download/sdk).
 4. [*Windows*] Add Git bin to PATH. i.e. `*Installation Directory*\bin`

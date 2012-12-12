@@ -16,7 +16,7 @@
 var testData = require("./test-data"),
     i18nMgr = require(testData.libPath + "/i18n-manager"),
     session = testData.session,
-    path = require("path"),
+    fs = require("fs"),
     wrench = require("wrench"),
     pkgrUtils = require(testData.libPath + "/packager-utils");
 
@@ -39,7 +39,7 @@ describe("i18n manager", function () {
             },
             xmlObject = {};
 
-        spyOn(path, "existsSync").andReturn(true);
+        spyOn(fs, "existsSync").andReturn(true);
         spyOn(wrench, "readdirSyncRecursive").andReturn(mockOSReturnFiles([
             'fr',
             'fr/logo.png'
@@ -69,7 +69,7 @@ describe("i18n manager", function () {
             },
             xmlObject = {};
 
-        spyOn(path, "existsSync").andReturn(false);
+        spyOn(fs, "existsSync").andReturn(false);
 
         i18nMgr.generateLocalizedMetadata(session, config, xmlObject, "icon");
 
@@ -87,7 +87,7 @@ describe("i18n manager", function () {
             },
             xmlObject = {};
 
-        spyOn(path, "existsSync").andReturn(true);
+        spyOn(fs, "existsSync").andReturn(true);
         spyOn(wrench, "readdirSyncRecursive").andReturn(mockOSReturnFiles([
             'fr',
             'fr/logo-mismatch.png'
@@ -109,7 +109,7 @@ describe("i18n manager", function () {
             },
             xmlObject = {};
 
-        spyOn(path, "existsSync").andReturn(true);
+        spyOn(fs, "existsSync").andReturn(true);
         spyOn(wrench, "readdirSyncRecursive").andReturn(mockOSReturnFiles([
             'fr',
             'fr/assets/images/logo.png'
@@ -139,7 +139,7 @@ describe("i18n manager", function () {
             },
             xmlObject = {};
 
-        spyOn(path, "existsSync").andReturn(true);
+        spyOn(fs, "existsSync").andReturn(true);
         spyOn(wrench, "readdirSyncRecursive").andReturn(mockOSReturnFiles([
             'fr',
             'fr/splash-1280x768.jpg',
@@ -181,7 +181,7 @@ describe("i18n manager", function () {
             },
             xmlObject = {};
 
-        spyOn(path, "existsSync").andReturn(false);
+        spyOn(fs, "existsSync").andReturn(false);
 
         i18nMgr.generateLocalizedMetadata(session, config, xmlObject, "rim:splash");
 
@@ -202,7 +202,7 @@ describe("i18n manager", function () {
             },
             xmlObject = {};
 
-        spyOn(path, "existsSync").andReturn(true);
+        spyOn(fs, "existsSync").andReturn(true);
         spyOn(wrench, "readdirSyncRecursive").andReturn(mockOSReturnFiles([
             'fr',
             'fr/splash-1280x768-mismatch.jpg',
@@ -236,7 +236,7 @@ describe("i18n manager", function () {
             },
             xmlObject = {};
 
-        spyOn(path, "existsSync").andReturn(true);
+        spyOn(fs, "existsSync").andReturn(true);
         spyOn(wrench, "readdirSyncRecursive").andReturn(mockOSReturnFiles([
             'fr',
             'fr/assets/images/splash-1280x768.jpg',

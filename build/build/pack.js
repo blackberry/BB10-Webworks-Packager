@@ -20,9 +20,9 @@ var wrench = require("wrench"),
     path = require("path");
 
 function copyFolder(source, destination) {
-    if (path.existsSync(source)) {
+    if (fs.existsSync(source)) {
         //create the destination folder if it does not exist
-        if (!path.existsSync(destination)) {
+        if (!fs.existsSync(destination)) {
             wrench.mkdirSyncRecursive(destination, "0755");
         }
 
@@ -72,7 +72,7 @@ module.exports = function (buildEnv) {
     //Add execute permissions to node binaries
     fs.chmodSync(nodeFileMac, '0755');
     fs.chmodSync(nodeFileWindows, '0755');
-    if (path.existsSync(nodeFileLinux)) {
+    if (fs.existsSync(nodeFileLinux)) {
         //User included linux binary, chmod that as well
         fs.chmodSync(nodeFileLinux, '0755');
     }
@@ -81,7 +81,7 @@ module.exports = function (buildEnv) {
     fs.chmodSync(path.join(_c.DEPLOY, "bbwp"), '0755');
     fs.chmodSync(path.join(_c.DEPLOY, "bbwp.bat"), '0755');
 
-    if (path.existsSync(toolsDest)) {
+    if (fs.existsSync(toolsDest)) {
         //Add execute permissions to bbndk tools directory
         wrench.chmodSyncRecursive(toolsDest, '0755');
     }
