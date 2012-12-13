@@ -3,11 +3,11 @@ WebWorks is an application framework and packaging tool that allows a developer 
 This repo contains the code for the BlackBerry 10 WebWorks Packager and submodules the Framework.
 
 ##Prerequisites
-1. Install [node and npm](http://nodejs.org/download/)[v0.8.14+] and add to path.
+1. Install [node and npm](http://nodejs.org/download/) [v0.8.14+] and add to path.
 2. Install [BlackBerry 10 Native SDK](http://developer.blackberry.com/native/beta/download/).
-3. Install [BlackBerry 10 WebWorks SDK](https://developer.blackberry.com/html5/download/sdk).
+3. Install [BlackBerry 10 WebWorks SDK](https://developer.blackberry.com/html5/download/sdk). [optional - improves build time]
 4. [*Windows*] Add Git bin to PATH. i.e. `*Installation Directory*\bin`
-5. [*Linux*] Build node[v0.6.10+], ensure it works on your distro and copy the binary into `third_party\node\linux\` folder.
+5. [*Linux*] Build node [v0.8.14+], ensure it works on your distro and copy the binary into `third_party\node\linux\` folder.
 
 ##Setup and Build
 1. `git clone https://github.com/blackberry-webworks/BB10-Webworks-Packager.git`
@@ -16,7 +16,7 @@ This repo contains the code for the BlackBerry 10 WebWorks Packager and submodul
 4. **Setup bbndk environment variables:** (must be done within each session, prior to jake)
     - [*Mac/Linux*] `source *BBNDK installation directory*/bbndk-env.sh`
     - [*Windows*] `*BBNDK installation directory*\bbndk-env.bat`
-5. **Copy Dependencies:** <br />
+5. **Copy Dependencies:** [optional - improves build time]<br />
     Copy the `dependencies` directory from the latest [BlackBerry 10 WebWorks SDK](https://developer.blackberry.com/html5/download/sdk) into the cloned `BB10-WebWorks-Packager` folder. For more details on how to install go [here](https://developer.blackberry.com/html5/documentation/install_and_configure_ww_bb10_2007535_11.html).
 6. **Configuration:**
     - [*Mac/Linux*] `./configure` [from terminal]
@@ -32,12 +32,9 @@ Please ensure you build your application from the "target/zip" folder and not th
 Otherwise the resulting bar won't launch.
 
 ##Common issues
- ```
-Cloning into dependencies/webplatform... error: Couldn't resolve host 'github.rim.net' while accessing
-http://github.rim.net/webworks/webplatform.git/info/refs
-```
+Problem: Native build errors when running jake.
 <br />
-Solution: This error can be ignored, but please see the "Setup and Build" - "Webplatform setup:" section above for instructions on copying the necessary webplatform files.
+Solution: Usually running `jake clean` and then `jake` will fix any native build errors.
 
 ## Authors
 * [Bryan Higgins](http://github.com/bryanhiggins)
