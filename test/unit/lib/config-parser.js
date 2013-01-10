@@ -128,6 +128,30 @@ describe("config parser", function () {
         });
     });
 
+    it("fails when id is undefined", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["@"].id = undefined;
+
+        mockParsing(data);
+
+        //Should throw an EXCEPTION_INVALID_ID error
+        expect(function () {
+            configParser.parse(configPath, session, extManager, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ID"));
+    });
+
+    it("fails when id is empty", function () {
+        var data = testUtilities.cloneObj(testData.xml2jsConfig);
+        data["@"].id = "";
+
+        mockParsing(data);
+
+        //Should throw an EXCEPTION_INVALID_ID error
+        expect(function () {
+            configParser.parse(configPath, session, extManager, {});
+        }).toThrow(localize.translate("EXCEPTION_INVALID_ID"));
+    });
+
     it("Fails when no name was provided - single element", function () {
         var data = testUtilities.cloneObj(testData.xml2jsConfig);
         data.name = "";
