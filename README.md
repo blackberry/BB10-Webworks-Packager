@@ -11,7 +11,7 @@ This repo contains the code for the BlackBerry 10 WebWorks Packager and submodul
 
 ##Setup and Build
 1. `git clone https://github.com/blackberry-webworks/BB10-Webworks-Packager.git`
-2. `cd BB10-WebWorks-Packager`
+2. `cd BB10-Webworks-Packager`
 3. `git checkout master`
 4. **Setup bbndk environment variables:** (must be done within each session, prior to jake)
     - [*Mac/Linux*] `source *BBNDK installation directory*/bbndk-env.sh`
