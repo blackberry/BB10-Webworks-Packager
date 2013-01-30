@@ -133,12 +133,36 @@ describe("i18n manager", function () {
         });
     });
 
-    it("generate correct metadata for splash", function () {
+    it("generate correct metadata for icon when image is in subfolder and OS is windows", function () {
+        var config = {
+                icon: ["assets\\images\\logo.png"]
+            },
+            xmlObject = {};
+
+        spyOn(pkgrUtils, 'isWindows').andReturn(true);
+        spyOn(fs, "existsSync").andReturn(true);
+        spyOn(wrench, "readdirSyncRecursive").andReturn(mockOSReturnFiles([
+            'fr',
+            'fr\\assets\\images\\logo.png'
+        ]));
+
+        i18nMgr.generateLocalizedMetadata(session, config, xmlObject, "icon");
+
+        expect(xmlObject.icon).toBeDefined();
+        expect(xmlObject.icon.image).toBeDefined();
+        expect(xmlObject.icon.image.length).toBe(1);
+        expect(xmlObject.icon.image).toContain({
+            _value: "assets/images/logo.png"
+        });
+    });
+
+    it("generate correct metadata for splash and OS is *nx", function () {
         var config = {
                 "rim:splash": ["splash-1280x768.jpg", "splash-768x1280.jpg"]
             },
             xmlObject = {};
 
+        spyOn(pkgrUtils, 'isWindows').andReturn(false);
         spyOn(fs, "existsSync").andReturn(true);
         spyOn(wrench, "readdirSyncRecursive").andReturn(mockOSReturnFiles([
             'fr',
