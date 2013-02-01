@@ -123,9 +123,7 @@ describe("Native packager", function () {
             "<asset>xyz</asset>" +
             "<entryPointType>Qnx/WebKit</entryPointType>" +
             "<cascadesTheme>" + config.theme + "</cascadesTheme>" +
-            "<initialWindow><systemChrome>none</systemChrome><transparent>true</transparent><autoOrients>true</autoOrients></initialWindow>" +
-            "<env value=\"8\" var=\"WEBKIT_NUMBER_OF_BACKINGSTORE_TILES\"></env>",
-
+            "<initialWindow><systemChrome>none</systemChrome><transparent>true</transparent><autoOrients>true</autoOrients></initialWindow>",
             bbTabletXML2 = "<permission system=\"true\">run_native</permission>" +
             "<permission system=\"false\">access_internet</permission>" +
             "<name>" + config.name['default'] + "</name>" +
