@@ -53,6 +53,7 @@ describe("config parser", function () {
             expect(configObj.permissions).toContain('read_geolocation');
             expect(configObj.permissions).toContain('use_camera');
             expect(configObj.enableChildWebView).toBe(false);
+            expect(configObj.enableChildWebView).toBe(false);
         });
     });
 
@@ -1441,6 +1442,36 @@ describe("config parser", function () {
                 configParser.parse(configPath, session, extManager, function (configObj) {
                     expect(configObj.enableWebSecurity).toBe(false);
                     expect(logger.warn).toHaveBeenCalledWith(localize.translate("WARNING_WEBSECURITY_DISABLED"));
+                });
+            });
+        });
+
+        describe('enabling popupBlocker', function () {
+
+            // { '@': { id: 'blackberry.app', required: true, version: '1.0.0.0' },
+            //   param: { '@': { name: 'childBrowser', value: 'disable' } } }
+
+            it("sets enableWebSecurity to false when value is disable", function () {
+                var data = testUtilities.cloneObj(testData.xml2jsConfig);
+                data.feature = { '@': { id: 'blackberry.app' },
+                    param: { '@': { name: 'popupBlocker', value: 'enable' } } };
+
+                mockParsing(data);
+
+                configParser.parse(configPath, session, extManager, function (configObj) {
+                    expect(configObj.enablePopupBlocker).toBe(true);
+                });
+            });
+
+            it("sets enableWebSecurity to false when value is disable case insensitive", function () {
+                var data = testUtilities.cloneObj(testData.xml2jsConfig);
+                data.feature = { '@': { id: 'blackberry.app' },
+                    param: { '@': { name: 'popupBlocker', value: 'EnAbLe' } } };
+
+                mockParsing(data);
+
+                configParser.parse(configPath, session, extManager, function (configObj) {
+                    expect(configObj.enablePopupBlocker).toBe(true);
                 });
             });
         });
